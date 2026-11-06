@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": { "zh": "Shiftloom 排班", "en": "Shiftloom" },
+  "description": {
+    "zh": "团队排班 SaaS 的英文官网：落地页（带排班表界面示意）和价格页（三档、对比表、常见问题）",
+    "en": "Marketing site for a team scheduling SaaS: a landing page with a drawn weekly-rota UI, and pricing with three plans, a comparison table and FAQ"
+  },
+  "kind": "web",
+  "screens": [
+    { "file": "home.html", "title": { "zh": "首页", "en": "Home" } },
+    { "file": "pricing.html", "title": { "zh": "价格", "en": "Pricing" } }
+  ],
+  "style": "minimal",
+  "categories": ["saas"],
+  "tags": ["landing", "pricing", "calendar", "dashboard"],
+  "lang": "en",
+  "license": "CC0-1.0",
+  "author": { "login": "orderg-x", "id": 271418316 },
+  "ai": { "generated": true, "tool": "dsh-design-studio@0.11.0" }
+}

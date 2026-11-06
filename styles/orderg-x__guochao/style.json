@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#FBF3E4",
+    "surface": "#FFFAF0",
+    "text": "#2A1410",
+    "muted": "#6F4A3A",
+    "line": "#E8D3B5",
+    "primary": "#B8202A",
+    "accent": "#C8952E",
+    "on": "#FFF7E6",
+    "link": "#A31D26"
+  },
+  "head": "SERIF",
+  "w": 800,
+  "radius": 6,
+  "shadow": "0 6px 18px rgba(140,30,20,.12)",
+  "dzh": "中国红配金、粗宋体、传统纹样",
+  "den": "Chinese red and gold, bold Song type, traditional patterns",
+  "nzh": "中国红的大色块配金色细线；标题用粗宋体，可以竖排；祥云、回纹、印章这类纹样用 SVG 画，只做点缀别铺满；底色是米黄纸色，不用纯白",
+  "nen": "Big Chinese-red blocks with fine gold lines; bold Song headings, vertical text allowed; clouds, fret borders and seal stamps drawn in SVG as accents only; rice-paper background, not pure white"
+}

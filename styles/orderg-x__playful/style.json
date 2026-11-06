@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#FFF7E8",
+    "surface": "#FFFFFF",
+    "text": "#1D1B3A",
+    "muted": "#5D5A82",
+    "line": "#1D1B3A",
+    "primary": "#FF6A3D",
+    "accent": "#1F9E92",
+    "on": "#1D1B3A",
+    "link": "#137167"
+  },
+  "head": "ROUND",
+  "w": 800,
+  "radius": 20,
+  "shadow": "4px 4px 0 #1D1B3A",
+  "dzh": "粗描边、硬阴影、贴纸感",
+  "den": "Thick outlines, hard shadows, sticker feel",
+  "nzh": "卡片和按钮 2px 深色描边 + 不模糊的硬阴影；主色按钮上用深色字；元素可以略微倾斜、像贴纸；颜色最多三种",
+  "nen": "2px dark outlines and hard, unblurred shadows on cards and buttons; dark text on the primary button; slightly tilted sticker-like bits; three colors max"
+}

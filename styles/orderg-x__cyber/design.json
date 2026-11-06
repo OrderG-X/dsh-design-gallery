@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "赛博朋克",
+    "en": "Cyberpunk"
+  },
+  "description": {
+    "zh": "近黑底、品红青色霓虹、等宽字",
+    "en": "Near-black, magenta and cyan neon, monospace"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

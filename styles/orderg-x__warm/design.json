@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "温暖手作",
+    "en": "Warm craft"
+  },
+  "description": {
+    "zh": "纸感底色、圆润、手绘感",
+    "en": "Paper tones, soft and rounded, hand-made feel"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

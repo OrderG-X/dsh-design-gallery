@@ -1,0 +1,143 @@
+* { box-sizing: border-box; }
+html { background: var(--bg); }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+h1, h2, h3, p { margin: 0; }
+svg { display: block; }
+.sprite { position: absolute; width: 0; height: 0; overflow: hidden; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* 状态栏：中间空着，灵动岛由外框画 */
+.status {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  height: var(--status-h);
+  padding: 4px 26px 0 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg);
+}
+.status-time { font-size: var(--fs-body); font-weight: 600; letter-spacing: .01em; }
+.status-icons { display: flex; align-items: center; gap: 6px; color: var(--text); }
+
+/* 标签栏：49 + 34 横条 */
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: 0 12px var(--home-bar);
+  background: var(--surface);
+  border-top: var(--hair);
+}
+.tab {
+  min-height: var(--tab-h);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font-size: var(--fs-micro);
+  letter-spacing: .12em;
+  color: var(--muted);
+}
+.tab svg { width: 24px; height: 24px; }
+.tab.is-on { color: var(--primary); font-weight: 600; }
+
+.page { padding: 0 var(--gutter) calc(var(--tab-h) + var(--home-bar) + var(--space-6)); }
+
+/* 图标 */
+.ico { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+/* 印章：朱砂只点一两处 */
+.seal {
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 3px;
+  background: var(--accent);
+  color: var(--on);
+  font-family: var(--font-serif);
+  font-size: var(--fs-h3);
+  font-weight: 600;
+  line-height: 1;
+  box-shadow: inset 0 0 0 2px var(--accent), inset 0 0 0 3px rgba(245, 242, 236, .55);
+}
+
+/* 小标题：前面一截细线 */
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--fs-meta);
+  letter-spacing: .24em;
+  color: var(--muted);
+}
+.eyebrow::before { content: ""; width: 16px; height: 1px; background: var(--muted); }
+
+.head {
+  font-family: var(--font-serif);
+  font-weight: var(--w-head);
+  letter-spacing: .12em;
+  color: var(--text);
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: var(--space-7) 0 var(--space-4);
+}
+.section-head h2 { font-size: var(--fs-h3); }
+.more {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-left: var(--space-3);
+  font-size: var(--fs-meta);
+  color: var(--muted);
+  letter-spacing: .08em;
+}
+
+.meta { font-size: var(--fs-meta); color: var(--muted); }
+
+/* 主按钮：墨色实底 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 50px;
+  padding: 0 var(--space-5);
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: var(--on);
+  font-size: var(--fs-body);
+  letter-spacing: .2em;
+  transition: transform .2s cubic-bezier(.2, .8, .2, 1), opacity .2s;
+}
+.btn:active { transform: scale(.98); opacity: .9; }
+.btn-ghost { background: transparent; color: var(--text); box-shadow: inset 0 0 0 1px var(--line); }
+
+.hairline { height: 1px; background: var(--line); border: 0; margin: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

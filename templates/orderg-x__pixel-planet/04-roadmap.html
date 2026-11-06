@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="dsh-design" content="slides">
+<title>上线时间线 · 像素星球</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="deck.css">
+<style>
+  .track {
+    position: absolute;
+    top: 403px;
+    left: 64px;
+    width: 1152px;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, var(--color-line-strong) 0 8px, transparent 8px 16px);
+  }
+  .track .done { position: absolute; left: 0; top: 0; width: 235px; height: 2px; background: var(--color-accent); }
+  .steps {
+    position: absolute;
+    top: 296px;
+    left: 64px;
+    width: 1152px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    column-gap: 24px;
+  }
+  .step { position: relative; }
+  .step .st { font-family: var(--font-mono); font-size: var(--text-hud); line-height: 24px; letter-spacing: 0.12em; color: var(--color-muted); text-transform: uppercase; }
+  .step .dt { margin-top: 4px; font-family: var(--font-mono); font-size: var(--text-sub); font-weight: 700; line-height: 44px; white-space: nowrap; }
+  .step .node {
+    position: absolute;
+    top: 100px;
+    left: 0;
+    width: 16px;
+    height: 16px;
+    background: var(--color-bg);
+    border: 2px solid var(--color-line-strong);
+  }
+  .step h2 { margin-top: 72px; font-size: var(--text-body); font-weight: 600; line-height: 32px; }
+  .step .d { margin-top: 8px; font-size: var(--text-small); line-height: 30px; color: var(--color-muted); }
+
+  .step.done .node { background: var(--color-accent); border-color: var(--color-accent); }
+  .step.now .st, .step.now .dt { color: var(--color-accent); }
+  .step.now .node { background: var(--color-accent); border-color: var(--color-accent); outline: 2px solid var(--color-accent); outline-offset: 4px; }
+  .step.go .st { color: var(--color-primary); }
+  .step.go .dt { color: var(--color-primary); text-shadow: var(--glow-text); }
+  .step.go .node { top: 96px; width: 24px; height: 24px; background: var(--color-primary); border-color: var(--color-primary); box-shadow: var(--glow); }
+
+  .note {
+    position: absolute;
+    left: 64px;
+    top: 588px;
+    font-size: var(--text-hud);
+    line-height: 24px;
+    color: var(--color-muted);
+  }
+</style>
+</head>
+<body>
+<main class="slide">
+  <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+  <header class="hud t">
+    <span class="rec">Pixel Planet <i>//</i> 新作发布会</span>
+    <a class="pg" href="05-numbers.html">[ 04 / 06 ]</a>
+  </header>
+
+  <p class="kicker">04 // Roadmap</p>
+  <h1 class="title">2027 年 3 月 21 日，正式上线</h1>
+
+  <div class="track" aria-hidden="true"><span class="done"></span></div>
+  <ol class="steps">
+    <li class="step done">
+      <p class="st">Done</p>
+      <p class="dt">2026.08</p>
+      <span class="node" aria-hidden="true"></span>
+      <h2>一测</h2>
+      <p class="d">3,000 名玩家，<br>连续玩了 14 天</p>
+    </li>
+    <li class="step now">
+      <p class="st">Now · 今天</p>
+      <p class="dt">2026.11</p>
+      <span class="node" aria-hidden="true"></span>
+      <h2>首次公开</h2>
+      <p class="d">发布会现场试玩，<br>同时开放预约</p>
+    </li>
+    <li class="step">
+      <p class="st">Next</p>
+      <p class="dt">2027.01</p>
+      <span class="node" aria-hidden="true"></span>
+      <h2>二测</h2>
+      <p class="d">2 万个名额，<br>开放四人联机</p>
+    </li>
+    <li class="step go">
+      <p class="st">Launch</p>
+      <p class="dt">2027.03.21</p>
+      <span class="node" aria-hidden="true"></span>
+      <h2>正式上线</h2>
+      <p class="d">电脑和主机<br>同一天发售</p>
+    </li>
+    <li class="step">
+      <p class="st">Later</p>
+      <p class="dt">2027 夏</p>
+      <span class="node" aria-hidden="true"></span>
+      <h2>「深海层」更新</h2>
+      <p class="d">新增 3 层遗迹，<br>同时推出手机版</p>
+    </li>
+  </ol>
+
+  <p class="note">时间以发布会当天的计划为准，有变化会第一时间公布</p>
+
+  <footer class="hud b">
+    <span>Echo-8 Studio</span>
+    <span>2026.11.20</span>
+  </footer>
+</main>
+</body>
+</html>

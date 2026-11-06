@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 设计台本身的问题 / Problems with the design studio itself
+    url: https://github.com/OrderG-X/dsh-design-studio/issues
+    about: 插件的 bug 和建议请到这里 / Plugin bugs and ideas go here

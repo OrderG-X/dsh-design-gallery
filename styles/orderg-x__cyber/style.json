@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#0B0B16",
+    "surface": "#151528",
+    "text": "#E9E6FF",
+    "muted": "#A09CC8",
+    "line": "#2E2B52",
+    "primary": "#FF2E88",
+    "accent": "#22E1FF",
+    "on": "#0B0B16",
+    "link": "#22E1FF"
+  },
+  "head": "MONO",
+  "w": 700,
+  "radius": 2,
+  "shadow": "0 0 0 1px #FF2E88, 0 0 18px rgba(255,46,136,.45)",
+  "dzh": "近黑底、品红青色霓虹、等宽字",
+  "den": "Near-black, magenta and cyan neon, monospace",
+  "nzh": "标题用等宽字、全大写，可以加一点故障错位（两层彩色 text-shadow）；边框是 1px 霓虹线加外发光，发光只给主按钮和关键数字；背景可以叠细网格线；正文照样要清楚",
+  "nen": "Monospace, all-caps headings with a slight glitch (two colored text-shadows); 1px neon borders with glow, glow only on the main button and key numbers; a fine grid on the background is fine; body text stays readable"
+}

@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#0E0E10",
+    "surface": "#18181B",
+    "text": "#F2EFE9",
+    "muted": "#A19C93",
+    "line": "#2C2C30",
+    "primary": "#C9A86A",
+    "accent": "#E8E2D6",
+    "on": "#17140E",
+    "link": "#C9A86A"
+  },
+  "head": "SERIF",
+  "w": 500,
+  "radius": 12,
+  "shadow": "0 12px 40px rgba(0,0,0,.45)",
+  "dzh": "近黑底、香槟金点缀、大图",
+  "den": "Near-black, champagne gold accents, big imagery",
+  "nzh": "金色只点在关键按钮和细线上；层级靠表面色深浅，不靠阴影；标题细一点、字距放开；留白要多",
+  "nen": "Gold only on key buttons and fine lines; layers from surface shades, not shadows; lighter, tracked-out headings; generous space"
+}

@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "type": "system",
+  "title": { "zh": "陶土 Terracotta", "en": "Terracotta" },
+  "description": {
+    "zh": "给生活方式品牌用的设计系统：陶土橙、米白、橄榄绿点缀，衬线标题配无衬线正文，中等圆角、暖色阴影，带深色版。",
+    "en": "A design system for lifestyle brands: terracotta, rice white and an olive accent, serif headings over sans body, medium radii, warm shadows and a dark theme."
+  },
+  "categories": ["home", "retail"],
+  "tags": ["landing", "detail", "cart", "checkout", "form", "illustration"],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": { "login": "orderg-x", "id": 271418316 },
+  "ai": { "generated": true, "tool": "dsh-design-studio@0.11.0" }
+}

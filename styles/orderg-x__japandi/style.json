@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#F2EEE6",
+    "surface": "#FAF8F3",
+    "text": "#2F2B26",
+    "muted": "#6B645A",
+    "line": "#DDD5C8",
+    "primary": "#4F4234",
+    "accent": "#8C9A6E",
+    "on": "#FAF8F3",
+    "link": "#6B4F33"
+  },
+  "head": "SANS",
+  "w": 500,
+  "radius": 6,
+  "shadow": "0 2px 8px rgba(79,66,52,.06)",
+  "dzh": "米色原木、低饱和、小字大留白",
+  "den": "Oat and wood tones, muted, small type and lots of space",
+  "nzh": "像杂货家居品牌：字偏小偏细、留白很多；只用米、原木棕、灰绿，饱和度低；照片柔光、木麻陶这类自然材质；细线分隔几乎不用阴影，主按钮深棕实底",
+  "nen": "Like a homeware brand: small light type and lots of space; only oat, wood brown and sage, low saturation; soft-light photos of wood, linen and ceramic; hairlines, almost no shadow, solid dark-brown main button"
+}

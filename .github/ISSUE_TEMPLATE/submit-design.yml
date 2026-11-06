@@ -1,0 +1,49 @@
+name: 投稿设计 / Submit a design
+description: 把设计台「分享到市场」存下的 zip 拖进来 / Drop the zip saved by the design studio's "Share to gallery"
+title: "投稿 / Submission: "
+labels: [submission]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **只交原创、虚构品牌、假数据的静态设计稿。** 附件一上传就是公开的，交之前确认里面没有真实的手机号、身份证、邮箱、地址、照片。
+        **Original work, made-up brands and fake data only.** Attachments become public the moment you drop them in; make sure there is no real personal data.
+
+        更新自己交过的那套：再交一次同名的就行。 / To update a design you submitted before, just submit it again with the same short name.
+  - type: textarea
+    id: design
+    attributes:
+      label: 设计包 / Design pack
+      description: 把 zip 拖到这个框里（一次一个） / Drag the zip into this box (one per submission)
+      placeholder: 拖 zip 到这里 / Drop the zip here
+    validations:
+      required: true
+  - type: input
+    id: slug
+    attributes:
+      label: 短名 / Short name
+      description: 小写字母、数字、-，3–40 个字；不填就按标题生成 / Lowercase letters, digits and -, 3–40 chars; generated from the title if empty
+      placeholder: matcha-cafe
+  - type: dropdown
+    id: license
+    attributes:
+      label: 授权 / License
+      options:
+        - CC0-1.0（谁都能随便用，不用署名 / anyone can use it, no credit needed）
+        - CC-BY-4.0（别人用要署你的名 / others must credit you）
+      default: 0
+    validations:
+      required: true
+  - type: checkboxes
+    id: promise
+    attributes:
+      label: 确认 / Confirm
+      options:
+        - label: 这是我自己（或用设计台）做的原创设计，图片都是自己做的或 CC0 / 公有领域 / This is my original design; all images are mine or CC0 / public domain
+          required: true
+        - label: 品牌是虚构的，没有仿冒真实网站、应用或机构 / The brand is made up and does not imitate a real site, app or organization
+          required: true
+        - label: 里面没有真实的个人信息 / It contains no real personal data
+          required: true
+        - label: 同意按上面选的授权公开，并收进设计市场 / I agree to publish it under the license above in the design gallery
+          required: true

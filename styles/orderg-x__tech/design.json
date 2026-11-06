@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "专业科技",
+    "en": "Pro / tech"
+  },
+  "description": {
+    "zh": "冷灰蓝、信息密、数字清楚",
+    "en": "Cool gray-blue, dense info, crisp numbers"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080">
+<meta name="dsh-design" content="poster 1080x1920">
+<title>海报 · 城市夜跑</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; }
+  body { background: var(--color-bg); color: var(--color-text); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  .poster { position: relative; width: 1080px; height: 1920px; overflow: hidden; }
+  .bg { position: absolute; inset: 0; }
+  .num, .en { font-family: var(--font-num); font-style: italic; font-weight: var(--weight-head); text-transform: uppercase; }
+
+  .top { position: absolute; left: var(--safe); right: var(--safe); top: 72px; display: flex; justify-content: space-between; align-items: center; font-size: var(--text-sm); color: var(--color-muted); }
+  .top .en { color: var(--color-text); letter-spacing: .14em; }
+  .top .en::before { content: ""; display: inline-block; width: 40px; height: 10px; margin-right: 14px; background: var(--color-primary); transform: skewX(var(--slant)); vertical-align: 2px; }
+
+  .ghost { position: absolute; left: 36px; top: 156px; margin: 0; font-size: var(--text-num); line-height: .8; letter-spacing: -.04em; color: transparent; -webkit-text-stroke: 2px rgba(244, 245, 246, .16); white-space: nowrap; }
+  .title { position: absolute; left: 70px; top: 300px; margin: 0; font-size: var(--text-title); font-weight: 900; line-height: 1; letter-spacing: -.02em; color: var(--color-text); -webkit-text-stroke: 5px var(--color-text); transform: skewX(var(--slant)); transform-origin: left bottom; }
+  .sub { position: absolute; left: var(--safe); top: 548px; margin: 0; display: flex; align-items: center; gap: var(--space-4); font-size: var(--text-lg); font-weight: 600; letter-spacing: .02em; }
+  .sub::before { content: ""; width: 14px; height: 44px; background: var(--color-primary); transform: skewX(var(--slant)); }
+
+  .dist { position: absolute; left: var(--safe); right: var(--safe); top: 744px; display: grid; row-gap: 72px; }
+  .row { display: grid; grid-template-columns: 1fr 340px; align-items: center; }
+  .row .num { margin: 0; font-size: var(--text-num); line-height: .8; letter-spacing: -.05em; color: var(--color-primary); margin-left: -12px; }
+  .row h2 { margin: 0 0 var(--space-3); font-size: var(--text-lg); font-weight: 600; line-height: 1.2; }
+  .row h2 small { margin-left: var(--space-3); font-family: var(--font-num); font-style: italic; font-weight: 800; font-size: var(--text-sm); letter-spacing: .12em; color: var(--color-muted); }
+  .row p { margin: 0; font-size: var(--text-md); line-height: 1.5; color: var(--color-muted); }
+  .row p b { color: var(--color-text); font-weight: 600; }
+
+  .route { position: absolute; left: var(--safe); right: var(--safe); top: 1360px; }
+  .route-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: var(--space-4); }
+  .route-head .en { font-size: var(--text-lg); letter-spacing: .02em; }
+    .route svg { display: block; width: 920px; height: 220px; }
+  .legend { display: flex; align-items: center; gap: var(--space-3); font-family: var(--font-num); font-style: italic; font-weight: 800; font-size: var(--text-sm); color: var(--color-text); }
+  .legend i { display: inline-block; width: 36px; height: 0; border-top: 6px solid var(--color-primary); border-radius: 3px; }
+  .legend i.k5 { margin-left: var(--space-3); border-top: 3px dashed var(--color-text); }
+  .legend span { margin-left: var(--space-4); padding-left: var(--space-4); border-left: 2px solid var(--color-line); font-family: var(--font-sans); font-style: normal; font-weight: 400; color: var(--color-muted); }
+
+  .info { position: absolute; left: var(--safe); right: var(--safe); top: 1676px; height: 168px; display: grid; grid-template-columns: 330px 1fr 236px; column-gap: var(--space-6); align-items: stretch; }
+  .when .num { display: block; font-size: var(--text-date); line-height: .9; letter-spacing: -.04em; }
+  .when p, .where p { margin: 0; font-size: var(--text-md); line-height: 1.5; }
+  .when p { margin-top: var(--space-4); color: var(--color-muted); }
+  .when p b, .where b { color: var(--color-text); font-weight: 600; }
+  .where { border-left: 2px solid var(--color-line); padding-left: var(--space-6); display: flex; flex-direction: column; justify-content: center; gap: var(--space-2); font-size: var(--text-md); line-height: 1.4; }
+  .where .label { font-size: var(--text-sm); color: var(--color-muted); }
+  .where .alert { margin-top: var(--space-3); display: flex; align-items: center; gap: var(--space-3); color: var(--color-accent); font-weight: 600; }
+  .where .alert svg { width: 28px; height: 28px; flex-shrink: 0; }
+  .cta { position: relative; display: grid; grid-template-columns: 112px 1fr; align-items: center; column-gap: var(--space-4); padding: 0 var(--space-5); color: var(--color-on); text-decoration: none; }
+  .cta::before { content: ""; position: absolute; inset: 0; background: var(--color-primary); transform: skewX(var(--slant)); border-radius: 4px; }
+  .cta > * { position: relative; }
+  .qr { width: 112px; height: 112px; box-sizing: border-box; border: 2px dashed rgba(14, 15, 17, .55); border-radius: 4px; display: grid; place-items: center; font-size: var(--text-sm); font-weight: 600; background: rgba(255, 255, 255, .35); }
+  .cta b { font-size: var(--text-md); line-height: 1.25; font-weight: 600; }
+</style>
+</head>
+<body>
+<main class="poster">
+  <svg class="bg" viewBox="0 0 1080 1920" width="1080" height="1920" aria-hidden="true">
+    <defs>
+      <linearGradient id="glow" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#C8FF2E" stop-opacity=".10"/>
+        <stop offset=".5" stop-color="#C8FF2E" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <rect width="1080" height="1920" fill="url(#glow)"/>
+    <g stroke="#2B2E35" stroke-width="2">
+      <path d="M700 250L1080 190M760 300L1080 250M640 360L1080 290M880 410L1080 380"/>
+    </g>
+    <polygon points="0,706 1080,610 1080,1244 0,1316" fill="#1A1C20"/>
+    <polygon points="0,700 1080,604 1080,614 0,710" fill="#C8FF2E"/>
+    <polygon points="0,1013 1080,917 1080,919 0,1015" fill="#2B2E35"/>
+    <g fill="#22252B">
+      <polygon points="820,1262 1080,1238 1080,1268 850,1290"/>
+    </g>
+  </svg>
+
+  <header class="top"><span class="en">City Night Run 2026</span><span>第 04 站 · 滨江城市跑团</span></header>
+
+  <p class="ghost en" aria-hidden="true">Night<br>Run</p>
+  <h1 class="title">城市夜跑</h1>
+  <p class="sub">沿江十公里，路灯一路亮到终点</p>
+
+  <section class="dist">
+    <div class="row">
+      <p class="num">10K</p>
+      <div>
+        <h2>竞速跑<small>RACE</small></h2>
+        <p><b>19:00</b> 鸣枪 · 限 2000 人</p>
+        <p>计时芯片 · 完赛奖牌</p>
+        <p>报名费 <b>¥120</b></p>
+      </div>
+    </div>
+    <div class="row">
+      <p class="num">5K</p>
+      <div>
+        <h2>欢乐跑<small>FUN</small></h2>
+        <p><b>19:30</b> 鸣枪 · 限 1500 人</p>
+        <p>亲子可报 · 发光手环</p>
+        <p>报名费 <b>¥80</b></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="route">
+    <div class="route-head">
+      <span class="en">Route 路线</span>
+      <span class="legend"><i class="k10"></i>10K<i class="k5"></i>5K<span>沿江往返</span></span>
+    </div>
+    <svg viewBox="0 0 920 220" role="img" aria-label="路线示意：从滨江体育公园出发，5K 在月光桥折返，10K 在灯塔码头折返">
+      <path d="M-10 186C120 166 220 206 360 194S600 150 720 164 880 186 930 180" fill="none" stroke="#1F2329" stroke-width="52" stroke-linecap="round"/>
+      <path d="M40 194C120 184 180 202 250 198M560 166C610 160 660 160 700 166M780 180C820 184 860 184 900 182" fill="none" stroke="#2B2E35" stroke-width="2" stroke-linecap="round"/>
+      <g stroke="#A1A5AD" stroke-width="3" fill="none" stroke-linecap="round">
+        <path d="M430 196C444 160 488 160 502 196M422 196H510M446 174V196M486 174V196"/>
+      </g>
+      <path d="M60 128C170 108 260 150 380 136S600 88 720 98 840 114 860 110" fill="none" stroke="#2B2E35" stroke-width="16" stroke-linecap="round"/>
+      <path d="M60 128C170 108 260 150 380 136S600 88 720 98 840 114 860 110" fill="none" stroke="#C8FF2E" stroke-width="6" stroke-linecap="round"/>
+      <path d="M60 110C170 90 260 132 380 118C410 114 438 110 462 106" fill="none" stroke="#F4F5F6" stroke-width="3" stroke-dasharray="10 9" stroke-linecap="round"/>
+      <g transform="translate(900 52)">
+        <path d="M-9 60H9L5 14H-5Z" fill="#22252B" stroke="#A1A5AD" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M-7 6H7V13H-7Z" fill="#A1A5AD"/>
+      </g>
+      <circle cx="60" cy="122" r="24" fill="#C8FF2E"/>
+      <path d="M52 111V134M52 112H68L64 118L68 124H52" fill="none" stroke="#0E0F11" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+      <circle cx="466" cy="117" r="16" fill="#0E0F11" stroke="#F4F5F6" stroke-width="5"/>
+      <circle cx="860" cy="110" r="14" fill="#0E0F11" stroke="#C8FF2E" stroke-width="6"/>
+      <g font-family="PingFang SC, HarmonyOS Sans SC, system-ui, sans-serif" font-size="24" fill="#F4F5F6">
+        <text x="24" y="40" font-weight="600">起终点</text>
+        <text x="24" y="72" fill="#A1A5AD">滨江体育公园</text>
+        <text x="466" y="40" text-anchor="middle" font-weight="600">5K 折返</text>
+        <text x="466" y="72" text-anchor="middle" fill="#A1A5AD">月光桥</text>
+        <text x="872" y="20" text-anchor="end" font-weight="600">10K 折返</text>
+        <text x="872" y="52" text-anchor="end" fill="#A1A5AD">灯塔码头</text>
+      </g>
+    </svg>
+  </section>
+
+  <section class="info">
+    <div class="when">
+      <span class="num">11.21</span>
+      <p><b>周六</b> · 18:30 集合</p>
+    </div>
+    <div class="where">
+      <span class="label">集合点</span>
+      <b>滨江体育公园北门</b>
+      <span class="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6.5V12L15.5 14"/></svg>11.14 截止报名</span>
+    </div>
+    <div class="cta">
+      <span class="qr">二维码</span>
+      <b>扫码<br>报名</b>
+    </div>
+  </section>
+</main>
+</body>
+</html>

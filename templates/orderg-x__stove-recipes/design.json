@@ -1,0 +1,49 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": {
+    "zh": "灶边菜谱",
+    "en": "Stove-side Recipes"
+  },
+  "description": {
+    "zh": "放在厨房用的家庭菜谱平板 App：时令菜谱和大字做菜模式",
+    "en": "A kitchen tablet recipe app: seasonal recipes and a big-type cooking mode"
+  },
+  "kind": "tablet",
+  "screens": [
+    {
+      "file": "recipes.html",
+      "title": {
+        "zh": "菜谱",
+        "en": "Recipes"
+      }
+    },
+    {
+      "file": "cook.html",
+      "title": {
+        "zh": "做菜",
+        "en": "Cooking"
+      }
+    }
+  ],
+  "style": "japandi",
+  "categories": [
+    "food",
+    "home"
+  ],
+  "tags": [
+    "list",
+    "detail",
+    "illustration"
+  ],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

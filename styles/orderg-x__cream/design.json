@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "奶油风",
+    "en": "Cream"
+  },
+  "description": {
+    "zh": "奶白燕麦焦糖、大圆角、柔光",
+    "en": "Milk, oat and caramel, big radii, soft light"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

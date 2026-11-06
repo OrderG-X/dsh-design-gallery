@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "国潮",
+    "en": "Guochao"
+  },
+  "description": {
+    "zh": "中国红配金、粗宋体、传统纹样",
+    "en": "Chinese red and gold, bold Song type, traditional patterns"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

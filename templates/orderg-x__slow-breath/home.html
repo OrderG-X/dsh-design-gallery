@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="app">
+<title>今日 · 慢呼吸</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app.css">
+<style>
+  .top { display: flex; align-items: flex-start; justify-content: space-between; padding-top: var(--space-2); }
+  .top h1 { font-size: var(--fs-h1); line-height: 1.3; margin-top: var(--space-2); }
+  .top .seal { margin-top: var(--space-1); }
+
+  .hero { margin-top: var(--space-5); background: var(--surface); border: var(--hair); border-radius: var(--radius); overflow: hidden; }
+  .hero-art { height: 148px; border-bottom: var(--hair); }
+  .hero-art svg { width: 100%; height: 100%; }
+  .hero-body { padding: var(--space-5) var(--space-5) var(--space-4); }
+  .hero-title { font-size: var(--fs-h1); line-height: 1.3; margin: var(--space-2) 0 0; }
+  .hero-btn { width: 100%; margin-top: var(--space-4); }
+  .hero-btn .ico { width: 18px; height: 18px; fill: currentColor; stroke: none; }
+
+  .streak { margin-top: var(--space-5); }
+  .streak-top { display: flex; align-items: flex-end; justify-content: space-between; }
+  .streak-num { font-size: var(--fs-num); line-height: 1; letter-spacing: .02em; }
+  .streak-unit { font-family: var(--font-serif); font-size: var(--fs-h3); margin-left: var(--space-1); }
+  .streak-top .meta { text-align: right; line-height: 1.5; }
+  .week { list-style: none; margin: var(--space-4) 0 0; padding: 0; display: grid; grid-template-columns: repeat(7, 1fr); }
+  .week li { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); font-size: var(--fs-meta); color: var(--muted); }
+  .week i { width: 28px; height: 28px; border-radius: 50%; box-shadow: inset 0 0 0 1px var(--line); }
+  .week .done i { box-shadow: none; background: radial-gradient(circle at 46% 46%, rgba(47, 59, 55, .86) 0 40%, rgba(47, 59, 55, .55) 56%, rgba(47, 59, 55, .14) 68%, transparent 72%); }
+  .week .today { color: var(--accent); font-weight: 600; }
+  .week .today i { box-shadow: inset 0 0 0 1px var(--accent); background: radial-gradient(circle, var(--accent) 0 3px, transparent 3.5px); }
+
+  .stats { margin-top: var(--space-5); display: grid; grid-template-columns: repeat(3, 1fr); border-top: var(--hair); border-bottom: var(--hair); }
+  .stats div { padding: var(--space-3) 0 var(--space-3) var(--space-4); }
+  .stats div:first-child { padding-left: 0; }
+  .stats div + div { border-left: var(--hair); }
+  .stats b { display: block; font-family: var(--font-serif); font-weight: var(--w-head); font-size: var(--fs-h1); line-height: 1.3; }
+  .stats small { font-size: var(--fs-meta); color: var(--muted); }
+  .stats .meta { display: block; }
+
+  .rail { display: flex; gap: var(--space-4); overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: var(--gutter); padding: 0 var(--gutter); margin: 0 calc(var(--gutter) * -1); scrollbar-width: none; }
+  .rail::-webkit-scrollbar { display: none; }
+  .course { flex: 0 0 212px; scroll-snap-align: start; }
+  .course-art { height: 128px; border: var(--hair); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
+  .course-art svg { width: 100%; height: 100%; }
+  .course h3 { font-size: var(--fs-h3); margin-top: var(--space-3); line-height: 1.4; }
+  .course .meta { margin-top: var(--space-1); }
+
+  .sounds { list-style: none; margin: 0; padding: 0; border-top: var(--hair); }
+  .sounds li { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-3) 0; border-bottom: var(--hair); }
+  .sound-dot { flex: 0 0 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; color: var(--primary); background: radial-gradient(circle at 46% 46%, rgba(47, 59, 55, .14), rgba(47, 59, 55, .07) 50%, rgba(47, 59, 55, .02) 68%, transparent 71%); }
+  .sound-dot .ico { width: 22px; height: 22px; stroke-width: 1.3; }
+  .sounds .txt { flex: 1; min-width: 0; }
+  .sounds .txt b { display: block; font-weight: 500; }
+  .play { flex: 0 0 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 0 1px var(--line); color: var(--primary); }
+  .play .ico { width: 18px; height: 18px; fill: currentColor; stroke: none; margin-left: 2px; }
+
+  .section-head { margin-top: 40px; }
+  .remind { margin-top: var(--space-6); display: flex; align-items: center; gap: var(--space-4); padding: var(--space-4) var(--space-5); background: var(--surface); border: var(--hair); border-radius: var(--radius); }
+  .remind .ico { flex: 0 0 24px; color: var(--primary); }
+  .remind .txt { flex: 1; }
+  .switch { flex: 0 0 auto; width: 46px; height: 28px; border-radius: var(--radius-pill); background: var(--primary); position: relative; }
+  .switch::after { content: ""; position: absolute; top: 3px; right: 3px; width: 22px; height: 22px; border-radius: 50%; background: var(--surface); }
+</style>
+</head>
+<body>
+<svg class="sprite" aria-hidden="true">
+  <defs>
+    <filter id="blur-s" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.2"/></filter>
+    <filter id="blur-m" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3"/></filter>
+    <filter id="blur-l" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="8"/></filter>
+  </defs>
+  <symbol id="i-today" viewBox="0 0 24 24"><path d="M3 18h18"/><path d="M7 18a5 5 0 0 1 10 0"/><path d="M12 6.5v2.5M5.8 10.2l1.6 1.4M18.2 10.2l-1.6 1.4"/></symbol>
+  <symbol id="i-course" viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/></symbol>
+  <symbol id="i-journal" viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height="17" rx="1.5"/><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4"/></symbol>
+  <symbol id="i-me" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></symbol>
+  <symbol id="i-rain" viewBox="0 0 24 24"><path d="M8 5l-2 5M13 4l-2 5M18 5l-2 5M10 12l-2 5M15 12l-2 5M7 18.5l-1 2.5M12 19l-1 2"/></symbol>
+  <symbol id="i-wind" viewBox="0 0 24 24"><path d="M3 9h11a3 3 0 1 0-3-3"/><path d="M3 14h15a3 3 0 1 1-3 3"/><path d="M3 19h6"/></symbol>
+  <symbol id="i-stream" viewBox="0 0 24 24"><path d="M3 8c2-1.6 4-1.6 6 0s4 1.6 6 0 4-1.6 6 0"/><path d="M3 13c2-1.6 4-1.6 6 0s4 1.6 6 0 4-1.6 6 0"/><path d="M6 18c2-1.6 4-1.6 6 0s4 1.6 6 0"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19 14.5A7.5 7.5 0 0 1 9.5 5a7.5 7.5 0 1 0 9.5 9.5z"/></symbol>
+</svg>
+
+<header class="status" aria-hidden="true">
+  <span class="status-time">9:41</span>
+  <span class="status-icons">
+    <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx=".8"/><rect x="5" y="5.5" width="3" height="6.5" rx=".8"/><rect x="10" y="3" width="3" height="9" rx=".8"/><rect x="15" y="0" width="3" height="12" rx=".8"/></svg>
+    <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1.5 4.3a9.5 9.5 0 0 1 13 0"/><path d="M4 7.1a6 6 0 0 1 8 0"/><circle cx="8" cy="10" r="1.3" fill="currentColor" stroke="none"/></svg>
+    <svg width="27" height="12" viewBox="0 0 27 12"><rect x=".5" y=".5" width="23" height="11" rx="3.2" fill="none" stroke="currentColor" stroke-opacity=".4"/><rect x="2" y="2" width="17" height="8" rx="1.8" fill="currentColor"/><path d="M25 4v4c.8-.3 1.4-1.1 1.4-2s-.6-1.7-1.4-2z" fill="currentColor" fill-opacity=".4"/></svg>
+  </span>
+</header>
+
+<main class="page">
+  <div class="top">
+    <div>
+      <p class="eyebrow">十一月七日 · 周六 · 立冬</p>
+      <h1 class="head">早上好，林舟</h1>
+    </div>
+    <span class="seal" aria-label="慢呼吸">慢</span>
+  </div>
+
+  <section class="hero">
+    <div class="hero-art">
+      <svg viewBox="0 0 342 172" preserveAspectRatio="xMidYMid slice" role="img" aria-label="晨雾里的远山">
+        <defs>
+          <linearGradient id="h-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E9E4DA"/><stop offset="1" stop-color="#F7F4EF"/></linearGradient>
+          <linearGradient id="h-far" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2F3B37" stop-opacity=".2"/><stop offset="1" stop-color="#2F3B37" stop-opacity="0"/></linearGradient>
+          <linearGradient id="h-mid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2F3B37" stop-opacity=".42"/><stop offset=".8" stop-color="#2F3B37" stop-opacity=".04"/></linearGradient>
+          <linearGradient id="h-near" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2F3B37" stop-opacity=".72"/><stop offset="1" stop-color="#2F3B37" stop-opacity=".3"/></linearGradient>
+        </defs>
+        <rect x="-10" y="-10" width="362" height="200" fill="url(#h-sky)"/>
+        <circle cx="252" cy="54" r="40" fill="#FBF9F5" opacity=".7" filter="url(#blur-l)"/>
+        <circle cx="252" cy="54" r="19" fill="#FBF9F5"/>
+        <path d="M-10 110 C20 98 42 74 70 70 C92 66 104 88 124 84 C150 78 160 50 188 48 C214 46 228 76 250 80 C274 84 292 70 314 76 C332 80 344 90 356 94 V190 H-10Z" fill="url(#h-far)" filter="url(#blur-m)"/>
+        <path d="M-10 134 C20 122 40 104 62 104 C84 104 92 120 112 118 C136 116 150 92 174 94 C196 96 202 116 224 120 C248 124 264 108 286 110 C308 112 326 126 356 130 V190 H-10Z" fill="url(#h-mid)" filter="url(#blur-s)"/>
+        <ellipse cx="171" cy="126" rx="210" ry="14" fill="#F5F2EC" opacity=".9" filter="url(#blur-l)"/>
+        <path d="M-10 160 C30 148 52 142 80 146 C104 150 118 139 142 141 C170 143 184 156 212 156 C242 156 258 146 288 148 C312 150 330 156 356 160 V190 H-10Z" fill="url(#h-near)" filter="url(#blur-s)"/>
+        <g fill="none" stroke="#2F3B37" stroke-opacity=".5" stroke-width="1" stroke-linecap="round">
+          <path d="M196 44q3-3 6 0q3-3 6 0"/>
+          <path d="M214 34q2-2 4 0q2-2 4 0"/>
+        </g>
+      </svg>
+    </div>
+    <div class="hero-body">
+      <p class="eyebrow">今日练习</p>
+      <h2 class="head hero-title">山间晨雾</h2>
+      <p class="meta">方块呼吸 · 10 分钟 · 晨间唤醒 第 3 / 7 课</p>
+      <a class="btn hero-btn" href="session.html">开始练习 <svg class="ico"><use href="#i-play"/></svg></a>
+    </div>
+  </section>
+
+  <section class="streak" aria-label="连续练习">
+    <div class="streak-top">
+      <p><span class="head streak-num">12</span><span class="streak-unit">天</span></p>
+      <p class="meta">已连续练习<br>最长一次 21 天</p>
+    </div>
+    <ol class="week">
+      <li class="done"><span>一</span><i></i></li>
+      <li class="done"><span>二</span><i></i></li>
+      <li class="done"><span>三</span><i></i></li>
+      <li class="done"><span>四</span><i></i></li>
+      <li class="done"><span>五</span><i></i></li>
+      <li class="today"><span>六</span><i></i></li>
+      <li><span>日</span><i></i></li>
+    </ol>
+  </section>
+
+  <section class="stats" aria-label="练习数据">
+    <div><span class="meta">昨晚入睡</span><b>16<small> 分钟</small></b></div>
+    <div><span class="meta">本周练习</span><b>76<small> 分钟</small></b></div>
+    <div><span class="meta">累计</span><b>42<small> 次</small></b></div>
+  </section>
+
+  <div class="section-head">
+    <h2 class="head">为你推荐</h2>
+    <span class="more">全部课程</span>
+  </div>
+  <div class="rail">
+    <article class="course">
+      <div class="course-art">
+        <svg viewBox="0 0 212 128" preserveAspectRatio="xMidYMid slice" role="img" aria-label="夜雨">
+          <defs>
+            <linearGradient id="r-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#DDD7CB"/><stop offset="1" stop-color="#F3F0EA"/></linearGradient>
+            <linearGradient id="r-hill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2F3B37" stop-opacity=".55"/><stop offset="1" stop-color="#2F3B37" stop-opacity=".15"/></linearGradient>
+          </defs>
+          <rect x="-10" y="-10" width="232" height="150" fill="url(#r-sky)"/>
+          <ellipse cx="70" cy="26" rx="90" ry="22" fill="#2F3B37" opacity=".16" filter="url(#blur-l)"/>
+          <ellipse cx="170" cy="40" rx="70" ry="16" fill="#2F3B37" opacity=".12" filter="url(#blur-l)"/>
+          <path d="M-10 112 C24 92 46 86 72 96 C96 104 112 84 140 86 C166 88 184 100 222 98 V150 H-10Z" fill="url(#r-hill)" filter="url(#blur-s)"/>
+          <g stroke="#2F3B37" stroke-opacity=".3" stroke-width=".9" stroke-linecap="round">
+            <path d="M24 34l-6 16M48 46l-6 16M76 30l-6 16M102 52l-6 16M128 36l-6 16M156 54l-6 16M182 34l-6 16M200 60l-6 16M36 70l-6 16M90 74l-6 16M140 70l-6 16M170 84l-6 16"/>
+          </g>
+        </svg>
+      </div>
+      <h3 class="head">听雨入眠</h3>
+      <p class="meta">睡前 · 15 分钟 · 苏念</p>
+    </article>
+    <article class="course">
+      <div class="course-art">
+        <svg viewBox="0 0 212 128" preserveAspectRatio="xMidYMid slice" role="img" aria-label="松枝">
+          <rect x="-10" y="-10" width="232" height="150" fill="#F1EDE5"/>
+          <circle cx="150" cy="70" r="46" fill="#2F3B37" opacity=".06" filter="url(#blur-l)"/>
+          <path d="M-6 98 C40 84 82 72 120 52 C140 42 162 36 196 34" fill="none" stroke="#2F3B37" stroke-opacity=".7" stroke-width="3.2" stroke-linecap="round" filter="url(#blur-s)"/>
+          <path d="M74 74 C88 82 96 96 98 110" fill="none" stroke="#2F3B37" stroke-opacity=".55" stroke-width="2" stroke-linecap="round" filter="url(#blur-s)"/>
+          <g stroke="#2F3B37" stroke-opacity=".5" stroke-width="1.1" stroke-linecap="round" filter="url(#blur-s)">
+            <path d="M120 52l-14-14M120 52l-4-19M120 52l6-18M120 52l16-11M120 52l19-2M120 52l-18-6"/>
+            <path d="M168 38l-12-15M168 38l-1-19M168 38l9-16M168 38l17-8M168 38l18 3M168 38l-17-4"/>
+            <path d="M60 80l-14-12M60 80l-6-18M60 80l5-18M60 80l15-10M60 80l-18 0"/>
+            <path d="M98 110l-15-6M98 110l-12-13M98 110l-3-17M98 110l7-15M98 110l15-6"/>
+          </g>
+        </svg>
+      </div>
+      <h3 class="head">松风身体扫描</h3>
+      <p class="meta">放松 · 20 分钟 · 程远</p>
+    </article>
+    <article class="course">
+      <div class="course-art">
+        <svg viewBox="0 0 212 128" preserveAspectRatio="xMidYMid slice" role="img" aria-label="水上的月亮">
+          <rect x="-10" y="-10" width="232" height="150" fill="#E7E2D8"/>
+          <circle cx="106" cy="46" r="34" fill="#FBF9F5" opacity=".8" filter="url(#blur-l)"/>
+          <circle cx="106" cy="46" r="20" fill="#FBF9F5"/>
+          <rect x="-10" y="84" width="232" height="60" fill="#2F3B37" opacity=".14"/>
+          <ellipse cx="106" cy="98" rx="18" ry="5" fill="#FBF9F5" opacity=".7" filter="url(#blur-m)"/>
+          <g stroke="#2F3B37" stroke-opacity=".28" stroke-width="1" stroke-linecap="round">
+            <path d="M30 94h40M140 92h36M58 104h28M126 106h44M20 114h32M92 116h30M150 120h40"/>
+          </g>
+        </svg>
+      </div>
+      <h3 class="head">月下数息</h3>
+      <p class="meta">入睡 · 8 分钟 · 苏念</p>
+    </article>
+  </div>
+
+  <div class="remind">
+    <svg class="ico"><use href="#i-moon"/></svg>
+    <div class="txt">
+      <b>睡前提醒 22:30</b>
+      <p class="meta">到点提醒你做「听雨入眠」</p>
+    </div>
+    <span class="switch" role="switch" aria-checked="true" aria-label="睡前提醒"></span>
+  </div>
+
+  <div class="section-head">
+    <h2 class="head">睡前声音</h2>
+    <span class="more">更多</span>
+  </div>
+  <ul class="sounds">
+    <li><span class="sound-dot"><svg class="ico"><use href="#i-rain"/></svg></span><div class="txt"><b>雨打芭蕉</b><span class="meta">白噪音 · 32 分钟</span></div><button class="play" type="button" aria-label="播放雨打芭蕉"><svg class="ico"><use href="#i-play"/></svg></button></li>
+    <li><span class="sound-dot"><svg class="ico"><use href="#i-wind"/></svg></span><div class="txt"><b>松间风</b><span class="meta">自然声 · 45 分钟</span></div><button class="play" type="button" aria-label="播放松间风"><svg class="ico"><use href="#i-play"/></svg></button></li>
+    <li><span class="sound-dot"><svg class="ico"><use href="#i-stream"/></svg></span><div class="txt"><b>夜半溪声</b><span class="meta">自然声 · 60 分钟</span></div><button class="play" type="button" aria-label="播放夜半溪声"><svg class="ico"><use href="#i-play"/></svg></button></li>
+  </ul>
+</main>
+
+<nav class="tabbar" aria-label="主导航">
+  <a class="tab is-on" href="home.html" aria-current="page"><svg class="ico"><use href="#i-today"/></svg>今日</a>
+  <span class="tab"><svg class="ico"><use href="#i-course"/></svg>课程</span>
+  <a class="tab" href="journal.html"><svg class="ico"><use href="#i-journal"/></svg>记录</a>
+  <span class="tab"><svg class="ico"><use href="#i-me"/></svg>我的</span>
+</nav>
+</body>
+</html>

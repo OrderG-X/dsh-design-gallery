@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="miniprogram">
+<title>发现 · 周末去哪</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body class="discover">
+<header class="mp-top">
+  <div class="mp-status"><span>9:41</span><span class="mp-sys"><svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M8 2.2c2.5 0 4.8 1 6.5 2.6l1.2-1.3A11 11 0 0 0 8 .4 11 11 0 0 0 .3 3.5l1.2 1.3A9.3 9.3 0 0 1 8 2.2z"/><path d="M8 5.8c1.5 0 2.9.6 3.9 1.5l1.2-1.3A7.4 7.4 0 0 0 8 4a7.4 7.4 0 0 0-5.1 2l1.2 1.3c1-.9 2.4-1.5 3.9-1.5z"/><path d="M8 9.3c.6 0 1.2.2 1.6.6L8 11.6 6.4 9.9c.4-.4 1-.6 1.6-.6z"/></svg><svg width="27" height="13" viewBox="0 0 27 13" aria-hidden="true"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="currentColor" opacity=".45"/><rect x="2" y="2" width="18" height="9" rx="2"/><path d="M25 4.5v4c.8-.3 1.5-1.1 1.5-2s-.7-1.7-1.5-2z" opacity=".5"/></svg></span></div>
+  <div class="mp-nav custom">
+    <span class="logo" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 21V4"/><path d="M6 4.5h11l-2.5 4 2.5 4H6"/></svg></span>
+    <span class="brand round">周末去哪</span>
+    <button class="city"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>杭州<svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg></button>
+  </div>
+</header>
+<main class="mp-page">
+  <section class="hello">
+    <p class="sticker teal tilt-l when">11.08 – 11.09 · 本周末</p>
+    <h2 class="round">这周末，<br>出门玩点新鲜的</h2>
+    <div class="weather tilt-r" aria-label="周六晴，19 度">
+      <svg viewBox="0 0 40 40" aria-hidden="true"><g stroke="#1D1B3A" stroke-width="2.2" stroke-linecap="round"><path d="M20 3v5M20 32v5M3 20h5M32 20h5M8 8l3.5 3.5M28.5 28.5 32 32M8 32l3.5-3.5M28.5 11.5 32 8"/></g><circle cx="20" cy="20" r="8" fill="#FF6A3D" stroke="#1D1B3A" stroke-width="2.2"/></svg>
+      <p><b class="num">19°</b><span>周六 晴</span></p>
+    </div>
+  </section>
+
+  <div class="search"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4 4"/></svg><span>搜活动、场地、主办方</span></div>
+
+  <div class="chips" role="tablist" aria-label="分类">
+    <button class="chip on" role="tab" aria-selected="true"><span>全部</span></button>
+    <button class="chip" role="tab" aria-selected="false"><span>手作</span></button>
+    <button class="chip" role="tab" aria-selected="false"><span>音乐</span></button>
+    <button class="chip" role="tab" aria-selected="false"><span>亲子</span></button>
+    <button class="chip" role="tab" aria-selected="false"><span>户外</span></button>
+  </div>
+
+  <header class="sec">
+    <h3 class="round">本周末热门</h3><span class="muted">26 场</span>
+    <button class="sort"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5v14M4 16l3 3 3-3M17 19V5M14 8l3-3 3 3"/></svg>离我近</button>
+  </header>
+
+  <a class="feature card" href="detail.html">
+    <div class="feature-ill">
+      <svg class="ill" viewBox="0 0 340 180" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+<rect x="-20" y="-20" width="380" height="240" fill="#FFE0D3"/>
+<g stroke="#1D1B3A" stroke-width="2.4" stroke-linecap="round"><path d="M252 36V24M286 47l8-9M218 47l-8-9M302 76h12M202 76h-12"/></g>
+<circle cx="252" cy="100" r="42" fill="#FF6A3D" stroke="#1D1B3A" stroke-width="2.5"/>
+<path d="M30 58c0-7 6-11 12-9 2-7 10-10 16-6 5-3 13 0 13 7 5 0 8 4 8 8H30z" fill="#FFFFFF" stroke="#1D1B3A" stroke-width="2.2" stroke-linejoin="round"/>
+<path d="M-6 16Q86 64 176 30" fill="none" stroke="#1D1B3A" stroke-width="1.8"/><path d="M176 30Q262 0 346 22" fill="none" stroke="#1D1B3A" stroke-width="1.8"/>
+<path d="M8.4 25.8h8v2.5a4 4 0 0 1-8 0z" fill="#FF6A3D" stroke="#1D1B3A" stroke-width="1.6" stroke-linejoin="round"/><path d="M45.0 38.4h8v2.5a4 4 0 0 1-8 0z" fill="#FFFFFF" stroke="#1D1B3A" stroke-width="1.6" stroke-linejoin="round"/><path d="M81.5 44.5h8v2.5a4 4 0 0 1-8 0z" fill="#1F9E92" stroke="#1D1B3A" stroke-width="1.6" stroke-linejoin="round"/><path d="M117.8 44.0h8v2.5a4 4 0 0 1-8 0z" fill="#FF6A3D" stroke="#1D1B3A" stroke-width="1.6" stroke-linejoin="round"/><path d="M154.0 37.0h8v2.5a4 4 0 0 1-8 0z" fill="#FFFFFF" stroke="#1D1B3A" stroke-width="1.6" stroke-linejoin="round"/><path d="M193.5 24.3h8v2.5a4 4 0 0 1-8 0z" fill="#1F9E92" stroke="#1D1B3A" stroke-width="1.6" stroke-linejoin="round"/><path d="M236.2 15.8h8v2.5a4 4 0 0 1-8 0z" fill="#FF6A3D" stroke="#1D1B3A" stroke-width="1.6" stroke-linejoin="round"/><path d="M278.7 13.8h8v2.5a4 4 0 0 1-8 0z" fill="#FFFFFF" stroke="#1D1B3A" stroke-width="1.6" stroke-linejoin="round"/><path d="M321.0 18.3h8v2.5a4 4 0 0 1-8 0z" fill="#1F9E92" stroke="#1D1B3A" stroke-width="1.6" stroke-linejoin="round"/>
+<path d="M-12 142Q76 96 186 128T352 116V200H-12z" fill="#D3EFEB" stroke="#1D1B3A" stroke-width="2.5" stroke-linejoin="round"/>
+<g transform="translate(62 84)"><path d="M0 30L22 8 44 30z" fill="#FF6A3D" stroke="#1D1B3A" stroke-width="2.2" stroke-linejoin="round"/><path d="M15 15l-4 15M29 15l4 15" stroke="#1D1B3A" stroke-width="1.6"/><rect x="4" y="30" width="36" height="16" fill="#FFFFFF" stroke="#1D1B3A" stroke-width="2.2"/><path d="M22 8V0l8 3-8 3" fill="#1F9E92" stroke="#1D1B3A" stroke-width="1.6" stroke-linejoin="round"/></g>
+<path d="M-12 164Q112 128 242 152T352 148V200H-12z" fill="#1F9E92" stroke="#1D1B3A" stroke-width="2.5" stroke-linejoin="round"/>
+<path d="M136 162l62-8 16 18-66 8z" fill="#FFFFFF" stroke="#1D1B3A" stroke-width="2.2" stroke-linejoin="round"/><path d="M150 160.5l5 17M166 158.5l6 17M182 156.5l6 17" stroke="#FF6A3D" stroke-width="3"/>
+<g transform="translate(158 140)"><path d="M-9 20c0-9 4-14 9-14s9 5 9 14z" fill="#FF6A3D" stroke="#1D1B3A" stroke-width="2"/><circle cx="0" cy="0" r="7" fill="#FFFFFF" stroke="#1D1B3A" stroke-width="2"/></g>
+<g transform="translate(186 137)"><path d="M-9 20c0-9 4-14 9-14s9 5 9 14z" fill="#1F9E92" stroke="#1D1B3A" stroke-width="2"/><circle cx="0" cy="0" r="7" fill="#FFFFFF" stroke="#1D1B3A" stroke-width="2"/></g>
+<g transform="translate(124 160) rotate(22)"><rect x="-2.5" y="-40" width="5" height="30" rx="1" fill="#1D1B3A"/><path d="M-4 -42h8v5h-8z" fill="#1D1B3A"/><path d="M0 -13c6 0 8.5 3.2 8.5 7 0 2.4-1.4 3.6-1.4 5.2 0 2 3.4 3.6 3.4 8.3C10.5 13.5 5.8 17 0 17s-10.5-3.5-10.5-9.5c0-4.7 3.4-6.3 3.4-8.3 0-1.6-1.4-2.8-1.4-5.2 0-3.8 2.5-7 8.5-7z" fill="#FFFFFF" stroke="#1D1B3A" stroke-width="2" stroke-linejoin="round"/><circle cx="0" cy="3" r="3.2" fill="#1D1B3A"/><path d="M-4 10h8" stroke="#1D1B3A" stroke-width="2" stroke-linecap="round"/></g>
+<g fill="#1D1B3A"><path d="M118 52V34l14-4v18" fill="none" stroke="#1D1B3A" stroke-width="2.2" stroke-linejoin="round"/><ellipse cx="114.5" cy="53" rx="4.5" ry="3.6"/><ellipse cx="128.5" cy="49" rx="4.5" ry="3.6"/><path d="M302 132v-14" stroke="#1D1B3A" stroke-width="2.2"/><ellipse cx="298.5" cy="133" rx="4.5" ry="3.6"/><path d="M302 118c4 1 7 4 6 8" fill="none" stroke="#1D1B3A" stroke-width="2.2" stroke-linecap="round"/></g>
+</svg>
+      <span class="sticker orange tilt-l s1">周六黄昏</span>
+      <span class="sticker tilt-r s2">剩 54 席</span>
+    </div>
+    <div class="feature-body">
+      <h3 class="round">黄昏草地音乐会 · 不插电专场</h3>
+      <p class="meta"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/></svg>周六 16:30<i>·</i>青柳公园东草坪<i>·</i>3.2 km</p>
+      <div class="feature-foot">
+        <span class="price-tag">¥68<small>起</small></span>
+        <span class="going"><span class="faces" aria-hidden="true"><i class="f1"></i><i class="f2"></i><i class="f3"></i></span>186 人报名</span>
+        <span class="go" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6l6 6-6 6"/></svg></span>
+      </div>
+    </div>
+  </a>
+
+  <article class="row card">
+    <div class="thumb"><svg class="thumb-ill" viewBox="0 0 88 88" aria-hidden="true">
+<rect width="88" height="88" fill="#D3EFEB"/>
+<circle cx="70" cy="18" r="7" fill="#FFFFFF" stroke="#1D1B3A" stroke-width="2"/>
+<rect x="37" y="66" width="14" height="24" fill="#1D1B3A"/>
+<ellipse cx="44" cy="66" rx="30" ry="8" fill="#1F9E92" stroke="#1D1B3A" stroke-width="2.2"/>
+<path d="M25 40h38c0 14-7 22-19 22S25 54 25 40z" fill="#FF6A3D" stroke="#1D1B3A" stroke-width="2.2" stroke-linejoin="round"/>
+<ellipse cx="44" cy="40" rx="19" ry="5.5" fill="#FFE0D3" stroke="#1D1B3A" stroke-width="2.2"/>
+<path d="M33 50c4 3 18 3 22 0" fill="none" stroke="#1D1B3A" stroke-width="1.6" stroke-linecap="round"/>
+<path d="M10 60c-4-6-4-14 0-20M78 60c4-6 4-14 0-20" fill="none" stroke="#1D1B3A" stroke-width="2" stroke-linecap="round"/>
+<path d="M14 14l12 12" stroke="#1D1B3A" stroke-width="4" stroke-linecap="round"/><circle cx="12" cy="12" r="4" fill="#FF6A3D" stroke="#1D1B3A" stroke-width="2"/>
+</svg></div>
+    <div class="row-body">
+      <p class="row-top"><span class="tag ">手作</span><span class="left">剩 6 席</span></p>
+      <h3>陶土小碗手作课</h3>
+      <p class="meta">周六 14:00 · 旧砖厂工坊</p>
+      <p class="row-foot"><span class="price-tag">¥128</span><span class="unit">/人 · 2 小时</span></p>
+    </div>
+  </article>
+
+  <article class="row card">
+    <div class="thumb"><svg class="thumb-ill" viewBox="0 0 88 88" aria-hidden="true">
+<rect width="88" height="88" fill="#FFE0D3"/>
+<circle cx="18" cy="20" r="9" fill="#FF6A3D" stroke="#1D1B3A" stroke-width="2"/>
+<path d="M6 46h76M6 56h76M14 40v26M44 40v26M74 40v26" stroke="#1D1B3A" stroke-width="2" stroke-linecap="round"/>
+<path d="M-2 66Q44 56 90 66V90H-2z" fill="#1F9E92" stroke="#1D1B3A" stroke-width="2.2"/>
+<path d="M33 66v10M48 66v10" stroke="#1D1B3A" stroke-width="3.4" stroke-linecap="round"/>
+<path d="M22 58a7 7 0 0 1 5-11 8 8 0 0 1 12-4 8 8 0 0 1 13 2 7 7 0 0 1 5 11 7 7 0 0 1-7 9H29a7 7 0 0 1-7-7z" fill="#FFFFFF" stroke="#1D1B3A" stroke-width="2.2" stroke-linejoin="round"/>
+<ellipse cx="62" cy="52" rx="8" ry="9.5" fill="#1D1B3A"/><path d="M55 46l-5-3M69 46l5-3" stroke="#1D1B3A" stroke-width="3" stroke-linecap="round"/>
+<circle cx="59.5" cy="51" r="1.6" fill="#FFFFFF"/><circle cx="65" cy="51" r="1.6" fill="#FFFFFF"/>
+<circle cx="70" cy="26" r="6" fill="#FF6A3D" stroke="#1D1B3A" stroke-width="2"/><path d="M70 20l2-4" stroke="#1D1B3A" stroke-width="2" stroke-linecap="round"/><path d="M72 17c3-2 6-1 7 1-3 1-5 1-7-1z" fill="#1F9E92" stroke="#1D1B3A" stroke-width="1.4"/>
+</svg></div>
+    <div class="row-body">
+      <p class="row-top"><span class="tag o">亲子</span></p>
+      <h3>云杉农场亲子日：喂小羊</h3>
+      <p class="meta">周日 09:30 · 云杉农场</p>
+      <p class="row-foot"><span class="price-tag">¥99</span><span class="unit">/家庭 · 含午餐</span></p>
+    </div>
+  </article>
+
+  <article class="row card">
+    <div class="thumb"><svg class="thumb-ill" viewBox="0 0 88 88" aria-hidden="true">
+<rect width="88" height="88" fill="#1D1B3A"/>
+<circle cx="64" cy="22" r="11" fill="#FFF7E8"/><circle cx="70" cy="18" r="9" fill="#1D1B3A"/>
+<path d="M18 16v6M15 19h6M38 30v4M36 32h4M76 44v4M74 46h4" stroke="#FFF7E8" stroke-width="1.8" stroke-linecap="round"/>
+<path d="M0 74h88" stroke="#FFF7E8" stroke-width="2" stroke-dasharray="8 6"/>
+<circle cx="24" cy="58" r="12" fill="none" stroke="#FF6A3D" stroke-width="3.4"/><circle cx="64" cy="58" r="12" fill="none" stroke="#FF6A3D" stroke-width="3.4"/>
+<path d="M24 58l12-18h18l10 18M36 40l8 18h-20M44 58l10-18M34 34h8M54 40l-2-6h6" fill="none" stroke="#FFF7E8" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="44" cy="58" r="2.6" fill="#1F9E92"/>
+</svg></div>
+    <div class="row-body">
+      <p class="row-top"><span class="tag w">户外</span><span class="left">限 40 人</span></p>
+      <h3>夜骑西环 18 公里</h3>
+      <p class="meta">周六 19:00 · 西环绿道北口</p>
+      <p class="row-foot"><span class="price-tag">¥0</span><span class="unit">自带车 · 有头盔借</span></p>
+    </div>
+  </article>
+</main>
+
+<nav class="mp-tabbar" aria-label="主导航">
+  <a class="on" href="discover.html" aria-current="page"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M15.6 8.4l-2.1 5.1-5.1 2.1 2.1-5.1z"/></svg><span>发现</span></a>
+  <span class="tab"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span>日历</span></span>
+  <span class="tab"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 7.5a2 2 0 0 1 2-2h13a2 2 0 0 1 2 2v2a2.5 2.5 0 0 0 0 5v2a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2v-2a2.5 2.5 0 0 0 0-5z"/><path d="M14.5 6.5v2M14.5 11v2M14.5 15.5v2"/></svg><span>票夹</span></span>
+  <span class="tab"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20.5c1.3-3.8 4.1-5.6 7.5-5.6s6.2 1.8 7.5 5.6"/></svg><span>我的</span></span>
+</nav>
+
+<style>
+.logo { width: 32px; height: 32px; display: grid; place-items: center; border: var(--stroke); border-radius: 50%; background: var(--color-primary); box-shadow: var(--shadow-sm); transform: rotate(-8deg); }
+.logo .ico { width: 18px; height: 18px; stroke-width: 2.4; fill: var(--color-surface); }
+.brand { font-size: var(--text-xl); font-weight: 800; letter-spacing: .02em; }
+.city { display: inline-flex; align-items: center; gap: 2px; height: 44px; padding: 0 6px; font-size: var(--text-md); font-weight: 700; }
+.city > span { line-height: 1; }
+
+.hello { position: relative; padding: 16px 0 16px; }
+.when { margin-left: 2px; }
+.hello h2 { margin-top: 12px; font-size: var(--text-2xl); font-weight: 800; line-height: 1.25; letter-spacing: -.01em; }
+.weather { position: absolute; right: 4px; top: 28px; width: 92px; padding: 10px 8px 8px; border: var(--stroke); border-radius: 18px; background: var(--color-surface); box-shadow: var(--shadow-sm); text-align: center; }
+.weather svg { width: 36px; height: 36px; margin: 0 auto; }
+.weather b { display: block; font-size: var(--text-xl); line-height: 1.2; }
+.weather span { display: block; font-size: var(--text-sm); font-weight: 600; color: var(--color-muted); }
+
+.search { display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border: var(--stroke); border-radius: var(--radius-full); background: var(--color-surface); color: var(--color-muted); }
+.search .ico { color: var(--color-text); }
+
+.chips { display: flex; gap: 8px; margin-top: 8px; }
+.chip { height: 44px; display: grid; align-content: center; }
+.chip > span { display: grid; place-items: center; height: 34px; padding: 0 14px; border: var(--stroke); border-radius: var(--radius-full); background: var(--color-surface); font-weight: 700; }
+.chip.on > span { background: var(--color-primary); box-shadow: var(--shadow-sm); font-weight: 800; }
+
+.sec { display: flex; align-items: center; gap: 8px; margin: 4px 0 4px; }
+.sec h3 { font-size: var(--text-lg); font-weight: 800; }
+.sec .muted { font-size: var(--text-sm); }
+.sort { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; height: 44px; padding: 0 2px 0 8px; font-size: var(--text-sm); font-weight: 700; }
+
+.feature { display: block; overflow: hidden; margin-right: 4px; }
+.feature-ill { position: relative; height: 156px; border-bottom: var(--stroke); }
+.ill { width: 100%; height: 100%; }
+.s1 { position: absolute; left: 12px; top: 12px; }
+.s2 { position: absolute; right: 12px; top: 14px; }
+.feature-body { padding: 12px 14px 14px; }
+.feature-body h3 { font-size: var(--text-lg); font-weight: 800; line-height: 1.35; }
+.meta { display: flex; align-items: center; gap: 4px; margin-top: 4px; font-size: var(--text-sm); color: var(--color-muted); white-space: nowrap; }
+.meta i { font-style: normal; }
+.feature-foot { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
+.going { display: inline-flex; align-items: center; gap: 6px; font-size: var(--text-sm); color: var(--color-muted); }
+.faces { display: inline-flex; }
+.faces i { width: 22px; height: 22px; border: var(--stroke); border-radius: 50%; margin-left: -7px; background: var(--color-accent); }
+.faces i:first-child { margin-left: 0; background: var(--color-primary); }
+.faces .f3 { background: var(--color-primary-soft); }
+.go { margin-left: auto; width: 32px; height: 32px; display: grid; place-items: center; border: var(--stroke); border-radius: 50%; background: var(--color-accent); }
+.go .ico { width: 18px; height: 18px; stroke-width: 2.6; }
+
+.row { display: flex; gap: 12px; margin-top: 16px; margin-right: 4px; padding: 10px; }
+.thumb { flex-shrink: 0; width: 88px; height: 88px; border: var(--stroke); border-radius: 12px; overflow: hidden; }
+.thumb-ill { width: 100%; height: 100%; }
+.row-body { flex: 1; min-width: 0; }
+.row-top { display: flex; align-items: center; justify-content: space-between; }
+.left { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border: 1.5px solid var(--color-line); border-radius: 6px; background: var(--color-primary); font-size: var(--text-sm); font-weight: 800; transform: rotate(3deg); white-space: nowrap; }
+.row h3 { margin-top: 4px; font-family: var(--font-round); font-size: var(--text-md); font-weight: 800; line-height: 1.35; }
+.row .meta { margin-top: 2px; }
+.row-foot { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+.row-foot .price-tag { font-size: var(--text-md); line-height: 24px; }
+.unit { font-size: var(--text-sm); color: var(--color-muted); white-space: nowrap; }
+</style>
+</body>
+</html>

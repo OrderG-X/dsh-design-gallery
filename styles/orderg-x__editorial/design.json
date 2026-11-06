@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "杂志编辑",
+    "en": "Editorial"
+  },
+  "description": {
+    "zh": "大标题、黑线栅格、红色点题",
+    "en": "Big headlines, black-rule grid, a red accent"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

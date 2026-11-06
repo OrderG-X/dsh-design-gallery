@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "中式雅致",
+    "en": "Ink & paper"
+  },
+  "description": {
+    "zh": "宣纸底、墨色字、朱砂点缀",
+    "en": "Paper white, ink-black type, a touch of cinnabar"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

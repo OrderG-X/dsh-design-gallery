@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#FAFAF9",
+    "surface": "#FFFFFF",
+    "text": "#18181B",
+    "muted": "#6B6B73",
+    "line": "#E4E4E7",
+    "primary": "#18181B",
+    "accent": "#2563EB",
+    "on": "#FFFFFF",
+    "link": "#2563EB"
+  },
+  "head": "SANS",
+  "w": 600,
+  "radius": 10,
+  "shadow": "0 1px 2px rgba(24,24,27,.06)",
+  "dzh": "大留白、细线、黑白加一点蓝",
+  "den": "Lots of space, hairlines, black and white with a touch of blue",
+  "nzh": "靠字号和留白分层级，不靠色块；分隔用 1px 细线；蓝色只给链接和选中态；大标题字距收 -0.02em",
+  "nen": "Hierarchy from type size and whitespace, not color blocks; 1px hairlines; blue only for links and selection; tighten big headings to -0.02em"
+}

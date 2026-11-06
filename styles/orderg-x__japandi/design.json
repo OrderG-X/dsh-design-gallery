@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "日系原木",
+    "en": "Japandi"
+  },
+  "description": {
+    "zh": "米色原木、低饱和、小字大留白",
+    "en": "Oat and wood tones, muted, small type and lots of space"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

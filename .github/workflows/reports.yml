@@ -1,0 +1,89 @@
+# 举报：仿冒钓鱼、色情暴力两类，3 个满 30 天的不同账号分别举报同一套 → 先自动隐藏（写下架名单、立刻发新目录），等维护者判断。
+# 误伤：维护者回 /restore 作者__名字。别的类别只通知维护者，不自动动。
+# 举报内容不可信：只经环境变量传，脚本严格解析（id 只认 作者__名字）。
+name: reports
+
+on:
+  issues:
+    types: [opened]
+
+permissions: {}
+
+# 不设 concurrency：共用一个组时排队的会被后来的顶掉（漏算）。每条举报各跑各的；写 main 时冲突了重来（下架是幂等的）
+jobs:
+  report:
+    if: contains(github.event.issue.labels.*.name, 'report')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - id: app
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.GALLERY_APP_ID }}
+          private-key: ${{ secrets.GALLERY_APP_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app.outputs.token }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 读这条举报
+        id: r
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          node scripts/reports.mjs parse
+
+      - name: 数有效举报，够了就先隐藏
+        if: steps.r.outputs.hide_kind == 'true'
+        id: d
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          ID: ${{ steps.r.outputs.id }}
+        run: |
+          set -euo pipefail
+          # 还开着的举报全取（分页）；先挑出有效举报人（按数字 id 去重），只查他们的账号年龄
+          gh api --paginate "repos/$GITHUB_REPOSITORY/issues?labels=report&state=open&per_page=100" | jq -s 'add // []' > issues.json
+          echo '{}' > ages.json
+          # 候选人全查（不截断）；凑够 3 个满 30 天的就不用再查了
+          cut=$(date -u -d '30 days ago' +%Y-%m-%dT%H:%M:%SZ); ok=0
+          for u in $(node scripts/reports.mjs candidates --id "$ID" --issues issues.json | grep -E '^[A-Za-z0-9-]{1,39}$'); do
+            c=$(gh api "users/$u" --jq .created_at 2>/dev/null || echo '')
+            jq --arg u "$u" --arg c "$c" '. + {($u): $c}' ages.json > ages.tmp && mv ages.tmp ages.json
+            if [ -n "$c" ] && [ "$c" \< "$cut" ]; then ok=$((ok + 1)); fi
+            if [ "$ok" -ge 3 ]; then break; fi
+          done
+          # 写 main：先对齐最新的 main 再判断、再提交；推不上去（别的举报 / 命令刚推过）就重来
+          for try in 1 2 3 4 5; do
+            git fetch -q origin main && git reset -q --hard origin/main
+            node scripts/reports.mjs decide --id "$ID" --issues issues.json --ages ages.json --apply --out action.json
+            cat action.json
+            f=$(jq -r '.changed // ""' action.json)
+            if [ -z "$f" ] || git diff --quiet -- "$f"; then break; fi
+            git -c user.name=dsh-design-gallery-bot -c user.email=bot@users.noreply.github.com commit -q -m "auto-hide $ID (3 reports)" -- "$f"
+            if git push -q origin HEAD:main; then
+              gh workflow run publish.yml --ref main >/dev/null
+              echo "hidden=true" >> "$GITHUB_OUTPUT"
+              break
+            fi
+            sleep $((try * 5))
+          done
+
+      - name: 告诉举报人和维护者
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          N: ${{ github.event.issue.number }}
+          HIDDEN: ${{ steps.d.outputs.hidden }}
+          ID: ${{ steps.r.outputs.id }}
+        run: |
+          if [ "$HIDDEN" = "true" ]; then
+            printf '已有 3 个账号举报，**先自动隐藏了**（新目录发出后插件里就看不到），维护者会尽快判断。\nThree accounts reported this design, so it is **hidden for now**; a maintainer will review it soon.\n\n维护者：确认违规不用动；误伤回 `/restore %s`。\n' "$ID" > reply.md
+            gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$N/labels" -f 'labels[]=auto-hidden' >/dev/null || true
+          else
+            printf '收到，维护者会看。 / Thanks, a maintainer will take a look.\n' > reply.md
+          fi
+          gh issue comment "$N" --repo "$GITHUB_REPOSITORY" --body-file reply.md >/dev/null

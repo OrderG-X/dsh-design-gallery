@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="dsh-design" content="web">
+<title>组件 · 青石 Slate</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<style>
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+  body { margin: 0; background: var(--color-bg); color: var(--color-text); font: var(--weight-regular) var(--text-md)/var(--leading-normal) var(--font-sans); -webkit-font-smoothing: antialiased; }
+  .sym { display: none; }
+  .doc { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: 100vh; }
+
+  /* 侧栏 */
+  .side { position: sticky; top: 0; height: 100vh; box-sizing: border-box; overflow-y: auto; padding: var(--space-4) var(--space-3) var(--space-5); background: var(--color-surface); border-right: 1px solid var(--color-line); }
+  .logo { display: flex; align-items: center; gap: 10px; padding: 4px var(--space-2) var(--space-4); text-decoration: none; color: var(--color-text); }
+  .logo svg { width: 28px; height: 28px; flex: none; }
+  .logo b { display: block; font: var(--weight-semibold) var(--text-md)/1.2 var(--font-sans); }
+  .logo span { display: block; font: var(--weight-regular) var(--text-xs)/1.3 var(--font-sans); color: var(--color-muted); }
+  .side .input-wrap { margin: 0 0 var(--space-2); }
+  .side .nav-title:first-of-type { margin-top: var(--space-3); }
+  .side-foot { margin: var(--space-5) var(--space-2) 0; padding-top: var(--space-4); border-top: 1px solid var(--color-line); }
+
+  /* 正文区 */
+  .main { min-width: 0; }
+  .topbar { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: var(--space-3); height: 48px; padding: 0 var(--space-6); background: var(--color-bg); border-bottom: 1px solid var(--color-line); }
+  .topbar .spacer { flex: 1; }
+  .wrap { max-width: 976px; margin: 0 auto; padding: 0 var(--space-6) var(--space-8); }
+  .hero { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-5); align-items: end; padding: var(--space-6) 0 var(--space-5); }
+  .hero .lead { margin: var(--space-2) 0 0; max-width: 34em; font-size: var(--text-lg); line-height: var(--leading-normal); color: var(--color-muted); }
+  .hero-meta { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4); }
+  .facts { display: grid; grid-template-columns: repeat(3, auto); gap: var(--space-1) var(--space-5); padding: var(--space-3) var(--space-4); border: 1px solid var(--color-line); border-radius: var(--radius-lg); background: var(--color-surface); }
+  .facts dt { font: var(--weight-regular) var(--text-xs)/1.3 var(--font-sans); color: var(--color-muted); }
+  .facts dd { margin: 0; font: var(--weight-semibold) var(--text-xl)/1.2 var(--font-sans); font-variant-numeric: var(--numeric); }
+
+  /* 预览：一块真实界面 */
+  .preview { border: 1px solid var(--color-line); border-radius: var(--radius-xl); background: var(--color-surface); box-shadow: var(--shadow-md); overflow: hidden; }
+  .preview .navbar { height: 44px; }
+  .pv-body { display: grid; grid-template-columns: 176px minmax(0, 1fr); }
+  .pv-side { padding: var(--space-3) var(--space-2); background: var(--color-surface-2); border-right: 1px solid var(--color-line); }
+  .pv-side .nav-item { background: transparent; }
+  .pv-side .nav-item[aria-current="page"] { background: var(--color-surface); box-shadow: var(--shadow-sm); }
+  .pv-main { padding: var(--space-4); min-width: 0; background: var(--color-bg); }
+  .pv-head { display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-3); }
+  .pv-head .h3 { flex: 1; }
+  .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-3); margin-bottom: var(--space-3); }
+  .stats .card { padding: var(--space-3) var(--space-4); }
+  .stats .stat-value { font-size: var(--text-2xl); margin-top: 6px; }
+  .spark { display: block; width: 100%; height: 22px; margin-top: 6px; }
+
+  /* 分区 */
+  .sec { padding: var(--space-7) 0 0; scroll-margin-top: 56px; }
+  .sec-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--color-line); }
+  .sec-head p { margin: 0; color: var(--color-muted); font-size: var(--text-sm); }
+  .sub { margin: var(--space-5) 0 var(--space-3); font: var(--weight-semibold) var(--text-sm)/1 var(--font-sans); color: var(--color-muted); }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+  .demo { padding: var(--space-5); border: 1px solid var(--color-line); border-radius: var(--radius-lg); background: var(--color-surface); }
+  .demo + .demo { margin-top: var(--space-3); }
+  .grid-2 > .demo + .demo, .grid-3 > .demo + .demo { margin-top: 0; }
+  code.v { font: var(--weight-regular) var(--text-xs)/1.3 var(--font-mono); color: var(--color-muted); }
+
+  /* 颜色 */
+  .ramp { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); border: 1px solid var(--color-line); border-radius: var(--radius-lg); overflow: hidden; background: var(--color-surface); }
+  .ramp figure { margin: 0; border-left: 1px solid var(--color-line); }
+  .ramp figure:first-child { border-left: 0; }
+  .chip { display: block; height: 64px; border-bottom: 1px solid var(--color-line); }
+  .sw figcaption, .ramp figcaption { display: grid; gap: 2px; padding: 8px 10px 10px; font-size: var(--text-xs); line-height: 1.35; }
+  .sw b, .ramp b { font: var(--weight-semibold) var(--text-sm)/1.3 var(--font-sans); color: var(--color-text); }
+  .sw span, .ramp span { color: var(--color-muted); font-variant-numeric: var(--numeric); }
+  .swatches { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--space-3); }
+  .sw { margin: 0; border: 1px solid var(--color-line); border-radius: var(--radius-lg); overflow: hidden; background: var(--color-surface); }
+  .sw .chip { height: 56px; display: flex; align-items: flex-end; padding: 8px 10px; box-sizing: border-box; font: var(--weight-semibold) var(--text-sm)/1 var(--font-sans); }
+  .ratio { display: flex; height: 28px; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--color-line); font: var(--weight-medium) var(--text-xs)/28px var(--font-sans); }
+  .ratio i { font-style: normal; padding: 0 10px; white-space: nowrap; overflow: hidden; }
+
+  /* 字体 */
+  .type-row { display: grid; grid-template-columns: 148px minmax(0, 1fr); gap: var(--space-4); align-items: baseline; padding: 10px 0; border-bottom: 1px solid var(--color-line); }
+  .type-row:last-child { border-bottom: 0; }
+  .type-row code { font: var(--weight-regular) var(--text-xs)/1.4 var(--font-mono); color: var(--color-muted); }
+  .type-row span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.25; }
+  .nums { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+  .nums ol { margin: 0; padding: 0; list-style: none; font-size: var(--text-lg); text-align: right; }
+  .nums li { padding: 4px 0; border-bottom: 1px dashed var(--color-line); }
+  .prop { font-variant-numeric: proportional-nums; font-feature-settings: "tnum" 0; }
+
+  /* 间距、圆角、阴影 */
+  .spaces { display: grid; gap: 8px; }
+  .space { display: grid; grid-template-columns: 92px 40px 1fr; align-items: center; gap: var(--space-3); font-size: var(--text-sm); }
+  .space i { display: block; height: 12px; border-radius: 2px; background: var(--color-primary); opacity: .85; }
+  .space code { font: var(--weight-regular) var(--text-xs)/1 var(--font-mono); color: var(--color-muted); }
+  .radii { display: flex; gap: var(--space-4); flex-wrap: wrap; }
+  .radii div { display: grid; justify-items: center; gap: 6px; font-size: var(--text-xs); color: var(--color-muted); }
+  .radii i { display: block; width: 56px; height: 56px; border: 1px solid var(--color-line-strong); background: var(--color-primary-soft); }
+  .shadows { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
+  .shadows div { height: 72px; border-radius: var(--radius-lg); background: var(--color-surface); display: grid; place-items: center; font: var(--weight-regular) var(--text-xs)/1 var(--font-mono); color: var(--color-muted); }
+
+  /* 按钮矩阵 */
+  .matrix { display: grid; grid-template-columns: 88px repeat(4, minmax(0, 1fr)); align-items: center; gap: var(--space-3) var(--space-4); }
+  .matrix .h { font: var(--weight-medium) var(--text-xs)/1 var(--font-sans); color: var(--color-muted); }
+
+  /* 用 / 别 */
+  .rules { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-top: var(--space-3); }
+  .rule { display: grid; grid-template-columns: 16px 1fr; gap: var(--space-2); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--color-surface); border: 1px solid var(--color-line); font-size: var(--text-sm); line-height: var(--leading-normal); }
+  .rule svg { width: 16px; height: 16px; margin-top: 2px; }
+  .rule.do { border-top: 2px solid var(--color-success); }
+  .rule.do svg { color: var(--color-success); }
+  .rule.dont { border-top: 2px solid var(--color-danger); }
+  .rule.dont svg { color: var(--color-danger); }
+  .rule p { margin: 0; }
+  .rule b { font-weight: var(--weight-semibold); }
+
+  .form-demo { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4) var(--space-5); }
+  .form-demo .full { grid-column: 1 / -1; }
+  .opts { display: grid; gap: 4px; }
+  .table-foot { display: flex; align-items: center; justify-content: space-between; padding: 8px var(--space-3); border-top: 1px solid var(--color-line); color: var(--color-muted); font-size: var(--text-sm); }
+  .toolbar { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-3); border-bottom: 1px solid var(--color-line); }
+  .toolbar .input-wrap { width: 240px; }
+  .stage { position: relative; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--color-line); background: var(--color-bg); }
+  .stage .modal-scrim { position: absolute; inset: 0; }
+  .ghost-page { height: 392px; }
+  .gp-bar { display: flex; align-items: center; gap: var(--space-3); height: 48px; padding: 0 var(--space-4); background: var(--color-surface); border-bottom: 1px solid var(--color-line); }
+  .gp-bar i, .gp-body i { display: block; height: 10px; border-radius: var(--radius-sm); background: var(--color-surface-2); }
+  .gp-bar i:last-child { height: 24px; }
+  .gp-body { display: grid; gap: 14px; padding: var(--space-5); }
+  .gp-body i:not(:first-child) { height: 36px; background: var(--color-surface); border: 1px solid var(--color-line); box-sizing: border-box; }
+  .stage-bg { background: linear-gradient(var(--color-bg), var(--color-bg)); }
+  .toasts { display: grid; gap: var(--space-3); justify-items: start; }
+  .list { margin: 0; padding: 0; list-style: none; }
+  .list li { display: flex; align-items: center; gap: var(--space-3); padding: 10px 0; border-bottom: 1px solid var(--color-line); }
+  .list li:last-child { border-bottom: 0; }
+  .list .grow { flex: 1; min-width: 0; }
+  .dark-panel { display: grid; grid-template-columns: 1.2fr 1fr; gap: var(--space-4); padding: var(--space-5); border-radius: var(--radius-xl); background: var(--color-bg); color: var(--color-text); }
+  .foot { margin-top: var(--space-8); padding-top: var(--space-4); border-top: 1px solid var(--color-line); display: flex; justify-content: space-between; color: var(--color-muted); font-size: var(--text-sm); }
+</style>
+</head>
+<body>
+<svg class="sym" aria-hidden="true">
+  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M7 12h10M10 18h4"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.3 2.4 2.4 4.8-5"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 4.2 2.8 17.5A2 2 0 0 0 4.5 20.5h15a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0z"/><path d="M12 10v4M12 17v.5"/></symbol>
+  <symbol id="i-err" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></symbol>
+  <symbol id="i-rocket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4c3.5 0 6 2.5 6 6-2 4-6 7-9 8l-5-5c1-3 4-7 8-9z"/><circle cx="14.5" cy="9.5" r="1.6"/><path d="M6 13l-2 1 1 4 4 1 1-2"/></symbol>
+  <symbol id="i-server" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><rect x="4" y="4" width="16" height="7" rx="1.5"/><rect x="4" y="13" width="16" height="7" rx="1.5"/><path d="M8 7.5h.01M8 16.5h.01"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15z"/><path d="M10 20.5h4"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="9" cy="9" r="3.5"/><path d="M3 20c.5-3.5 3-5.5 6-5.5s5.5 2 6 5.5"/><path d="M16 5.5a3.5 3.5 0 0 1 0 7M18 14.8c1.7.7 2.8 2.5 3 5.2"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M5.6 18.4l1.8-1.8M16.6 7.4l1.8-1.8"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V4M4 20h16M8 16v-4M12 16V8M16 16v-6"/></symbol>
+  <symbol id="i-branch" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><circle cx="7" cy="5.5" r="2"/><circle cx="7" cy="18.5" r="2"/><circle cx="17" cy="8" r="2"/><path d="M7 7.5v9M17 10c0 4-10 2.5-10 6.5"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 13 6.5 5h11L20 13v6H4z"/><path d="M4 13h4.5l1 2h5l1-2H20"/></symbol>
+  <symbol id="i-sort" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m8 10 4-4 4 4M8 14l4 4 4-4"/></symbol>
+</svg>
+
+<div class="doc">
+  <aside class="side">
+    <a class="logo" href="#top">
+      <svg viewBox="0 0 28 28" aria-hidden="true"><rect x="2" y="15" width="24" height="9" rx="3" fill="#2D5E91"/><rect x="5" y="8.5" width="18" height="8" rx="3" fill="#5B82AB"/><rect x="8" y="3" width="12" height="7" rx="3" fill="#A9BFD6"/></svg>
+      <div><b>青石 Slate</b><span>设计系统 · v1.0</span></div>
+    </a>
+    <label class="input-wrap"><svg><use href="#i-search"/></svg><input class="input input-sm" placeholder="查组件、变量" aria-label="查组件、变量"><span class="kbd">/</span></label>
+    <nav class="nav" aria-label="目录">
+      <p class="nav-title">基础</p>
+      <a class="nav-item" href="#color" aria-current="page"><svg><use href="#i-grid"/></svg>颜色</a>
+      <a class="nav-item" href="#type"><svg><use href="#i-chart"/></svg>字体与数字</a>
+      <a class="nav-item" href="#space"><svg><use href="#i-server"/></svg>间距、圆角、阴影</a>
+      <p class="nav-title">组件</p>
+      <a class="nav-item" href="#buttons">按钮</a>
+      <a class="nav-item" href="#forms">表单</a>
+      <a class="nav-item" href="#tags">标签与状态</a>
+      <a class="nav-item" href="#cards">卡片</a>
+      <a class="nav-item" href="#table">表格<span class="badge badge-muted">常用</span></a>
+      <a class="nav-item" href="#feedback">提示条与轻提示</a>
+      <a class="nav-item" href="#navs">标签页与导航</a>
+      <a class="nav-item" href="#modal">弹窗</a>
+      <a class="nav-item" href="#avatar">头像</a>
+      <a class="nav-item" href="#empty">空状态</a>
+      <p class="nav-title">主题</p>
+      <a class="nav-item" href="#dark">深色</a>
+    </nav>
+    <div class="side-foot"><p class="caption">CC0 · 随便用，不用署名</p></div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar" id="top">
+      <nav class="breadcrumb" aria-label="位置"><a href="#top">设计系统</a><span>/</span><span aria-current="page">青石 Slate</span></nav>
+      <span class="spacer"></span>
+      <span class="tag tag-success"><span class="dot dot-success"></span>稳定版</span>
+      <a class="btn btn-secondary btn-sm" href="#dark">看深色</a>
+    </header>
+
+    <div class="wrap">
+      <section class="hero">
+        <div>
+          <p class="overline">设计系统 · 工具软件与后台</p>
+          <h1 class="display" style="margin-top:10px">青石 Slate</h1>
+          <p class="lead">冷静的蓝灰、密而不挤的排布、对得齐的数字。给每天要盯着看八小时的控制台、后台和数据工具用。</p>
+          <div class="hero-meta">
+            <span class="tag tag-outline">8px 网格</span>
+            <span class="tag tag-outline">正文 14px</span>
+            <span class="tag tag-outline">圆角 4 / 6 / 8</span>
+            <span class="tag tag-outline">等宽数字</span>
+            <span class="tag tag-accent">锈铜点缀</span>
+          </div>
+        </div>
+        <dl class="facts">
+          <dt>正文字号</dt><dt>网格</dt><dt>正文对比</dt>
+          <dd class="num">14px</dd><dd class="num">8px</dd><dd class="num">15.1:1</dd>
+        </dl>
+      </section>
+
+      <div class="preview" aria-label="界面示例">
+        <div class="navbar">
+          <a class="brand" href="#top"><svg width="18" height="18" viewBox="0 0 28 28" aria-hidden="true"><rect x="2" y="15" width="24" height="9" rx="3" fill="#2D5E91"/><rect x="5" y="8.5" width="18" height="8" rx="3" fill="#5B82AB"/><rect x="8" y="3" width="12" height="7" rx="3" fill="#A9BFD6"/></svg>北岸控制台</a>
+          <nav class="breadcrumb" aria-label="位置"><a href="#top">订单平台</a><span>/</span><span aria-current="page">部署</span></nav>
+          <span class="spacer"></span>
+          <label class="input-wrap" style="width:220px"><svg><use href="#i-search"/></svg><input class="input input-sm" placeholder="搜服务、提交、负责人" aria-label="搜索"><span class="kbd">⌘K</span></label>
+          <a class="btn btn-ghost btn-icon btn-sm" href="#feedback" aria-label="通知"><svg><use href="#i-bell"/></svg></a>
+          <span class="avatar avatar-sm">林</span>
+        </div>
+        <div class="pv-body">
+          <nav class="pv-side nav" aria-label="控制台">
+            <a class="nav-item" href="#cards"><svg><use href="#i-chart"/></svg>概览</a>
+            <a class="nav-item" href="#table" aria-current="page"><svg><use href="#i-rocket"/></svg>部署<span class="badge">3</span></a>
+            <a class="nav-item" href="#table"><svg><use href="#i-server"/></svg>环境</a>
+            <a class="nav-item" href="#table"><svg><use href="#i-branch"/></svg>分支</a>
+            <a class="nav-item" href="#feedback"><svg><use href="#i-bell"/></svg>告警</a>
+            <a class="nav-item" href="#avatar"><svg><use href="#i-users"/></svg>成员</a>
+            <a class="nav-item" href="#forms"><svg><use href="#i-gear"/></svg>设置</a>
+          </nav>
+          <div class="pv-main">
+            <div class="pv-head">
+              <h2 class="h3">部署记录</h2>
+              <div class="segmented" role="tablist"><a class="tab" role="tab" aria-selected="true" href="#navs">7 天</a><a class="tab" role="tab" href="#navs">30 天</a><a class="tab" role="tab" href="#navs">本季度</a></div>
+              <a class="btn btn-secondary btn-sm" href="#buttons"><svg><use href="#i-download"/></svg>导出</a>
+              <a class="btn btn-sm" href="#buttons"><svg><use href="#i-plus"/></svg>新建部署</a>
+            </div>
+            <div class="stats">
+              <div class="card"><div class="stat-row"><p class="stat-label">部署次数</p><span class="stat-delta up">+12.4%</span></div><p class="stat-value">1,284</p></div>
+              <div class="card"><div class="stat-row"><p class="stat-label">平均构建</p><span class="stat-delta up">−18s</span></div><p class="stat-value">3m 42s</p></div>
+              <div class="card"><div class="stat-row"><p class="stat-label">失败率</p><span class="stat-delta down">+0.3%</span></div><p class="stat-value">0.8%</p></div>
+              <div class="card"><div class="stat-row"><p class="stat-label">在线实例</p><span class="tag tag-accent">新</span></div><p class="stat-value">96 / 96</p></div>
+            </div>
+            <div class="table-wrap">
+              <table class="table table-dense">
+                <thead><tr><th>服务</th><th>提交</th><th>环境</th><th>状态</th><th class="num">耗时</th><th>负责人</th><th class="num">时间</th></tr></thead>
+                <tbody>
+                  <tr><td>order-api</td><td><span class="mono">a3f9c21</span></td><td>生产</td><td><span class="tag tag-success">成功</span></td><td class="num">3m 08s</td><td>林知夏</td><td class="num muted">14:32</td></tr>
+                  <tr><td>pay-gateway</td><td><span class="mono">7be0d44</span></td><td>预发布</td><td><span class="tag tag-primary">进行中</span></td><td class="num">1m 51s</td><td>周屿</td><td class="num muted">14:29</td></tr>
+                  <tr><td>search-index</td><td><span class="mono">c18e0f2</span></td><td>生产</td><td><span class="tag tag-danger">失败</span></td><td class="num">6m 40s</td><td>陈墨</td><td class="num muted">13:57</td></tr>
+                  <tr><td>notify-worker</td><td><span class="mono">94d2ab7</span></td><td>测试</td><td><span class="tag tag-warning">待审批</span></td><td class="num">—</td><td>许安然</td><td class="num muted">13:40</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section class="sec" id="color">
+        <div class="sec-head"><h2 class="h2">颜色</h2><p>按角色取色，不按色相。界面九成是中性色，主色只给要点的东西。</p></div>
+        <p class="sub">中性色 <span style="font-weight:400">· 变量名都是 --color-名字</span></p>
+        <div class="ramp">
+          <figure><i class="chip" style="background:var(--color-bg)"></i><figcaption><b>bg</b><span>#F3F5F8</span></figcaption></figure>
+          <figure><i class="chip" style="background:var(--color-surface)"></i><figcaption><b>surface</b><span>#FFFFFF</span></figcaption></figure>
+          <figure><i class="chip" style="background:var(--color-surface-2)"></i><figcaption><b>surface-2</b><span>#ECEFF3</span></figcaption></figure>
+          <figure><i class="chip" style="background:var(--color-line)"></i><figcaption><b>line</b><span>#DCE1E8</span></figcaption></figure>
+          <figure><i class="chip" style="background:var(--color-line-strong)"></i><figcaption><b>line-strong</b><span>#A9B3C0</span></figcaption></figure>
+          <figure><i class="chip" style="background:var(--color-muted)"></i><figcaption><b>muted</b><span>#536073 · 5.9:1</span></figcaption></figure>
+          <figure><i class="chip" style="background:var(--color-text)"></i><figcaption><b>text</b><span>#17202B · 15.1:1</span></figcaption></figure>
+        </div>
+        <p class="sub">主色、点缀、状态</p>
+        <div class="swatches">
+          <figure class="sw"><i class="chip" style="background:var(--color-primary);color:var(--color-primary-ink)">Aa 6.7</i><figcaption><b>primary 钢青</b><code class="v">--color-primary</code><span>#2D5E91 · 按钮、选中、链接</span></figcaption></figure>
+          <figure class="sw"><i class="chip" style="background:var(--color-primary-soft);color:var(--color-primary)">Aa 5.7</i><figcaption><b>primary-soft</b><code class="v">--color-primary-soft</code><span>#E5EDF6 · 选中行、信息</span></figcaption></figure>
+          <figure class="sw"><i class="chip" style="background:var(--color-accent);color:#FFFFFF">Aa 4.8</i><figcaption><b>accent 锈铜</b><code class="v">--color-accent</code><span>#B4572A · 「新」、第二条线</span></figcaption></figure>
+          <figure class="sw"><i class="chip" style="background:var(--color-success-soft);color:var(--color-success)">成功 4.6</i><figcaption><b>success</b><code class="v">--color-success</code><span>#1C7A4D / #E2F2E9</span></figcaption></figure>
+          <figure class="sw"><i class="chip" style="background:var(--color-warning-soft);color:var(--color-warning)">警告 4.8</i><figcaption><b>warning</b><code class="v">--color-warning</code><span>#8F6000 / #FBF0D6</span></figcaption></figure>
+          <figure class="sw"><i class="chip" style="background:var(--color-danger-soft);color:var(--color-danger)">错误 4.6</i><figcaption><b>danger</b><code class="v">--color-danger</code><span>#BF3B30 / #FBE8E5</span></figcaption></figure>
+          <figure class="sw"><i class="chip" style="background:var(--color-danger);color:var(--color-danger-ink)">Aa 5.4</i><figcaption><b>danger 实心</b><code class="v">--color-danger-ink</code><span>危险按钮、红角标</span></figcaption></figure>
+          <figure class="sw"><i class="chip" style="background:var(--color-inverse);color:var(--color-inverse-ink)">Aa 13</i><figcaption><b>inverse</b><code class="v">--color-inverse</code><span>#1E2833 · 轻提示</span></figcaption></figure>
+          <figure class="sw"><i class="chip" style="background:var(--color-warning-fill)"></i><figcaption><b>warning-fill</b><code class="v">--color-warning-fill</code><span>#D09A1E · 只放点和条</span></figcaption></figure>
+          <figure class="sw"><i class="chip" style="background:var(--color-overlay)"></i><figcaption><b>overlay</b><code class="v">--color-overlay</code><span>弹窗遮罩 48%</span></figcaption></figure>
+        </div>
+        <p class="sub">用量：一屏大约这样分</p>
+        <div class="ratio" aria-label="用量比例">
+          <i style="width:52%;background:var(--color-bg);color:var(--color-muted)">bg 52%</i>
+          <i style="width:30%;background:var(--color-surface);color:var(--color-muted);border-left:1px solid var(--color-line)">surface 30%</i>
+          <i style="width:8%;background:var(--color-surface-2);color:var(--color-muted)">8%</i>
+          <i style="width:6%;background:var(--color-primary);color:var(--color-primary-ink)">6%</i>
+          <i style="width:2.5%;background:var(--color-accent)"></i>
+          <i style="width:1.5%;background:var(--color-danger)"></i>
+        </div>
+        <div class="rules">
+          <div class="rule do"><svg><use href="#i-ok"/></svg><p><b>状态靠「浅底 + 深字」</b>：成功、警告、错误都用 soft 底配同色字，一整列标签也不会刺眼。</p></div>
+          <div class="rule dont"><svg><use href="#i-err"/></svg><p><b>别把锈铜当第二主色</b>：它只标「新」、对比数据的第二条线，一屏最多两处。</p></div>
+        </div>
+      </section>
+
+      <section class="sec" id="type">
+        <div class="sec-head"><h2 class="h2">字体与数字</h2><p>系统无衬线；数字一律等宽（tabular-nums），编号、提交号、代码用等宽字体。</p></div>
+        <div class="grid-2" style="grid-template-columns:1.5fr 1fr;align-items:start">
+          <div class="demo" style="padding:var(--space-2) var(--space-5)">
+            <div class="type-row"><code>4xl · 36 / 600</code><span style="font:var(--weight-semibold) var(--text-4xl)/1.2 var(--font-sans);letter-spacing:-0.02em">部署概览 1,284</span></div>
+            <div class="type-row"><code>3xl · 28 / 600</code><span style="font:var(--weight-semibold) var(--text-3xl)/1.2 var(--font-sans)">本月构建时长</span></div>
+            <div class="type-row"><code>2xl · 22 / 600</code><span class="h2">环境与实例</span></div>
+            <div class="type-row"><code>xl · 18 / 600</code><span style="font:var(--weight-semibold) var(--text-xl)/1.3 var(--font-sans)">弹窗、抽屉标题</span></div>
+            <div class="type-row"><code>lg · 16 / 600</code><span class="h3">卡片标题 Card title</span></div>
+            <div class="type-row"><code>md · 14 / 400</code><span class="body">正文：每次部署都会保留 30 天日志，超过后自动归档。</span></div>
+            <div class="type-row"><code>sm · 13 / 400</code><span class="caption">说明、表头、次要信息 · Updated 2 min ago</span></div>
+            <div class="type-row"><code>xs · 12 / 500</code><span style="font:var(--weight-medium) var(--text-xs)/1.3 var(--font-sans);color:var(--color-muted)">标签、角标、时间戳 14:32:08</span></div>
+          </div>
+          <div>
+            <div class="demo">
+              <p class="overline" style="margin-bottom:var(--space-3)">等宽数字：列能对齐</p>
+              <div class="nums">
+                <div><p class="caption" style="margin-bottom:6px">比例数字</p><ol class="prop"><li>¥1,118.00</li><li>¥4,071.50</li><li>¥11,999.90</li></ol></div>
+                <div><p class="caption" style="margin-bottom:6px">等宽 .num</p><ol class="num"><li>¥1,118.00</li><li>¥4,071.50</li><li>¥11,999.90</li></ol></div>
+              </div>
+            </div>
+            <div class="demo">
+              <p class="overline" style="margin-bottom:var(--space-3)">字体栈</p>
+              <p class="caption" style="margin-bottom:6px"><code class="v">--font-sans</code> 系统 UI，苹方 / 鸿蒙黑体兜底</p>
+              <p class="caption" style="margin-bottom:var(--space-3)"><code class="v">--font-mono</code> 编号、提交号、命令行</p>
+              <p class="body"><span class="mono">a3f9c21</span> · <span class="mono">ord_48120</span> · 按 <span class="kbd">⌘</span> <span class="kbd">K</span> 搜索</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec" id="space">
+        <div class="sec-head"><h2 class="h2">间距、圆角、阴影</h2><p>8px 一格。组内 8、组间 16、区块 24–32。</p></div>
+        <div class="grid-2" style="grid-template-columns:1fr 1.35fr;align-items:start">
+          <div class="demo">
+            <div class="spaces">
+              <div class="space"><code>--space-1</code><span class="num">4</span><i style="width:4px"></i></div>
+              <div class="space"><code>--space-2</code><span class="num">8</span><i style="width:8px"></i></div>
+              <div class="space"><code>--space-3</code><span class="num">12</span><i style="width:12px"></i></div>
+              <div class="space"><code>--space-4</code><span class="num">16</span><i style="width:16px"></i></div>
+              <div class="space"><code>--space-5</code><span class="num">24</span><i style="width:24px"></i></div>
+              <div class="space"><code>--space-6</code><span class="num">32</span><i style="width:32px"></i></div>
+              <div class="space"><code>--space-7</code><span class="num">48</span><i style="width:48px"></i></div>
+              <div class="space"><code>--space-8</code><span class="num">64</span><i style="width:64px"></i></div>
+            </div>
+          </div>
+          <div>
+            <div class="demo">
+              <p class="overline" style="margin-bottom:var(--space-3)">圆角</p>
+              <div class="radii">
+                <div><i style="border-radius:var(--radius-sm)"></i>sm 4 · 标签</div>
+                <div><i style="border-radius:var(--radius-md)"></i>md 6 · 按钮</div>
+                <div><i style="border-radius:var(--radius-lg)"></i>lg 8 · 卡片</div>
+                <div><i style="border-radius:var(--radius-xl)"></i>xl 12 · 弹窗</div>
+              </div>
+            </div>
+            <div class="demo" style="background:var(--color-bg)">
+              <p class="overline" style="margin-bottom:var(--space-3)">阴影：只给浮起来的</p>
+              <div class="shadows">
+                <div style="box-shadow:var(--shadow-sm)">sm 按钮</div>
+                <div style="box-shadow:var(--shadow-md)">md 下拉</div>
+                <div style="box-shadow:var(--shadow-lg)">lg 弹窗</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec" id="buttons">
+        <div class="sec-head"><h2 class="h2">按钮</h2><p>一块区域只放一个主按钮。默认 32 高，表格行内用 28，表单底部用 40。</p></div>
+        <div class="demo">
+          <div class="matrix">
+            <span></span><span class="h">主 .btn</span><span class="h">次 .btn-secondary</span><span class="h">文字 .btn-ghost</span><span class="h">危险 .btn-danger</span>
+            <span class="h">lg · 40</span>
+            <span><button class="btn btn-lg">发布版本</button></span>
+            <span><button class="btn btn-secondary btn-lg">保存草稿</button></span>
+            <span><button class="btn btn-ghost btn-lg">取消</button></span>
+            <span><button class="btn btn-danger btn-lg">删除环境</button></span>
+            <span class="h">md · 32</span>
+            <span><button class="btn"><svg><use href="#i-plus"/></svg>新建部署</button></span>
+            <span><button class="btn btn-secondary"><svg><use href="#i-download"/></svg>导出 CSV</button></span>
+            <span><button class="btn btn-ghost"><svg><use href="#i-refresh"/></svg>重新运行</button></span>
+            <span><button class="btn btn-danger btn-secondary"><svg><use href="#i-trash"/></svg>回滚</button></span>
+            <span class="h">sm · 28</span>
+            <span><button class="btn btn-sm">批准</button></span>
+            <span><button class="btn btn-secondary btn-sm">查看日志</button></span>
+            <span><button class="btn btn-ghost btn-sm">复制链接</button></span>
+            <span><button class="btn btn-danger btn-sm">停止</button></span>
+            <span class="h">禁用</span>
+            <span><button class="btn" disabled>发布版本</button></span>
+            <span><button class="btn btn-secondary" disabled>保存草稿</button></span>
+            <span><button class="btn btn-ghost" disabled>重新运行</button></span>
+            <span><button class="btn btn-danger" disabled>删除环境</button></span>
+          </div>
+        </div>
+        <div class="demo">
+          <div class="row">
+            <span class="caption" style="width:88px">图标按钮</span>
+            <button class="btn btn-secondary btn-icon" aria-label="筛选"><svg><use href="#i-filter"/></svg></button>
+            <button class="btn btn-secondary btn-icon" aria-label="复制"><svg><use href="#i-copy"/></svg></button>
+            <button class="btn btn-ghost btn-icon" aria-label="更多"><svg><use href="#i-more"/></svg></button>
+            <span class="caption" style="margin-left:var(--space-5)">悬停 / 焦点</span>
+            <button class="btn is-hover">悬停</button>
+            <button class="btn btn-secondary" style="box-shadow:var(--ring)">键盘焦点</button>
+          </div>
+        </div>
+        <div class="rules">
+          <div class="rule do"><svg><use href="#i-ok"/></svg><p><b>动词开头、说清结果</b>：「新建部署」「导出 CSV」，不用「确定」「提交」。主按钮放右边，取消在它左边。</p></div>
+          <div class="rule dont"><svg><use href="#i-err"/></svg><p><b>别一排三个实心按钮</b>：次要的降成描边或文字按钮；危险操作别做成默认焦点。</p></div>
+        </div>
+      </section>
+
+      <section class="sec" id="forms">
+        <div class="sec-head"><h2 class="h2">表单</h2><p>标签在上、说明在下；出错时边框变红、下面一句话说怎么改。</p></div>
+        <div class="grid-2" style="grid-template-columns:1.35fr 1fr;align-items:start">
+          <div class="demo">
+            <div class="form-demo">
+              <div class="field"><label class="label" for="f1">服务名称<span class="req">*</span></label><input class="input" id="f1" value="order-api"><p class="hint">小写字母、数字和 -，创建后不能改</p></div>
+              <div class="field"><label class="label" for="f2">部署环境</label><select class="select" id="f2"><option>预发布</option><option>生产</option><option>测试</option></select></div>
+              <div class="field"><label class="label" for="f3">实例数</label><input class="input is-focus num" id="f3" value="12"><p class="hint">聚焦：主色边 + 3px 光圈</p></div>
+              <div class="field"><label class="label" for="f4">健康检查路径</label><input class="input" id="f4" value="healthz" aria-invalid="true"><p class="hint is-error">要以 / 开头，例如 /healthz</p></div>
+              <div class="field full"><label class="label" for="f5">变更说明</label><textarea class="textarea" id="f5" placeholder="这次改了什么、影响哪些接口"></textarea></div>
+              <div class="field"><label class="label" for="f6">所属团队</label><input class="input" id="f6" value="交易中台" disabled><p class="hint">禁用：由项目继承</p></div>
+              <div class="field"><label class="label" for="f7">搜索</label><label class="input-wrap"><svg><use href="#i-search"/></svg><input class="input" id="f7" placeholder="按名称或标签筛选"></label></div>
+            </div>
+          </div>
+          <div class="demo">
+            <p class="label" style="margin:0 0 var(--space-2)">通知方式</p>
+            <div class="opts">
+              <label class="check"><input type="checkbox" checked>部署失败</label>
+              <label class="check"><input type="checkbox" checked>等待审批</label>
+              <label class="check"><input type="checkbox">每次部署成功</label>
+              <label class="check"><input type="checkbox" disabled>短信（企业版）</label>
+            </div>
+            <p class="label" style="margin:var(--space-4) 0 var(--space-2)">回滚策略</p>
+            <div class="opts">
+              <label class="radio"><input type="radio" name="rb" checked>健康检查失败时自动回滚</label>
+              <label class="radio"><input type="radio" name="rb">只通知，手动回滚</label>
+            </div>
+            <p class="label" style="margin:var(--space-4) 0 var(--space-2)">开关</p>
+            <div class="opts" style="gap:var(--space-2)">
+              <label class="switch"><input type="checkbox" role="switch" checked>灰度发布</label>
+              <label class="switch"><input type="checkbox" role="switch">维护模式</label>
+              <label class="switch"><input type="checkbox" role="switch" checked disabled>审计日志（不可关）</label>
+            </div>
+          </div>
+        </div>
+        <div class="rules">
+          <div class="rule do"><svg><use href="#i-ok"/></svg><p><b>开关立刻生效，勾选框要等保存</b>：设置页的即时项用 .switch，表单里的多选用 .check。</p></div>
+          <div class="rule dont"><svg><use href="#i-err"/></svg><p><b>别只用占位字当标签</b>：一输入就看不到了。占位字只写例子。</p></div>
+        </div>
+      </section>
+
+      <section class="sec" id="tags">
+        <div class="sec-head"><h2 class="h2">标签与状态</h2><p>标签 22 高、4 圆角、不能点；要点的用小按钮。</p></div>
+        <div class="grid-2">
+          <div class="demo">
+            <p class="sub" style="margin-top:0">状态标签</p>
+            <div class="row">
+              <span class="tag tag-success">成功</span><span class="tag tag-primary">进行中</span><span class="tag tag-warning">待审批</span><span class="tag tag-danger">失败</span><span class="tag">已归档</span><span class="tag tag-outline">v2.14.0</span><span class="tag tag-accent">新</span>
+            </div>
+            <p class="sub">状态点 + 字（表格里更省地方）</p>
+            <div class="row" style="gap:var(--space-5)">
+              <span class="row" style="gap:6px"><span class="dot dot-success"></span>运行中</span>
+              <span class="row" style="gap:6px"><span class="dot dot-warning"></span>降级</span>
+              <span class="row" style="gap:6px"><span class="dot dot-danger"></span>宕机</span>
+              <span class="row" style="gap:6px"><span class="dot"></span>已停止</span>
+            </div>
+          </div>
+          <div class="demo">
+            <p class="sub" style="margin-top:0">角标</p>
+            <div class="row" style="gap:var(--space-5)">
+              <span class="row" style="gap:6px">告警<span class="badge">3</span></span>
+              <span class="row" style="gap:6px">待处理<span class="badge">128</span></span>
+              <span class="row" style="gap:6px">草稿<span class="badge badge-muted">12</span></span>
+            </div>
+            <p class="sub">进度</p>
+            <div style="display:grid;gap:10px">
+              <div class="row" style="gap:var(--space-3)"><span class="caption" style="width:72px">CPU</span><div class="progress" style="flex:1"><i style="width:42%"></i></div><span class="num caption" style="width:36px;text-align:right">42%</span></div>
+              <div class="row" style="gap:var(--space-3)"><span class="caption" style="width:72px">内存</span><div class="progress progress-warning" style="flex:1"><i style="width:78%"></i></div><span class="num caption" style="width:36px;text-align:right">78%</span></div>
+              <div class="row" style="gap:var(--space-3)"><span class="caption" style="width:72px">磁盘</span><div class="progress progress-danger" style="flex:1"><i style="width:93%"></i></div><span class="num caption" style="width:36px;text-align:right">93%</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec" id="cards">
+        <div class="sec-head"><h2 class="h2">卡片</h2><p>1px 边框分层，不加阴影；悬浮的东西才用 .card-raised。</p></div>
+        <div class="grid-3">
+          <div class="card">
+            <div class="stat-row"><p class="stat-label">本月请求量</p><span class="stat-delta up">+8.2%</span></div>
+            <p class="stat-value">48.6M</p>
+            <svg class="spark" viewBox="0 0 200 22" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,18 20,15 40,16 60,11 80,13 100,9 120,10 140,6 160,8 180,4 200,5" fill="none" stroke="var(--color-primary)" stroke-width="1.6"/><polyline points="0,20 20,19 40,18 60,18 80,16 100,17 120,15 140,15 160,13 180,14 200,12" fill="none" stroke="var(--color-accent)" stroke-width="1.4" stroke-dasharray="3 3"/></svg>
+            <p class="caption" style="margin-top:6px">实线本月，虚线上月</p>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3 class="card-title">待审批</h3><span class="badge">2</span></div>
+            <ul class="list">
+              <li><span class="avatar avatar-sm">周</span><div class="grow"><p class="body" style="font-weight:500">pay-gateway → 生产</p><p class="caption">周屿 · 10 分钟前</p></div><button class="btn btn-sm">批准</button></li>
+              <li><span class="avatar avatar-sm avatar-accent">许</span><div class="grow"><p class="body" style="font-weight:500">notify-worker → 测试</p><p class="caption">许安然 · 32 分钟前</p></div><button class="btn btn-secondary btn-sm">查看</button></li>
+            </ul>
+          </div>
+          <div class="card card-raised">
+            <h3 class="card-title">预发布环境</h3>
+            <p class="card-meta" style="margin:4px 0 var(--space-3)">上海二区 · 12 个实例</p>
+            <div class="row" style="gap:6px"><span class="dot dot-success"></span><span class="caption">全部健康，最近一次部署 14:29</span></div>
+            <div class="card-footer"><button class="btn btn-ghost btn-sm">日志</button><button class="btn btn-secondary btn-sm">管理</button></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec" id="table">
+        <div class="sec-head"><h2 class="h2">表格</h2><p>行高 40（紧凑 32）；文字左对齐，数字右对齐、等宽；状态用标签或状态点。</p></div>
+        <div class="table-wrap">
+          <div class="toolbar">
+            <label class="input-wrap"><svg><use href="#i-search"/></svg><input class="input input-sm" placeholder="搜实例名" aria-label="搜实例名"></label>
+            <button class="btn btn-secondary btn-sm"><svg><use href="#i-filter"/></svg>状态：全部</button>
+            <span style="flex:1"></span>
+            <span class="caption">已选 1 项</span>
+            <button class="btn btn-secondary btn-sm">重启</button>
+            <button class="btn btn-danger btn-secondary btn-sm">下线</button>
+          </div>
+          <table class="table">
+            <thead><tr><th class="col-check"><label class="check"><input type="checkbox" aria-label="全选"></label></th><th>实例</th><th>区域</th><th>状态</th><th class="num">CPU</th><th class="num">内存</th><th class="num">请求 / 分</th><th>版本</th><th></th></tr></thead>
+            <tbody>
+              <tr><td class="col-check"><label class="check"><input type="checkbox" aria-label="选择"></label></td><td><span class="mono">order-api-7f9c</span></td><td>上海二区</td><td><span class="row" style="gap:6px"><span class="dot dot-success"></span>运行中</span></td><td class="num">38%</td><td class="num">1.21 GB</td><td class="num">8,412</td><td><span class="tag tag-outline">v2.14.0</span></td><td><button class="btn btn-ghost btn-icon btn-sm" aria-label="更多"><svg><use href="#i-more"/></svg></button></td></tr>
+              <tr class="is-selected"><td class="col-check"><label class="check"><input type="checkbox" checked aria-label="选择"></label></td><td><span class="mono">order-api-2b1d</span></td><td>上海二区</td><td><span class="row" style="gap:6px"><span class="dot dot-warning"></span>降级</span></td><td class="num">91%</td><td class="num">3.08 GB</td><td class="num">12,960</td><td><span class="tag tag-outline">v2.14.0</span></td><td><button class="btn btn-ghost btn-icon btn-sm" aria-label="更多"><svg><use href="#i-more"/></svg></button></td></tr>
+              <tr><td class="col-check"><label class="check"><input type="checkbox" aria-label="选择"></label></td><td><span class="mono">order-api-c40a</span></td><td>北京一区</td><td><span class="row" style="gap:6px"><span class="dot dot-success"></span>运行中</span></td><td class="num">24%</td><td class="num">0.96 GB</td><td class="num">5,207</td><td><span class="tag tag-outline">v2.13.2</span></td><td><button class="btn btn-ghost btn-icon btn-sm" aria-label="更多"><svg><use href="#i-more"/></svg></button></td></tr>
+              <tr><td class="col-check"><label class="check"><input type="checkbox" aria-label="选择"></label></td><td><span class="mono">order-api-e85f</span></td><td>北京一区</td><td><span class="row" style="gap:6px"><span class="dot dot-danger"></span>宕机</span></td><td class="num muted">—</td><td class="num muted">—</td><td class="num muted">0</td><td><span class="tag tag-outline">v2.13.2</span></td><td><button class="btn btn-ghost btn-icon btn-sm" aria-label="更多"><svg><use href="#i-more"/></svg></button></td></tr>
+              <tr><td class="col-check"><label class="check"><input type="checkbox" aria-label="选择"></label></td><td><span class="mono">order-api-91aa</span></td><td>广州三区</td><td><span class="row" style="gap:6px"><span class="dot"></span>已停止</span></td><td class="num muted">0%</td><td class="num">0.12 GB</td><td class="num muted">0</td><td><span class="tag tag-outline">v2.12.7</span></td><td><button class="btn btn-ghost btn-icon btn-sm" aria-label="更多"><svg><use href="#i-more"/></svg></button></td></tr>
+            </tbody>
+          </table>
+          <div class="table-foot">
+            <span class="num">第 1–5 条，共 96 条</span>
+            <nav class="pagination" aria-label="分页"><a href="#table" aria-label="上一页"><svg width="14" height="14"><use href="#i-left"/></svg></a><a href="#table" aria-current="page">1</a><a href="#table">2</a><a href="#table">3</a><span>…</span><a href="#table">20</a><a href="#table" aria-label="下一页"><svg width="14" height="14"><use href="#i-right"/></svg></a></nav>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec" id="feedback">
+        <div class="sec-head"><h2 class="h2">提示条与轻提示</h2><p>提示条留在页面里，等人看完；轻提示 3 秒后自己消失，只说刚刚发生了什么。</p></div>
+        <div class="grid-2" style="grid-template-columns:1.4fr 1fr;align-items:start">
+          <div style="display:grid;gap:var(--space-3)">
+            <div class="alert" role="status"><svg><use href="#i-info"/></svg><p class="alert-title">今晚 23:00 到 23:30 例行维护</p><p class="alert-text">期间可以查看，但不能新建部署。</p></div>
+            <div class="alert alert-success" role="status"><svg><use href="#i-ok"/></svg><p class="alert-title">v2.14.0 已在生产全部上线</p><p class="alert-text">96 个实例健康检查通过，用时 4 分 12 秒。</p></div>
+            <div class="alert alert-warning" role="status"><svg><use href="#i-warn"/></svg><p class="alert-title">磁盘用量超过 90%</p><p class="alert-text">search-index 的日志卷还剩 3.2 GB，大约两天写满。</p><a class="btn btn-secondary btn-sm alert-action" href="#table">去清理</a></div>
+            <div class="alert alert-danger" role="alert"><svg><use href="#i-err"/></svg><p class="alert-title">部署失败：健康检查超时</p><p class="alert-text">已自动回滚到 v2.13.2。看日志第 418 行。</p><a class="btn btn-secondary btn-sm alert-action" href="#table">看日志</a></div>
+          </div>
+          <div class="demo stage-bg" style="min-height:100%;box-sizing:border-box">
+            <p class="caption" style="margin-bottom:var(--space-3)">轻提示 <code class="v">.toast</code>：右下角，3 秒消失</p>
+            <div class="toasts">
+              <div class="toast" role="status"><svg><use href="#i-ok"/></svg>已复制提交号 a3f9c21</div>
+              <div class="toast" role="status"><svg><use href="#i-ok"/></svg>已归档 3 条记录<button class="btn btn-ghost btn-sm">撤销</button></div>
+              <div class="toast toast-danger" role="alert"><svg><use href="#i-err"/></svg>网络断开，正在重连<button class="btn btn-ghost btn-sm">重试</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="rules">
+          <div class="rule do"><svg><use href="#i-ok"/></svg><p><b>标题说结果，正文说下一步</b>：出错时给出能点的去处（「看日志」），不只说「出错了」。</p></div>
+          <div class="rule dont"><svg><use href="#i-err"/></svg><p><b>别用轻提示报错误</b>：要处理的错误放提示条或弹窗，轻提示一闪就没了。</p></div>
+        </div>
+      </section>
+
+      <section class="sec" id="navs">
+        <div class="sec-head"><h2 class="h2">标签页与导航</h2><p>同一页里切视图用标签页；切筛选用分段；切页面用侧栏。</p></div>
+        <div class="demo">
+          <div class="tabs" role="tablist">
+            <a class="tab" role="tab" aria-selected="true" href="#navs">概览</a>
+            <a class="tab" role="tab" href="#navs">部署<span class="badge">3</span></a>
+            <a class="tab" role="tab" href="#navs">日志</a>
+            <a class="tab" role="tab" href="#navs">监控</a>
+            <a class="tab" role="tab" href="#navs">设置</a>
+          </div>
+          <div class="row" style="margin-top:var(--space-4);justify-content:space-between">
+            <div class="segmented" role="tablist"><a class="tab" role="tab" href="#navs">1 小时</a><a class="tab" role="tab" aria-selected="true" href="#navs">24 小时</a><a class="tab" role="tab" href="#navs">7 天</a><a class="tab" role="tab" href="#navs">自定义</a></div>
+            <nav class="breadcrumb" aria-label="位置"><a href="#navs">订单平台</a><svg width="12" height="12"><use href="#i-right"/></svg><a href="#navs">order-api</a><svg width="12" height="12"><use href="#i-right"/></svg><span aria-current="page">实例</span></nav>
+          </div>
+        </div>
+        <div class="grid-2" style="grid-template-columns:220px 1fr;margin-top:var(--space-3)">
+          <div class="demo" style="padding:var(--space-3)">
+            <nav class="nav" aria-label="侧栏示例">
+              <a class="nav-item" href="#navs"><svg><use href="#i-chart"/></svg>概览</a>
+              <a class="nav-item" href="#navs" aria-current="page"><svg><use href="#i-rocket"/></svg>部署<span class="badge">3</span></a>
+              <a class="nav-item" href="#navs"><svg><use href="#i-server"/></svg>环境</a>
+              <p class="nav-title">团队</p>
+              <a class="nav-item" href="#navs"><svg><use href="#i-users"/></svg>成员</a>
+              <a class="nav-item" href="#navs"><svg><use href="#i-gear"/></svg>设置</a>
+            </nav>
+          </div>
+          <div class="demo" style="padding:0;overflow:hidden">
+            <div class="navbar">
+              <a class="brand" href="#navs"><svg width="18" height="18" viewBox="0 0 28 28" aria-hidden="true"><rect x="2" y="15" width="24" height="9" rx="3" fill="#2D5E91"/><rect x="5" y="8.5" width="18" height="8" rx="3" fill="#5B82AB"/><rect x="8" y="3" width="12" height="7" rx="3" fill="#A9BFD6"/></svg>北岸控制台</a>
+              <a class="btn btn-secondary btn-sm" href="#navs">订单平台<svg><use href="#i-down"/></svg></a>
+              <span class="spacer"></span>
+              <a class="btn btn-ghost btn-icon btn-sm" href="#navs" aria-label="通知"><svg><use href="#i-bell"/></svg></a>
+              <span class="avatar avatar-sm">林</span>
+            </div>
+            <div style="padding:var(--space-4) var(--space-5);display:grid;gap:var(--space-3)">
+              <nav class="breadcrumb" aria-label="位置"><a href="#navs">订单平台</a><svg width="12" height="12"><use href="#i-right"/></svg><a href="#navs">服务</a><svg width="12" height="12"><use href="#i-right"/></svg><span aria-current="page">order-api</span></nav>
+              <div class="row" style="justify-content:space-between">
+                <div class="row" style="gap:var(--space-2)"><h3 class="h2">order-api</h3><span class="tag tag-success">运行中</span><span class="tag tag-outline">v2.14.0</span></div>
+                <div class="row" style="gap:var(--space-2)"><button class="btn btn-secondary">回滚</button><button class="btn">部署新版本</button></div>
+              </div>
+              <div class="row" style="justify-content:space-between">
+                <p class="caption">顶栏 48 高；页头 = 面包屑 + 标题 + 状态 + 右侧操作。</p>
+                <nav class="pagination" aria-label="分页"><a href="#navs" aria-label="上一页"><svg width="14" height="14"><use href="#i-left"/></svg></a><a href="#navs">1</a><a href="#navs" aria-current="page">2</a><a href="#navs">3</a><a href="#navs" aria-label="下一页"><svg width="14" height="14"><use href="#i-right"/></svg></a></nav>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec" id="modal">
+        <div class="sec-head"><h2 class="h2">弹窗</h2><p>只在必须马上决定时用。宽 480，标题是一个问题，按钮写清后果。</p></div>
+        <div class="stage">
+          <div class="ghost-page" aria-hidden="true">
+            <div class="gp-bar"><i style="width:120px"></i><i style="width:64px;margin-left:auto"></i><i style="width:24px;border-radius:50%"></i></div>
+            <div class="gp-body"><i style="width:30%;height:14px"></i><i style="width:100%"></i><i style="width:100%"></i><i style="width:100%"></i><i style="width:100%"></i><i style="width:100%"></i></div>
+          </div>
+          <div class="modal-scrim">
+            <div class="modal" role="dialog" aria-labelledby="m1">
+              <div class="modal-header"><h3 class="modal-title" id="m1">删除环境「预发布」？</h3><button class="btn btn-ghost btn-icon btn-sm" aria-label="关闭"><svg><use href="#i-x"/></svg></button></div>
+              <div class="modal-body">
+                <p class="body" style="margin-bottom:var(--space-3)">12 个实例会立刻停止，30 天内的日志一起删除。这一步不能撤销。</p>
+                <div class="field"><label class="label" for="m2">输入环境名确认</label><input class="input" id="m2" placeholder="预发布"></div>
+              </div>
+              <div class="modal-footer"><button class="btn btn-secondary">取消</button><button class="btn btn-danger">删除环境</button></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec" id="avatar">
+        <div class="sec-head"><h2 class="h2">头像</h2><p>没有照片时用姓氏首字，底色从主色浅底、点缀浅底、表面色里轮换。</p></div>
+        <div class="demo">
+          <div class="row" style="gap:var(--space-6)">
+            <div class="row"><span class="avatar avatar-lg">林</span><span class="avatar">周</span><span class="avatar avatar-sm">陈</span></div>
+            <div class="row"><span class="avatar avatar-square avatar-lg avatar-neutral">交易</span><span class="caption">方头像：团队、项目</span></div>
+            <div class="row"><span class="avatar-group"><span class="avatar">林</span><span class="avatar avatar-accent">许</span><span class="avatar avatar-success">何</span><span class="avatar avatar-neutral">+5</span></span><span class="caption">8 位成员</span></div>
+            <div class="row" style="gap:10px"><span class="avatar">林</span><div><p class="body" style="font-weight:500">林知夏</p><p class="caption">平台组 · 负责人</p></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec" id="empty">
+        <div class="sec-head"><h2 class="h2">空状态</h2><p>说清为什么是空的、下一步做什么，给一个按钮。</p></div>
+        <div class="grid-2">
+          <div class="card card-flush">
+            <div class="empty">
+              <div class="empty-art"><svg><use href="#i-bell"/></svg></div>
+              <h3 class="empty-title">还没有告警规则</h3>
+              <p class="empty-text">设一条规则，CPU、错误率超过阈值时通知值班的人。</p>
+              <div class="row" style="justify-content:center"><button class="btn"><svg><use href="#i-plus"/></svg>新建规则</button><button class="btn btn-ghost">从模板导入</button></div>
+            </div>
+          </div>
+          <div class="card card-flush">
+            <div class="empty">
+              <div class="empty-art"><svg><use href="#i-search"/></svg></div>
+              <h3 class="empty-title">没找到「order-ap1」</h3>
+              <p class="empty-text">换个关键词，或者清掉「状态：失败」筛选再试。</p>
+              <button class="btn btn-secondary">清除筛选</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="sec" id="dark">
+        <div class="sec-head"><h2 class="h2">深色</h2><p>&lt;html data-theme="dark"&gt;：同一套变量换值，组件不用改。</p></div>
+        <div class="dark-panel" data-theme="dark">
+          <div class="card">
+            <div class="card-header"><h3 class="card-title">最近部署</h3><a class="btn btn-ghost btn-sm" href="#table">全部</a></div>
+            <ul class="list">
+              <li><span class="dot dot-success"></span><div class="grow"><p class="body"><span class="mono">a3f9c21</span> order-api</p><p class="caption">生产 · 3m 08s</p></div><span class="tag tag-success">成功</span></li>
+              <li><span class="dot dot-primary"></span><div class="grow"><p class="body"><span class="mono">7be0d44</span> pay-gateway</p><p class="caption">预发布 · 进行中</p></div><span class="tag tag-primary">进行中</span></li>
+              <li><span class="dot dot-danger"></span><div class="grow"><p class="body"><span class="mono">c18e0f2</span> search-index</p><p class="caption">生产 · 6m 40s</p></div><span class="tag tag-danger">失败</span></li>
+            </ul>
+          </div>
+          <div style="display:grid;gap:var(--space-3);align-content:start">
+            <div class="card"><div class="stat-row"><p class="stat-label">失败率</p><span class="stat-delta down">+0.3%</span></div><p class="stat-value">0.8%</p></div>
+            <div class="alert alert-warning"><svg><use href="#i-warn"/></svg><p class="alert-title">内存用量 78%</p><p class="alert-text">order-api-2b1d 持续 15 分钟。</p></div>
+            <div class="row"><button class="btn">新建部署</button><button class="btn btn-secondary">导出</button><label class="switch"><input type="checkbox" role="switch" checked>灰度</label></div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="foot"><span>青石 Slate · v1.0 · 2026 年 11 月</span><span>CC0-1.0</span></footer>
+    </div>
+  </div>
+</div>
+</body>
+</html>

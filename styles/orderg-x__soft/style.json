@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#E9EDF2",
+    "surface": "#E9EDF2",
+    "text": "#2D3440",
+    "muted": "#556072",
+    "line": "#D3D9E1",
+    "primary": "#3E5BD8",
+    "accent": "#22A06B",
+    "on": "#FFFFFF",
+    "link": "#3E5BD8"
+  },
+  "head": "ROUND",
+  "w": 700,
+  "radius": 18,
+  "shadow": "6px 6px 14px #C8CED6, -6px -6px 14px #FFFFFF",
+  "dzh": "同色底、凸起凹陷的柔光阴影",
+  "den": "Same-color surfaces with raised and pressed soft shadows",
+  "nzh": "卡片和底同色，靠一亮一暗两道阴影凸起，按下用内阴影；容易看不清，所以主按钮一定用主色实底、文字够深；别整屏都是凸起",
+  "nen": "Cards share the background color and rise with a light and a dark shadow; pressed states use inset shadows; it gets low-contrast fast, so the main button is solid primary with strong text; don't make everything raised"
+}

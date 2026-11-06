@@ -1,0 +1,53 @@
+:root {
+  --bg: #F2EEE6;
+  --surface: #FAF8F3;
+  --surface-2: #ECE6DB;
+  --linen: #E7E0D3;
+  --text: #2F2B26;
+  --muted: #6B645A;
+  --line: #DDD5C8;
+  --line-strong: #CBC1B1;
+  --primary: #4F4234;
+  --primary-press: #3E3329;
+  --on: #FAF8F3;
+  --accent: #8C9A6E;
+  --accent-ink: #5E6B45;
+  --accent-soft: #E4E6D7;
+  --link: #6B4F33;
+  --wood: #C8A983;
+  --clay: #B9805C;
+
+  --font: "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  --w-head: 500;
+  --w-light: 300;
+
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-md: 15px;
+  --fs-lg: 20px;
+  --fs-xl: 28px;
+  --fs-2xl: 48px;
+
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 24px;
+  --s-6: 32px;
+  --s-7: 40px;
+  --s-8: 56px;
+
+  --r-sm: 4px;
+  --r-md: 6px;
+  --r-full: 999px;
+
+  --hair: 1px solid var(--line);
+  --shadow: 0 2px 8px rgba(79, 66, 52, .06);
+
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --dur: 200ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur: 0ms; }
+}

@@ -1,0 +1,134 @@
+/* 设计系统「陶土 Terracotta」的设计变量：生活方式品牌。陶土橙、米白、橄榄绿点缀；衬线标题 + 无衬线正文；中等圆角、暖色阴影。
+   复制到设计目录，每屏 <link rel="stylesheet" href="tokens.css">，再 link components.css */
+:root {
+  /* 颜色：按角色定义（换主题只改这里） */
+  --color-bg: #F9F5EF;              /* 页面背景：米白 */
+  --color-surface: #FFFDFA;         /* 卡片、弹窗、输入框：纸白 */
+  --color-surface-2: #F2EBE1;       /* 次一级表面：分组、表头、选中 */
+  --color-sand: #E9DCCB;            /* 沙色：商品图底、大色块（不放小字） */
+  --color-text: #2B201B;            /* 正文：深赭（对 bg 14.4:1） */
+  --color-muted: #6B5A50;           /* 次要文字（对 bg 5.9:1） */
+  --color-line: #E8DED1;            /* 分割线、卡片边 */
+  --color-line-strong: #CBB9A6;     /* 输入框、勾选框的边 */
+  --color-primary: #AE4F3B;         /* 主色：陶土，关键按钮、选中、价格强调 */
+  --color-primary-hover: #923F2E;   /* 主色悬停；浅底上的主色字 */
+  --color-primary-soft: #F7E6DD;    /* 主色浅底 */
+  --color-primary-ink: #FFFFFF;     /* 主色上的文字（5.3:1） */
+  --color-accent: #626B33;          /* 点缀：橄榄，「手作」「有机」这类标签、小图标 */
+  --color-accent-soft: #ECEDDB;
+  --color-success: #2A7049;
+  --color-success-soft: #E3F0E7;
+  --color-warning: #8C5A0B;
+  --color-warning-soft: #F8EDD5;
+  --color-warning-fill: #C98A2B;    /* 警告的点、进度条（不放字） */
+  --color-danger: #A2303F;          /* 错误：酒红，和陶土主色分得开 */
+  --color-danger-soft: #F7E3E5;
+  --color-danger-ink: #FFFFFF;
+  --color-info: #3D6680;
+  --color-info-soft: #E3ECF1;
+  --color-inverse: #2E231D;         /* 反色底：轻提示、页脚 */
+  --color-inverse-ink: #F6EEE5;
+  --color-link: #923F2E;
+  --color-overlay: rgb(43 32 27 / 0.45);
+  --color-focus: rgb(174 79 59 / 0.26);
+
+  /* 字体：标题衬线（拉丁字母 Iowan，中文宋体），正文系统无衬线 */
+  --font-sans: system-ui, "PingFang SC", "HarmonyOS Sans SC", "MiSans", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --font-display: "Iowan Old Style", "Songti SC", "Noto Serif SC", "Source Han Serif SC", Georgia, serif;
+  --font-mono: "SF Mono", Menlo, Consolas, monospace;
+
+  /* 字号阶梯（约 1.25） */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-md: 16px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 28px;
+  --text-3xl: 40px;
+  --text-4xl: 56px;
+
+  /* 字重：衬线标题用常规体，靠字号撑；无衬线用 400 / 500 / 600 */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-display: 400;
+
+  /* 行高 */
+  --leading-tight: 1.15;
+  --leading-snug: 1.35;
+  --leading-normal: 1.65;
+  --leading-relaxed: 1.8;
+
+  /* 间距（4 / 8 的倍数），留白比工具类产品多一档 */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* 控件高度 */
+  --control-sm: 36px;
+  --control-md: 44px;
+  --control-lg: 52px;
+
+  /* 圆角：中等，像手捏过的边 */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-full: 999px;
+
+  /* 阴影：暖棕色、低透明、大模糊 */
+  --shadow-sm: 0 1px 2px rgb(92 52 32 / 0.06), 0 1px 3px rgb(92 52 32 / 0.05);
+  --shadow-md: 0 2px 4px rgb(92 52 32 / 0.05), 0 12px 28px -8px rgb(120 62 36 / 0.20);
+  --shadow-lg: 0 4px 10px rgb(92 52 32 / 0.06), 0 28px 60px -14px rgb(120 62 36 / 0.32);
+  --ring: 0 0 0 3px var(--color-focus);
+
+  /* 动效：慢一点、柔一点 */
+  --ease: cubic-bezier(.25, .8, .25, 1);
+  --dur: 220ms;
+}
+
+/* 深色版：<html data-theme="dark">（或给某一块加 data-theme="dark"）。夜里的窑：深赭底、亮陶土 */
+[data-theme="dark"] {
+  --color-bg: #1C1714;
+  --color-surface: #251E1A;
+  --color-surface-2: #2F2621;
+  --color-sand: #3A2F28;
+  --color-text: #EDE4D9;
+  --color-muted: #B3A496;
+  --color-line: #3A3029;
+  --color-line-strong: #5A4B40;
+  --color-primary: #E08A6B;
+  --color-primary-hover: #EBA286;
+  --color-primary-soft: #43271D;
+  --color-primary-ink: #1C1714;
+  --color-accent: #B5BE7A;
+  --color-accent-soft: #2E3020;
+  --color-success: #79C597;
+  --color-success-soft: #1D3125;
+  --color-warning: #E2B35E;
+  --color-warning-soft: #362A14;
+  --color-warning-fill: #D9A04A;
+  --color-danger: #EE8A95;
+  --color-danger-soft: #3B1E22;
+  --color-danger-ink: #1C1714;
+  --color-info: #8DB6D0;
+  --color-info-soft: #1D2C36;
+  --color-inverse: #EDE4D9;
+  --color-inverse-ink: #2B201B;
+  --color-link: #EBA286;
+  --color-overlay: rgb(0 0 0 / 0.6);
+  --color-focus: rgb(224 138 107 / 0.35);
+  --ring: 0 0 0 3px var(--color-focus);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 2px 4px rgb(0 0 0 / 0.35), 0 12px 28px -8px rgb(0 0 0 / 0.5);
+  --shadow-lg: 0 4px 10px rgb(0 0 0 / 0.4), 0 28px 60px -14px rgb(0 0 0 / 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur: 0ms; }
+}

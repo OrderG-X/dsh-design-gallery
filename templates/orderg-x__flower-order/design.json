@@ -1,0 +1,41 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": {
+    "zh": "花间",
+    "en": "Huajian Flowers"
+  },
+  "description": {
+    "zh": "花店的订单确认邮件：奶油燕麦焦糖配色、大圆角卡片、花束插画、订单明细与贺卡留言、配送进度和养护小贴士，表格布局、内联样式",
+    "en": "A flower shop order confirmation email in milk, oat and caramel: rounded cards, bouquet illustration, order details, delivery progress and care tips, built with tables and inline styles"
+  },
+  "kind": "email",
+  "screens": [
+    {
+      "file": "email.html",
+      "title": {
+        "zh": "订单确认",
+        "en": "Order confirmation"
+      }
+    }
+  ],
+  "style": "cream",
+  "categories": [
+    "retail",
+    "home"
+  ],
+  "tags": [
+    "detail",
+    "illustration"
+  ],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

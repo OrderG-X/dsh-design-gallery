@@ -1,0 +1,14 @@
+{
+  "copy": { "zh": "看起来是照着别人的作品做的，或用了不是自己的素材。市场只收原创（或注明来源的 CC0 / 公有领域素材）。", "en": "This looks copied from someone else's work or uses assets you don't own. The gallery only accepts original work (or credited CC0 / public-domain assets)." },
+  "brand": { "zh": "用了真实品牌、机构或名人的名字、标志。改成虚构的品牌再交。", "en": "Uses a real brand, organization or person. Please switch to a made-up brand and resubmit." },
+  "phish": { "zh": "像在仿冒真实网站的登录或付款页面。市场不收这类设计。", "en": "Looks like an imitation of a real login or payment page. The gallery does not accept these." },
+  "personal": { "zh": "里面有像真人的手机号、身份证号、邮箱、地址或照片。换成明显的假数据再交。", "en": "Contains what looks like real personal data (phone, ID, email, address, photo). Replace it with obvious fake data." },
+  "qr": { "zh": "有二维码。换成一个占位方块再交（二维码可能指向任何地方）。", "en": "Contains a QR code. Replace it with a placeholder square (a QR code could point anywhere)." },
+  "quality": { "zh": "还不太完整（空白屏、明显排版问题，或和已有的太像）。打磨一下再交。", "en": "Not quite finished yet (blank screens, obvious layout problems, or too close to an existing design). Please polish and resubmit." },
+  "nsfw": { "zh": "内容不适合放进市场。", "en": "The content is not suitable for the gallery." },
+  "politics": { "zh": "涉及政治、宗教或其他敏感话题。市场只收中性的设计。", "en": "Touches on political, religious or other sensitive topics. The gallery only takes neutral designs." },
+  "inject": { "zh": "文字里有像在给模型下指令的内容。删掉或改写再交。", "en": "Contains text that reads like instructions to an AI model. Remove or rephrase it." },
+  "spam": { "zh": "看起来是广告或灌水。", "en": "Looks like advertising or spam." },
+  "author": { "zh": "等你回复。14 天没有回应会自动关闭，之后随时可以重新提交。", "en": "Waiting for your reply. This will close automatically after 14 days without a response; you can resubmit any time." },
+  "other": { "zh": "维护者会在下面说明原因。", "en": "A maintainer will explain below." }
+}

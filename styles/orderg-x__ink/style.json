@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#F5F2EC",
+    "surface": "#FBF9F5",
+    "text": "#1E1E1C",
+    "muted": "#5F5B54",
+    "line": "#DAD4C8",
+    "primary": "#2F3B37",
+    "accent": "#8C2F2B",
+    "on": "#F5F2EC",
+    "link": "#8C2F2B"
+  },
+  "head": "SERIF",
+  "w": 500,
+  "radius": 4,
+  "shadow": "none",
+  "dzh": "宣纸底、墨色字、朱砂点缀",
+  "den": "Paper white, ink-black type, a touch of cinnabar",
+  "nzh": "大量留白、细线分隔；标题细宋体、字距放开；朱砂红只像印章一样点一两处；插画用浅灰的水墨晕染（SVG 模糊色块），不用照片堆满",
+  "nen": "Lots of space and hairline dividers; light Song headings with open tracking; cinnabar red only in one or two seal-like spots; illustrations as pale ink washes (blurred SVG shapes), not photo walls"
+}

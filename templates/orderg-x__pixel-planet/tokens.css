@@ -1,0 +1,30 @@
+:root {
+  --color-bg: #0B0B16;
+  --color-surface: #151528;
+  --color-surface-2: #1C1C36;
+  --color-text: #E9E6FF;
+  --color-muted: #A09CC8;
+  --color-line: #2E2B52;
+  --color-line-strong: #4A4680;
+  --color-primary: #FF2E88;
+  --color-accent: #22E1FF;
+  --color-on-primary: #0B0B16;
+  --color-link: #22E1FF;
+  --color-grid: rgba(46, 43, 82, 0.55);
+
+  --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, "PingFang SC", "HarmonyOS Sans SC", monospace;
+  --font-sans: "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  --weight-head: 700;
+
+  --text-hud: 16px;
+  --text-small: 20px;
+  --text-body: 24px;
+  --text-sub: 32px;
+  --text-title: 48px;
+
+  --radius: 2px;
+  --glow: 0 0 0 1px #FF2E88, 0 0 18px rgba(255, 46, 136, 0.45);
+  --glow-text: 0 0 24px rgba(255, 46, 136, 0.55);
+  --glitch: -2px 0 rgba(255, 46, 136, 0.85), 2px 0 rgba(34, 225, 255, 0.85);
+  --glitch-soft: -1.5px 0 rgba(255, 46, 136, 0.6), 1.5px 0 rgba(34, 225, 255, 0.6);
+}

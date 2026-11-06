@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#F6EFE6",
+    "surface": "#FFF9F2",
+    "text": "#2B1D14",
+    "muted": "#6E5A4B",
+    "line": "#E7D9C8",
+    "primary": "#A9542A",
+    "accent": "#5E7A4A",
+    "on": "#FFFFFF",
+    "link": "#52703F"
+  },
+  "head": "SERIF",
+  "w": 600,
+  "radius": 16,
+  "shadow": "0 8px 24px rgba(120,72,30,.12)",
+  "dzh": "纸感底色、圆润、手绘感",
+  "den": "Paper tones, soft and rounded, hand-made feel",
+  "nzh": "标题用衬线字，正文无衬线；插画用手绘线条和色块；阴影带暖色；中性色都偏暖，不用纯灰",
+  "nen": "Serif headings, sans body; hand-drawn line illustrations and color blocks; warm-tinted shadows; warm neutrals, no pure gray"
+}

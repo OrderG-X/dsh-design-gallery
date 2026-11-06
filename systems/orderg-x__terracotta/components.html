@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="dsh-design" content="web">
+<title>组件 · 陶土 Terracotta</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<style>
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+  body { margin: 0; background: var(--color-bg); color: var(--color-text); font: var(--weight-regular) var(--text-md)/var(--leading-normal) var(--font-sans); -webkit-font-smoothing: antialiased; }
+  .sym { display: none; }
+
+  .top { position: sticky; top: 0; z-index: 3; display: flex; align-items: center; gap: var(--space-5); height: 64px; padding: 0 var(--space-7); background: var(--color-bg); border-bottom: 1px solid var(--color-line); }
+  .mark { display: inline-flex; align-items: center; gap: 10px; min-height: 40px; color: var(--color-text); text-decoration: none; font: var(--weight-display) var(--text-xl)/1 var(--font-display); }
+  .mark svg { width: 30px; height: 30px; }
+  .mark em { font-style: normal; font: var(--weight-regular) var(--text-xs)/1 var(--font-sans); color: var(--color-muted); letter-spacing: 0.06em; margin-left: 2px; }
+  .toc { display: flex; gap: 2px; margin-left: auto; }
+  .toc a { display: inline-flex; align-items: center; min-height: 36px; padding: 0 10px; border-radius: var(--radius-full); color: var(--color-muted); text-decoration: none; font-size: var(--text-sm); }
+  .toc a:hover { background: var(--color-surface-2); color: var(--color-text); }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 var(--space-7); }
+  .hero { display: grid; grid-template-columns: minmax(0, 1fr) 560px; gap: var(--space-7); align-items: center; padding: var(--space-7) 0 var(--space-8); }
+  .hero .display { font-size: 84px; line-height: 1; margin: var(--space-4) 0 var(--space-2); }
+  .hero .latin { display: block; font: italic var(--weight-display) 44px/1.1 var(--font-display); color: var(--color-primary); letter-spacing: 0; margin-bottom: var(--space-5); }
+  .hero .lead { max-width: 25em; }
+  .hero-cta { display: flex; gap: var(--space-3); margin-top: var(--space-6); }
+  .specs { display: grid; grid-template-columns: repeat(3, auto); justify-content: start; gap: var(--space-1) var(--space-6); margin: var(--space-6) 0 0; padding-top: var(--space-5); border-top: 1px solid var(--color-line); }
+  .specs dt { font-size: var(--text-xs); color: var(--color-muted); letter-spacing: 0.06em; }
+  .specs dd { margin: 0; font: var(--weight-display) var(--text-lg)/1.3 var(--font-display); }
+
+  .shop { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); align-items: start; }
+  .shop .stack { display: grid; gap: var(--space-4); }
+  .quote { margin: var(--space-3) 0 var(--space-4); font: var(--weight-display) var(--text-lg)/1.55 var(--font-display); }
+  .who { display: flex; align-items: center; gap: var(--space-3); }
+
+  .sec { padding: var(--space-8) 0 0; scroll-margin-top: 72px; }
+  .sec-head { display: grid; grid-template-columns: 64px minmax(0, 1fr) minmax(0, 380px); gap: var(--space-5); align-items: baseline; margin-bottom: var(--space-6); padding-bottom: var(--space-4); border-bottom: 1px solid var(--color-line); }
+  .sec-no { font: italic var(--weight-display) var(--text-xl)/1 var(--font-display); color: var(--color-primary); }
+  .sec-head p { margin: 0; color: var(--color-muted); font-size: var(--text-sm); line-height: 1.6; }
+  .sub { margin: var(--space-6) 0 var(--space-3); font: var(--weight-medium) var(--text-xs)/1 var(--font-sans); letter-spacing: 0.12em; color: var(--color-muted); }
+  .sub:first-child { margin-top: 0; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-5); }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+  .panel { padding: var(--space-6); border-radius: var(--radius-xl); background: var(--color-surface); border: 1px solid var(--color-line); }
+  .panel-sand { background: var(--color-surface-2); border-color: transparent; }
+  code.v { font: var(--weight-regular) var(--text-xs)/1.4 var(--font-mono); color: var(--color-muted); }
+
+  .tiles { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: var(--space-4); }
+  .tile { margin: 0; border-radius: var(--radius-lg); overflow: hidden; background: var(--color-surface); border: 1px solid var(--color-line); }
+  .tile i { display: flex; align-items: flex-end; justify-content: space-between; height: 120px; padding: var(--space-4); box-sizing: border-box; font: normal var(--weight-display) var(--text-xl)/1 var(--font-display); }
+  .tile i small { font: var(--weight-medium) var(--text-xs)/1 var(--font-sans); letter-spacing: 0.04em; }
+  .tile.big i { height: 260px; font-size: var(--text-3xl); }
+  .tile figcaption { display: grid; gap: 2px; padding: var(--space-3) var(--space-4) var(--space-4); font-size: var(--text-sm); }
+  .tile b { font: var(--weight-semibold) var(--text-md)/1.3 var(--font-sans); }
+  .tile span { color: var(--color-muted); font-variant-numeric: tabular-nums; }
+  .tile-col { display: grid; gap: var(--space-4); align-content: start; }
+  .tiles-2 { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: var(--space-3); margin-top: var(--space-4); }
+  .tiles-2 .tile i { height: 64px; }
+
+  .type-big { font: var(--weight-display) 64px/1.1 var(--font-display); margin: 0 0 var(--space-3); letter-spacing: -0.01em; }
+  .scale-row { display: grid; grid-template-columns: 136px minmax(0, 1fr); gap: var(--space-4); align-items: baseline; padding: var(--space-3) 0; border-bottom: 1px solid var(--color-line); }
+  .scale-row:last-child { border-bottom: 0; }
+  .scale-row code { font: var(--weight-regular) var(--text-xs)/1.4 var(--font-mono); color: var(--color-muted); }
+  .scale-row span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-top: var(--space-5); }
+  .pair div { padding: var(--space-4); border-radius: var(--radius-md); background: var(--color-surface-2); }
+  .pair b { display: block; font: var(--weight-display) var(--text-2xl)/1.2 var(--font-display); margin-bottom: var(--space-2); }
+  .pair .sans { font: var(--weight-medium) var(--text-2xl)/1.2 var(--font-sans); }
+
+  .spaces { display: grid; gap: 10px; }
+  .space { display: grid; grid-template-columns: 86px 32px 1fr; align-items: center; gap: var(--space-3); font-size: var(--text-sm); }
+  .space i { display: block; height: 14px; border-radius: 4px; background: var(--color-primary); opacity: 0.8; }
+  .space code { font: var(--weight-regular) var(--text-xs)/1 var(--font-mono); color: var(--color-muted); }
+  .radii { display: flex; flex-wrap: wrap; gap: var(--space-5); }
+  .radii div { display: grid; justify-items: center; gap: var(--space-2); font-size: var(--text-xs); color: var(--color-muted); }
+  .radii i { display: block; width: 64px; height: 64px; background: var(--color-primary-soft); border: 1px solid color-mix(in oklab, var(--color-primary) 30%, transparent); }
+  .shadows { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-5); }
+  .shadows div { height: 88px; border-radius: var(--radius-lg); background: var(--color-surface); display: grid; place-items: center; font: var(--weight-regular) var(--text-xs)/1 var(--font-mono); color: var(--color-muted); }
+
+  .matrix { display: grid; grid-template-columns: 96px repeat(4, minmax(0, 1fr)); align-items: center; gap: var(--space-4); }
+  .matrix .h { font: var(--weight-medium) var(--text-xs)/1 var(--font-sans); letter-spacing: 0.06em; color: var(--color-muted); }
+
+  .rules { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin-top: var(--space-4); }
+  .rule { display: grid; grid-template-columns: 20px 1fr; gap: var(--space-3); padding: var(--space-4) var(--space-5); border-radius: var(--radius-md); background: var(--color-surface-2); font-size: var(--text-sm); line-height: 1.65; }
+  .rule svg { width: 20px; height: 20px; }
+  .rule.do svg { color: var(--color-accent); }
+  .rule.dont svg { color: var(--color-danger); }
+  .rule p { margin: 0; }
+  .rule b { font-weight: var(--weight-semibold); }
+
+  .form { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5); }
+  .form .full { grid-column: 1 / -1; }
+  .opts { display: grid; gap: var(--space-2); }
+  .summary { display: grid; gap: var(--space-3); }
+  .sum-row { display: flex; justify-content: space-between; font-size: var(--text-md); }
+  .sum-row.total { padding-top: var(--space-3); border-top: 1px solid var(--color-line); align-items: baseline; }
+  .item { display: flex; align-items: center; gap: var(--space-3); }
+  .thumb { width: 48px; height: 48px; border-radius: var(--radius-sm); background: var(--color-sand); flex: none; overflow: hidden; }
+  .thumb svg { width: 100%; height: 100%; display: block; }
+  .item p { margin: 0; }
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); font-size: var(--text-sm); color: var(--color-muted); }
+  .steps span:nth-child(2) { text-align: center; padding-right: 12%; }
+  .steps span:nth-child(3) { text-align: center; padding-left: 12%; }
+  .steps span:last-child { text-align: right; }
+  .steps .done { color: var(--color-text); }
+  .steps .now { color: var(--color-primary-hover); font-weight: var(--weight-medium); }
+  .table-foot { display: flex; align-items: center; justify-content: space-between; padding: var(--space-3) var(--space-5); border-top: 1px solid var(--color-line); color: var(--color-muted); font-size: var(--text-sm); }
+
+  .stage { position: relative; border-radius: var(--radius-xl); overflow: hidden; background: var(--color-bg); border: 1px solid var(--color-line); }
+  .stage .modal-scrim { position: absolute; inset: 0; }
+  .ghost { height: 440px; display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6); padding: var(--space-6); box-sizing: border-box; }
+  .ghost i { display: block; border-radius: var(--radius-lg); background: var(--color-sand); }
+  .ghost div { display: grid; gap: var(--space-3); align-content: start; }
+  .ghost div i { height: 14px; background: var(--color-surface-2); border-radius: var(--radius-sm); }
+  .toasts { display: grid; gap: var(--space-3); justify-items: center; padding: var(--space-6); border-radius: var(--radius-xl); background: var(--color-surface-2); }
+  .dark-panel { display: grid; grid-template-columns: 300px 1fr; gap: var(--space-6); padding: var(--space-6); border-radius: var(--radius-xl); background: var(--color-bg); color: var(--color-text); }
+  .foot { margin-top: var(--space-8); background: var(--color-inverse); color: var(--color-inverse-ink); }
+  .foot .wrap { display: flex; justify-content: space-between; align-items: center; padding-top: var(--space-6); padding-bottom: var(--space-6); font-size: var(--text-sm); }
+  .foot b { font: var(--weight-display) var(--text-xl)/1 var(--font-display); }
+</style>
+</head>
+<body>
+<svg class="sym" aria-hidden="true">
+  <symbol id="i-bag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8h14l-1 12H6z"/><path d="M9 10V7a3 3 0 0 1 6 0v3"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4-4"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14"/><path d="M5 19 14 10"/></symbol>
+  <symbol id="i-hand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12V6.5a1.5 1.5 0 0 1 3 0V11M11 10V5a1.5 1.5 0 0 1 3 0v6M14 10V6.5a1.5 1.5 0 0 1 3 0V14a6 6 0 0 1-6 6h-.5a6 6 0 0 1-5-2.7L3.6 14a1.5 1.5 0 0 1 2.4-1.8L8 14"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></symbol>
+  <symbol id="i-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m8.5 12.3 2.4 2.4 4.8-5"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 4.2 2.8 17.5A2 2 0 0 0 4.5 20.5h15a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0z"/><path d="M12 10v4M12 17v.5"/></symbol>
+  <symbol id="i-err" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24" fill="currentColor"><path d="m12 3.5 2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.8l-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c.8-3.8 3.6-6 7-6s6.2 2.2 7 6"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M4 8 12 4l8 4v8l-8 4-8-4z"/><path d="m4 8 8 4 8-4M12 12v8"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0c0 5.4-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></symbol>
+  <symbol id="i-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="9" width="16" height="11" rx="1"/><path d="M3 9h18M12 9v11M12 9c-1.5-3-5-3.5-5-1.3S10 9 12 9c2 0 5 .9 5-1.3S13.5 6 12 9"/></symbol>
+  <symbol id="vase" viewBox="0 0 400 300">
+    <rect width="400" height="300" fill="#E9DCCB"/>
+    <circle cx="318" cy="78" r="54" fill="#F3E8DA"/>
+    <rect y="236" width="400" height="64" fill="#DCC8B0"/>
+    <ellipse cx="200" cy="238" rx="66" ry="8" fill="#C4A988"/>
+    <path d="M199 112c-3-28-12-52-30-78" fill="none" stroke="#5B5634" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M195 82c8-14 22-22 38-24" fill="none" stroke="#5B5634" stroke-width="2" stroke-linecap="round"/>
+    <ellipse cx="168" cy="40" rx="9" ry="4" transform="rotate(-50 168 40)" fill="#7C8645"/>
+    <ellipse cx="180" cy="56" rx="10" ry="4.5" transform="rotate(30 180 56)" fill="#626B33"/>
+    <ellipse cx="186" cy="74" rx="10" ry="4.5" transform="rotate(-40 186 74)" fill="#7C8645"/>
+    <ellipse cx="222" cy="60" rx="10" ry="4.5" transform="rotate(-20 222 60)" fill="#626B33"/>
+    <ellipse cx="236" cy="57" rx="8" ry="4" transform="rotate(10 236 57)" fill="#8E9852"/>
+    <path d="M183 108h34c-2 8-3 14-3 20 34 12 46 44 38 76-5 18-16 28-30 30h-44c-14-2-25-12-30-30-8-32 4-64 38-76 0-6-1-12-3-20z" fill="#AE4F3B"/>
+    <path d="M186 128c-26 9-40 28-40 52 10 6 16-4 24 4 9 9 16-3 26 3 10 7 18-4 28 2 9 6 16-1 22-6 0-28-15-45-34-55-8 3-18 3-26 0z" fill="#C97A5E"/>
+    <path d="M183 108h34" stroke="#8F3F2E" stroke-width="3" stroke-linecap="round"/>
+    <path d="M160 160c-6 14-6 30 0 44" fill="none" stroke="#E2A487" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+    <circle cx="214" cy="206" r="2" fill="#8F3F2E" opacity=".6"/><circle cx="196" cy="216" r="1.6" fill="#8F3F2E" opacity=".6"/><circle cx="230" cy="190" r="1.4" fill="#8F3F2E" opacity=".6"/><circle cx="178" cy="200" r="1.4" fill="#8F3F2E" opacity=".6"/>
+  </symbol>
+  <symbol id="mug" viewBox="0 0 400 300">
+    <rect width="400" height="300" fill="#E4E2CF"/>
+    <rect y="230" width="400" height="70" fill="#D3D0B6"/>
+    <ellipse cx="200" cy="232" rx="78" ry="8" fill="#B9B596"/>
+    <path d="M236 150c30 0 34 46 4 50" fill="none" stroke="#EFE7DA" stroke-width="12" stroke-linecap="round"/>
+    <path d="M146 120h100v86c0 16-10 26-26 26h-48c-16 0-26-10-26-26z" fill="#F4EEE4"/>
+    <path d="M146 120h100v30c-18 8-34-6-50 2s-34 4-50-4z" fill="#626B33"/>
+    <ellipse cx="196" cy="120" rx="50" ry="6" fill="#4E5629"/>
+    <path d="M172 92c-6-10 6-16 0-26M198 92c-6-10 6-16 0-26M224 92c-6-10 6-16 0-26" fill="none" stroke="#B9B596" stroke-width="2.4" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="candle" viewBox="0 0 400 300">
+    <rect width="400" height="300" fill="#EFD9CB"/>
+    <rect y="232" width="400" height="68" fill="#E2C4B1"/>
+    <ellipse cx="200" cy="234" rx="70" ry="8" fill="#CFA78F"/>
+    <rect x="140" y="124" width="120" height="110" rx="14" fill="#2E231D"/>
+    <rect x="140" y="160" width="120" height="44" fill="#E9DCCB"/>
+    <text x="200" y="188" text-anchor="middle" font-family="Iowan Old Style, Georgia, serif" font-size="15" fill="#2E231D" letter-spacing="2">CEDAR</text>
+    <ellipse cx="200" cy="124" rx="60" ry="8" fill="#F6EEE5"/>
+    <path d="M200 120v-12" stroke="#2E231D" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M200 106c-8-10 0-22 0-30 8 10 10 20 0 30z" fill="#E0A04A"/>
+    <path d="M200 103c-3-5 0-10 0-14 3 5 4 9 0 14z" fill="#F6E1B0"/>
+  </symbol>
+  <symbol id="cloth" viewBox="0 0 400 300">
+    <rect width="400" height="300" fill="#DCE0CF"/>
+    <path d="M80 210 200 120l120 90-120 50z" fill="#F3EEE4"/>
+    <path d="M80 210 200 260l120-50" fill="none" stroke="#CDBFA8" stroke-width="2"/>
+    <path d="M110 205 200 140M140 210l92-70M290 205 200 140M260 210l-92-70" stroke="#AE4F3B" stroke-width="3" opacity=".75"/>
+    <path d="M200 120v140" stroke="#CDBFA8" stroke-width="1.5"/>
+  </symbol>
+</svg>
+
+<header class="top">
+  <a class="mark" href="#top" id="top">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#AE4F3B"/><path d="M12 9h8c-.6 2-.8 3.4-.8 4.6 4.8 1.8 6.4 6.2 5.2 10.2-.8 2.4-2.4 3.4-4.2 3.4h-8.4c-1.8 0-3.4-1-4.2-3.4-1.2-4 .4-8.4 5.2-10.2 0-1.2-.2-2.6-.8-4.6z" fill="#F9F5EF"/><path d="M8.6 18.4c4.4 1.4 10.4 1.4 14.8 0" stroke="#626B33" stroke-width="1.6" fill="none"/></svg>
+    陶土 Terracotta<em>设计系统 1.0</em>
+  </a>
+  <nav class="toc" aria-label="目录">
+    <a href="#color">颜色</a><a href="#type">字体</a><a href="#space">间距</a><a href="#buttons">按钮</a><a href="#forms">表单</a><a href="#tags">标签</a><a href="#cards">卡片</a><a href="#table">表格</a><a href="#feedback">提示</a><a href="#navs">导航</a><a href="#modal">弹窗</a><a href="#avatar">头像</a><a href="#empty">空状态</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <p class="overline">设计系统 · 生活方式品牌</p>
+      <h1 class="display">陶土</h1>
+      <span class="latin">Terracotta</span>
+      <p class="lead">陶土橙、米白和一点橄榄绿。衬线标题配无衬线正文，圆角像手捏过的边，阴影带着窑火的暖。给器物、家居、茶与香、手作小店用。</p>
+      <div class="hero-cta"><a class="btn btn-lg" href="#cards">看组件<svg><use href="#i-arrow"/></svg></a><a class="btn btn-secondary btn-lg" href="#color">配色与字体</a></div>
+      <dl class="specs">
+        <dt>标题</dt><dt>圆角</dt><dt>正文对比</dt>
+        <dd>衬线 · 宋体</dd><dd>6 / 10 / 14</dd><dd>14.4 : 1</dd>
+      </dl>
+    </div>
+    <div class="shop" aria-label="组件组合示例">
+      <article class="card card-raised">
+        <a class="card-media" href="#cards" aria-label="灰釉粗陶花器"><svg><use href="#vase"/></svg></a>
+        <div class="row" style="gap:6px;margin-bottom:var(--space-3)"><span class="tag tag-accent"><svg><use href="#i-hand"/></svg>手作</span><span class="tag tag-primary">限量 30 件</span></div>
+        <h3 class="card-title">灰釉粗陶花器</h3>
+        <p class="card-meta">手工拉坯 · 高 18 cm · 景德镇窑口</p>
+        <div class="card-footer"><span class="price"><small>¥</small>168</span><a class="btn btn-sm" href="#forms"><svg><use href="#i-bag"/></svg>加入购物袋</a></div>
+      </article>
+      <div class="stack">
+        <div class="card">
+          <p class="overline">季节来信</p>
+          <h3 class="h3" style="margin:var(--space-2) 0 var(--space-2)">冬天的第一窑，先告诉你</h3>
+          <p class="caption" style="margin-bottom:var(--space-4)">每月一封，新品、窑烧排期和工坊开放日。</p>
+          <div class="input-group"><input class="input" placeholder="邮箱地址" aria-label="邮箱地址"><button class="btn btn-icon" aria-label="订阅"><svg><use href="#i-arrow"/></svg></button></div>
+        </div>
+        <div class="card card-quiet">
+          <div class="rating" aria-label="5 星"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></div>
+          <p class="quote">“釉色比照片里更温柔，插一枝干芦苇就很好看。”</p>
+          <div class="who"><span class="avatar avatar-sm avatar-primary">宋</span><span class="caption">宋晚晴 · 已购 3 次</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="color">
+    <div class="sec-head"><span class="sec-no">01</span><h2 class="h1">颜色</h2><p>大面积是米白和纸白，陶土只落在要点的地方，橄榄绿是一点点自然的气息。</p></div>
+    <div class="tiles">
+      <figure class="tile big"><i style="background:var(--color-primary);color:var(--color-primary-ink)">陶土<small>白字 5.3 : 1</small></i><figcaption><b>主色 primary</b><code class="v">--color-primary</code><span>#AE4F3B · 主按钮、选中、价格强调</span></figcaption></figure>
+      <div class="tile-col">
+        <figure class="tile"><i style="background:var(--color-primary-hover);color:var(--color-primary-ink)">深陶<small>6.9 : 1</small></i><figcaption><b>primary-hover</b><span>#923F2E · 悬停、浅底上的字</span></figcaption></figure>
+        <figure class="tile"><i style="background:var(--color-primary-soft);color:var(--color-primary-hover)">浅陶<small>6.0 : 1</small></i><figcaption><b>primary-soft</b><span>#F7E6DD · 标签、选中底</span></figcaption></figure>
+      </div>
+      <div class="tile-col">
+        <figure class="tile"><i style="background:var(--color-accent);color:#FFFFFF">橄榄<small>5.7 : 1</small></i><figcaption><b>点缀 accent</b><span>#626B33 · 手作、有机、自然</span></figcaption></figure>
+        <figure class="tile"><i style="background:var(--color-accent-soft);color:var(--color-accent)">浅橄榄<small>4.9 : 1</small></i><figcaption><b>accent-soft</b><span>#ECEDDB</span></figcaption></figure>
+      </div>
+      <div class="tile-col">
+        <figure class="tile"><i style="background:var(--color-text);color:var(--color-bg)">深赭<small>14.4 : 1</small></i><figcaption><b>正文 text</b><span>#2B201B</span></figcaption></figure>
+        <figure class="tile"><i style="background:var(--color-muted);color:var(--color-bg)">陶灰<small>5.9 : 1</small></i><figcaption><b>次要 muted</b><span>#6B5A50</span></figcaption></figure>
+      </div>
+    </div>
+    <div class="tiles-2">
+      <figure class="tile"><i style="background:var(--color-bg)"></i><figcaption><b>米白 bg</b><span>#F9F5EF</span></figcaption></figure>
+      <figure class="tile"><i style="background:var(--color-surface)"></i><figcaption><b>纸白 surface</b><span>#FFFDFA</span></figcaption></figure>
+      <figure class="tile"><i style="background:var(--color-surface-2)"></i><figcaption><b>浅沙 surface-2</b><span>#F2EBE1</span></figcaption></figure>
+      <figure class="tile"><i style="background:var(--color-sand)"></i><figcaption><b>沙 sand</b><span>#E9DCCB · 商品图底</span></figcaption></figure>
+      <figure class="tile"><i style="background:var(--color-line)"></i><figcaption><b>线 line</b><span>#E8DED1</span></figcaption></figure>
+      <figure class="tile"><i style="background:var(--color-line-strong)"></i><figcaption><b>控件边</b><span>#CBB9A6</span></figcaption></figure>
+    </div>
+    <p class="sub">状态色：浅底配深字</p>
+    <div class="row" style="gap:var(--space-3)">
+      <span class="tag tag-success" style="height:32px;padding:0 16px">成功 #2A7049 · 5.1 : 1</span>
+      <span class="tag tag-warning" style="height:32px;padding:0 16px">提醒 #8C5A0B · 5.0 : 1</span>
+      <span class="tag tag-danger" style="height:32px;padding:0 16px">错误 酒红 #A2303F · 5.6 : 1</span>
+      <span class="tag" style="height:32px;padding:0 16px;background:var(--color-info-soft);color:var(--color-info)">信息 #3D6680 · 5.1 : 1</span>
+    </div>
+    <div class="rules">
+      <div class="rule do"><svg><use href="#i-ok"/></svg><p><b>错误用酒红，不用陶土</b>：主色本身偏红，报错一律用 danger，才分得清「点这里」和「出问题了」。</p></div>
+      <div class="rule dont"><svg><use href="#i-err"/></svg><p><b>别把沙色当底放小字</b>：sand 是商品图、大色块用的，正文放在 bg / surface 上。</p></div>
+    </div>
+  </section>
+
+  <section class="sec" id="type">
+    <div class="sec-head"><span class="sec-no">02</span><h2 class="h1">字体</h2><p>标题用衬线（拉丁字母 Iowan，中文宋体），常规字重、靠字号撑场；正文用系统无衬线，行高 1.65。</p></div>
+    <div class="grid-2" style="grid-template-columns:1.1fr 1fr;align-items:start">
+      <div class="panel">
+        <p class="type-big">慢慢做，<br>好好用。</p>
+        <p class="lead">一只杯子从揉泥到出窑要二十一天。我们把这段时间留在釉色里，也留在你每天的第一杯茶里。</p>
+        <div class="pair">
+          <div><b>器物 Vessel</b><span class="caption">--font-display · 衬线 400</span></div>
+          <div><b class="sans">器物 Vessel</b><span class="caption">--font-sans · 无衬线 500</span></div>
+        </div>
+      </div>
+      <div class="panel" style="padding-top:var(--space-3);padding-bottom:var(--space-3)">
+        <div class="scale-row"><code>4xl · 56 衬线</code><span class="display" style="font-size:var(--text-4xl)">秋日窑火</span></div>
+        <div class="scale-row"><code>3xl · 40 衬线</code><span class="h1">新品系列</span></div>
+        <div class="scale-row"><code>2xl · 28 衬线</code><span class="h2">工坊的故事</span></div>
+        <div class="scale-row"><code>xl · 22 衬线</code><span style="font:var(--weight-display) var(--text-xl)/1.3 var(--font-display)">价格 ¥168</span></div>
+        <div class="scale-row"><code>lg · 18 衬线 600</code><span class="h3">卡片标题</span></div>
+        <div class="scale-row"><code>md · 16 正文</code><span class="body">每一件都略有不同。</span></div>
+        <div class="scale-row"><code>sm · 14 说明</code><span class="caption">高 18 cm · 口径 6 cm</span></div>
+        <div class="scale-row"><code>xs · 12 标签</code><span class="overline">New arrival · 新到</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="space">
+    <div class="sec-head"><span class="sec-no">03</span><h2 class="h1">间距、圆角、阴影</h2><p>4 / 8 的倍数，留白比工具类产品多一档；圆角中等，阴影是暖棕色的。</p></div>
+    <div class="grid-3">
+      <div class="panel">
+        <p class="sub">间距</p>
+        <div class="spaces">
+          <div class="space"><code>--space-1</code><span>4</span><i style="width:4px"></i></div>
+          <div class="space"><code>--space-2</code><span>8</span><i style="width:8px"></i></div>
+          <div class="space"><code>--space-3</code><span>12</span><i style="width:12px"></i></div>
+          <div class="space"><code>--space-4</code><span>16</span><i style="width:16px"></i></div>
+          <div class="space"><code>--space-5</code><span>24</span><i style="width:24px"></i></div>
+          <div class="space"><code>--space-6</code><span>32</span><i style="width:32px"></i></div>
+          <div class="space"><code>--space-7</code><span>48</span><i style="width:48px"></i></div>
+          <div class="space"><code>--space-8</code><span>64</span><i style="width:64px"></i></div>
+        </div>
+      </div>
+      <div class="panel">
+        <p class="sub">圆角</p>
+        <div class="radii">
+          <div><i style="border-radius:var(--radius-sm)"></i>sm 6 · 小图</div>
+          <div><i style="border-radius:var(--radius-md)"></i>md 10 · 按钮</div>
+          <div><i style="border-radius:var(--radius-lg)"></i>lg 14 · 卡片</div>
+          <div><i style="border-radius:var(--radius-xl)"></i>xl 20 · 弹窗</div>
+          <div><i style="border-radius:var(--radius-full)"></i>full · 标签</div>
+        </div>
+      </div>
+      <div class="panel panel-sand">
+        <p class="sub">阴影</p>
+        <div class="shadows" style="grid-template-columns:1fr">
+          <div style="box-shadow:var(--shadow-sm);height:56px">--shadow-sm 按钮</div>
+          <div style="box-shadow:var(--shadow-md);height:56px">--shadow-md 悬浮卡片</div>
+          <div style="box-shadow:var(--shadow-lg);height:56px">--shadow-lg 弹窗</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="buttons">
+    <div class="sec-head"><span class="sec-no">04</span><h2 class="h1">按钮</h2><p>默认 44 高；主按钮实心陶土，次按钮细描边，文字按钮带下划线，像杂志里的「阅读全文」。</p></div>
+    <div class="panel">
+      <div class="matrix">
+        <span></span><span class="h">主 .btn</span><span class="h">次 .btn-secondary</span><span class="h">文字 .btn-ghost</span><span class="h">危险 .btn-danger</span>
+        <span class="h">lg · 52</span>
+        <span><button class="btn btn-lg">立即购买</button></span>
+        <span><button class="btn btn-secondary btn-lg">预约到店</button></span>
+        <span><button class="btn btn-ghost btn-lg">阅读全文</button></span>
+        <span><button class="btn btn-danger btn-lg">取消订单</button></span>
+        <span class="h">md · 44</span>
+        <span><button class="btn"><svg><use href="#i-bag"/></svg>加入购物袋</button></span>
+        <span><button class="btn btn-secondary"><svg><use href="#i-heart"/></svg>收藏</button></span>
+        <span><button class="btn btn-ghost">查看工艺<svg><use href="#i-arrow"/></svg></button></span>
+        <span><button class="btn btn-danger btn-secondary">移出购物袋</button></span>
+        <span class="h">sm · 36</span>
+        <span><button class="btn btn-sm">选好了</button></span>
+        <span><button class="btn btn-secondary btn-sm">换个颜色</button></span>
+        <span><button class="btn btn-ghost btn-sm">尺寸说明</button></span>
+        <span><button class="btn btn-danger btn-sm">删除</button></span>
+        <span class="h">禁用</span>
+        <span><button class="btn" disabled>已售罄</button></span>
+        <span><button class="btn btn-secondary" disabled>预约已满</button></span>
+        <span><button class="btn btn-ghost" disabled>阅读全文</button></span>
+        <span><button class="btn btn-danger" disabled>取消订单</button></span>
+      </div>
+      <div class="row" style="margin-top:var(--space-6);padding-top:var(--space-5);border-top:1px solid var(--color-line);gap:var(--space-4)">
+        <span class="caption" style="width:96px">图标 / 状态</span>
+        <button class="btn btn-secondary btn-icon" aria-label="收藏"><svg><use href="#i-heart"/></svg></button>
+        <button class="btn btn-icon" aria-label="购物袋"><svg><use href="#i-bag"/></svg></button>
+        <button class="btn is-hover">悬停</button>
+        <button class="btn btn-secondary" style="box-shadow:var(--ring)">键盘焦点</button>
+        <button class="btn btn-block" style="width:240px"><svg><use href="#i-bag"/></svg>结算 · ¥ 412</button>
+      </div>
+    </div>
+    <div class="rules">
+      <div class="rule do"><svg><use href="#i-ok"/></svg><p><b>一屏一个陶土按钮</b>：商品页是「加入购物袋」，结算页是「去付款」。其他都用描边或文字按钮。</p></div>
+      <div class="rule dont"><svg><use href="#i-err"/></svg><p><b>别做胶囊形主按钮</b>：按钮是 10 圆角的方块；全圆只留给标签、图标按钮和分页。</p></div>
+    </div>
+  </section>
+
+  <section class="sec" id="forms">
+    <div class="sec-head"><span class="sec-no">05</span><h2 class="h1">表单</h2><p>44 高、纸白底、1px 暖灰边；聚焦时陶土边加一圈浅光。说明在下面，出错时一句话说怎么改。</p></div>
+    <div class="grid-2" style="grid-template-columns:1.3fr 1fr;align-items:start">
+      <div class="panel">
+        <div class="form">
+          <div class="field"><label class="label" for="t1">收件人称呼</label><input class="input" id="t1" value="宋小姐"></div>
+          <div class="field"><label class="label" for="t2">配送城市</label><select class="select" id="t2"><option>杭州</option><option>上海</option><option>成都</option></select></div>
+          <div class="field"><label class="label" for="t3">杯底刻字<span class="opt">选填</span></label><input class="input is-focus" id="t3" value="给阿禾"><p class="hint">最多 6 个字，刻在杯底，不能退换</p></div>
+          <div class="field"><label class="label" for="t4">优惠码</label><div class="input-group"><input class="input" id="t4" value="AUTUMN" aria-invalid="true"><button class="btn btn-secondary">使用</button></div><p class="hint is-error">这个优惠码 11 月 1 日已过期</p></div>
+          <div class="field full"><label class="label" for="t5">礼物卡片留言</label><textarea class="textarea" id="t5">愿新的一年，每天都有一杯热茶。</textarea></div>
+          <div class="field full">
+            <span class="label">配送方式</span>
+            <div class="grid-2" style="gap:var(--space-3)">
+              <label class="choice"><input type="radio" name="ship" checked><span><b style="font-weight:500">普通快递</b><br><span class="caption">3–5 天 · 满 299 包邮</span></span></label>
+              <label class="choice"><input type="radio" name="ship"><span><b style="font-weight:500">门店自提</b><br><span class="caption">工坊开放日可取</span></span></label>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <span class="label">包装</span>
+        <div class="opts" style="margin:var(--space-3) 0 var(--space-5)">
+          <label class="check"><input type="checkbox" checked>亚麻布袋包装</label>
+          <label class="check"><input type="checkbox" checked>附手写卡片</label>
+          <label class="check"><input type="checkbox">隐藏价格标签</label>
+          <label class="check"><input type="checkbox" disabled>木箱包装（这件不支持）</label>
+        </div>
+        <span class="label">釉色</span>
+        <div class="opts" style="margin:var(--space-3) 0 var(--space-5)">
+          <label class="radio"><input type="radio" name="glaze" checked>灰釉</label>
+          <label class="radio"><input type="radio" name="glaze">赭石</label>
+          <label class="radio"><input type="radio" name="glaze">素烧</label>
+        </div>
+        <div class="opts" style="gap:var(--space-3)">
+          <label class="switch"><input type="checkbox" role="switch" checked>礼物模式</label>
+          <label class="switch"><input type="checkbox" role="switch">到货前提醒我</label>
+        </div>
+        <div class="row" style="margin-top:var(--space-5);justify-content:space-between"><span class="label">数量</span><div class="stepper"><button aria-label="减一" disabled>−</button><span>1</span><button aria-label="加一">+</button></div></div>
+      </div>
+    </div>
+    <div class="rules">
+      <div class="rule do"><svg><use href="#i-ok"/></svg><p><b>选规格用选项卡片</b>：配送方式、尺寸这类二三选一的，用 .choice 把说明一起放进去。</p></div>
+      <div class="rule dont"><svg><use href="#i-err"/></svg><p><b>别把整个表单塞进一行两列以上</b>：生活方式的表单要松，最多两列。</p></div>
+    </div>
+  </section>
+
+  <section class="sec" id="tags">
+    <div class="sec-head"><span class="sec-no">06</span><h2 class="h1">标签与状态</h2><p>标签是全圆的小胶囊，字距放宽一点；橄榄色留给「手作」「有机」这类和自然有关的词。</p></div>
+    <div class="grid-2">
+      <div class="panel">
+        <p class="sub">商品标签</p>
+        <div class="row"><span class="tag tag-accent"><svg><use href="#i-leaf"/></svg>植物染</span><span class="tag tag-accent"><svg><use href="#i-hand"/></svg>手作</span><span class="tag tag-primary">新到</span><span class="tag tag-solid">限量</span><span class="tag">陶瓷</span><span class="tag tag-outline">高 18 cm</span></div>
+        <p class="sub">订单状态</p>
+        <div class="row"><span class="tag tag-warning">待发货</span><span class="tag tag-primary">运输中</span><span class="tag tag-success">已签收</span><span class="tag tag-danger">已退款</span></div>
+      </div>
+      <div class="panel">
+        <p class="sub">角标、状态点、评分</p>
+        <div class="row" style="gap:var(--space-6)">
+          <span class="row" style="gap:var(--space-2)"><svg width="22" height="22"><use href="#i-bag"/></svg><span class="badge">2</span></span>
+          <span class="row" style="gap:var(--space-2)">消息<span class="badge badge-muted">12</span></span>
+          <span class="row" style="gap:var(--space-2)"><span class="dot dot-success"></span>有货</span>
+          <span class="row" style="gap:var(--space-2)"><span class="dot dot-warning"></span>仅剩 3 件</span>
+          <span class="row" style="gap:var(--space-2)"><span class="dot"></span>售罄</span>
+        </div>
+        <p class="sub">进度</p>
+        <div style="display:grid;gap:var(--space-3)">
+          <div><div class="row" style="justify-content:space-between;margin-bottom:6px"><span class="caption">冬季窑 · 已预订</span><span class="caption">64 / 80</span></div><div class="progress"><i style="width:80%"></i></div></div>
+          <div class="row" style="gap:var(--space-3)"><span class="rating" aria-label="4 星"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg class="off"><use href="#i-star"/></svg></span><span class="caption">4.8 · 126 条评价</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="cards">
+    <div class="sec-head"><span class="sec-no">07</span><h2 class="h1">卡片</h2><p>商品卡：上面一张沙色底的图，下面衬线标题和价格。平时只有细边，悬浮、重点推荐时才用暖阴影。</p></div>
+    <div class="grid-3">
+      <article class="card">
+        <a class="card-media" href="#cards" aria-label="燕麦釉马克杯"><svg><use href="#mug"/></svg></a>
+        <div class="row" style="justify-content:space-between"><h3 class="card-title">燕麦釉马克杯</h3><span class="price"><small>¥</small>98</span></div>
+        <p class="card-meta">320 ml · 可进洗碗机</p>
+        <div class="card-footer"><span class="row" style="gap:6px"><span class="dot dot-success"></span><span class="caption">有货</span></span><button class="btn btn-secondary btn-sm">加入购物袋</button></div>
+      </article>
+      <article class="card card-raised">
+        <a class="card-media" href="#cards" aria-label="雪松香薰蜡烛"><svg><use href="#candle"/></svg></a>
+        <div class="row" style="justify-content:space-between"><h3 class="card-title">雪松香薰蜡烛</h3><span class="price"><small>¥</small>128<s>¥158</s></span></div>
+        <p class="card-meta">燃烧约 40 小时 · 大豆蜡</p>
+        <div class="card-footer"><span class="tag tag-primary">本周推荐</span><button class="btn btn-sm">加入购物袋</button></div>
+      </article>
+      <article class="card">
+        <a class="card-media" href="#cards" aria-label="亚麻十字绣桌旗"><svg><use href="#cloth"/></svg></a>
+        <div class="row" style="justify-content:space-between"><h3 class="card-title">亚麻十字绣桌旗</h3><span class="price"><small>¥</small>186</span></div>
+        <p class="card-meta">40 × 180 cm · 植物染</p>
+        <div class="card-footer"><span class="row" style="gap:6px"><span class="dot dot-warning"></span><span class="caption">仅剩 3 件</span></span><button class="btn btn-secondary btn-sm">加入购物袋</button></div>
+      </article>
+    </div>
+  </section>
+
+  <section class="sec" id="table">
+    <div class="sec-head"><span class="sec-no">08</span><h2 class="h1">表格</h2><p>表头小字、字距放宽、没有底色；行高 56，只有横线。金额右对齐、等宽。</p></div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>订单</th><th>商品</th><th>下单日期</th><th>状态</th><th class="num">金额</th><th></th></tr></thead>
+        <tbody>
+          <tr><td class="muted">TC-24117</td><td><div class="item"><span class="thumb"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"><use href="#vase"/></svg></span><div><p>灰釉粗陶花器</p><p class="caption">灰釉 · ×1</p></div></div></td><td>11 月 6 日</td><td><span class="tag tag-primary">运输中</span></td><td class="num">¥168.00</td><td class="num"><a class="btn btn-ghost btn-sm" href="#table">查看</a></td></tr>
+          <tr><td class="muted">TC-24093</td><td><div class="item"><span class="thumb"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"><use href="#mug"/></svg></span><div><p>燕麦釉马克杯</p><p class="caption">燕麦 · ×2</p></div></div></td><td>11 月 2 日</td><td><span class="tag tag-success">已签收</span></td><td class="num">¥196.00</td><td class="num"><a class="btn btn-ghost btn-sm" href="#table">再买一次</a></td></tr>
+          <tr><td class="muted">TC-23980</td><td><div class="item"><span class="thumb"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"><use href="#candle"/></svg></span><div><p>雪松香薰蜡烛</p><p class="caption">200 g · ×1</p></div></div></td><td>10 月 27 日</td><td><span class="tag tag-warning">待发货</span></td><td class="num">¥128.00</td><td class="num"><a class="btn btn-ghost btn-sm" href="#table">修改</a></td></tr>
+          <tr><td class="muted">TC-23871</td><td><div class="item"><span class="thumb"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"><use href="#cloth"/></svg></span><div><p>亚麻十字绣桌旗</p><p class="caption">40 × 180 · ×1</p></div></div></td><td>10 月 19 日</td><td><span class="tag tag-danger">已退款</span></td><td class="num muted">¥186.00</td><td class="num"><a class="btn btn-ghost btn-sm" href="#table">详情</a></td></tr>
+        </tbody>
+      </table>
+      <div class="table-foot"><span>共 12 笔订单</span><nav class="pagination" aria-label="分页"><a href="#table" aria-label="上一页"><svg width="16" height="16"><use href="#i-left"/></svg></a><a href="#table" aria-current="page">1</a><a href="#table">2</a><a href="#table">3</a><a href="#table" aria-label="下一页"><svg width="16" height="16"><use href="#i-right"/></svg></a></nav></div>
+    </div>
+  </section>
+
+  <section class="sec" id="feedback">
+    <div class="sec-head"><span class="sec-no">09</span><h2 class="h1">提示条与轻提示</h2><p>提示条是没有边框的浅色块；轻提示是底部居中的深赭色胶囊，2–3 秒后消失。</p></div>
+    <div class="banner" style="border-radius:var(--radius-md);margin-bottom:var(--space-4)"><svg width="18" height="18"><use href="#i-truck"/></svg>立冬前下单，12 月 1 日前到家 · 满 299 包邮 <a href="#feedback">看配送说明</a></div>
+    <div class="grid-2" style="grid-template-columns:1.3fr 1fr;align-items:start">
+      <div style="display:grid;gap:var(--space-3)">
+        <div class="alert" role="status"><svg><use href="#i-info"/></svg><p class="alert-title">冬季窑 12 月 8 日开窑</p><p class="alert-text">现在预订的花器会在开窑后 3 天内发出。</p></div>
+        <div class="alert alert-success" role="status"><svg><use href="#i-ok"/></svg><p class="alert-title">包裹已经出发</p><p class="alert-text">预计 11 月 9 日送到，签收前会再提醒你一次。</p></div>
+        <div class="alert alert-warning" role="status"><svg><use href="#i-warn"/></svg><p class="alert-title">赭石釉只剩 3 件</p><p class="alert-text">手工烧制，这一窑卖完要等到明年春天。</p><a class="btn btn-secondary btn-sm alert-action" href="#cards">先留一件</a></div>
+        <div class="alert alert-danger" role="alert"><svg><use href="#i-err"/></svg><p class="alert-title">地址不完整，暂时没法发货</p><p class="alert-text">补上门牌号，我们今天就能寄出。</p><a class="btn btn-secondary btn-sm alert-action" href="#forms">去补充</a></div>
+      </div>
+      <div class="toasts">
+        <p class="caption">轻提示 <code class="v">.toast</code></p>
+        <div class="toast" role="status"><svg><use href="#i-ok"/></svg>已加入购物袋<a class="btn btn-ghost btn-sm" href="#forms">去结算</a></div>
+        <div class="toast" role="status"><svg><use href="#i-heart"/></svg>收进了「我的收藏」</div>
+        <div class="toast toast-danger" role="alert"><svg><use href="#i-err"/></svg>网络有点慢，再试一次<a class="btn btn-ghost btn-sm" href="#feedback">重试</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="navs">
+    <div class="sec-head"><span class="sec-no">10</span><h2 class="h1">标签页与导航</h2><p>顶栏 64 高，衬线的店名在左；标签页是细下划线，分段控件是全圆的沙色槽。</p></div>
+    <div class="table-wrap" style="overflow:hidden">
+      <div class="navbar">
+        <a class="brand" href="#navs"><svg width="26" height="26" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#AE4F3B"/><path d="M12 9h8c-.6 2-.8 3.4-.8 4.6 4.8 1.8 6.4 6.2 5.2 10.2-.8 2.4-2.4 3.4-4.2 3.4h-8.4c-1.8 0-3.4-1-4.2-3.4-1.2-4 .4-8.4 5.2-10.2 0-1.2-.2-2.6-.8-4.6z" fill="#F9F5EF"/></svg>窑边小铺</a>
+        <nav class="links" aria-label="主导航"><a href="#navs" aria-current="page">新品</a><a href="#navs">器物</a><a href="#navs">织物</a><a href="#navs">香与茶</a><a href="#navs">工坊</a></nav>
+        <span class="spacer"></span>
+        <a class="btn btn-ghost btn-icon" href="#navs" aria-label="搜索" style="text-decoration:none"><svg><use href="#i-search"/></svg></a>
+        <a class="btn btn-ghost btn-icon" href="#navs" aria-label="我的" style="text-decoration:none"><svg><use href="#i-user"/></svg></a>
+        <a class="btn btn-secondary btn-sm" href="#navs"><svg><use href="#i-bag"/></svg>购物袋<span class="badge">2</span></a>
+      </div>
+      <div style="padding:var(--space-5) var(--space-6) var(--space-6)">
+        <nav class="breadcrumb" aria-label="位置"><a href="#navs">首页</a><span>/</span><a href="#navs">器物</a><span>/</span><span aria-current="page">灰釉粗陶花器</span></nav>
+        <div class="tabs" role="tablist" style="margin-top:var(--space-4)">
+          <a class="tab" role="tab" aria-selected="true" href="#navs">商品详情</a>
+          <a class="tab" role="tab" href="#navs">工艺与保养</a>
+          <a class="tab" role="tab" href="#navs">评价<span class="badge badge-muted">126</span></a>
+          <a class="tab" role="tab" href="#navs">配送与退换</a>
+        </div>
+        <div class="row" style="margin-top:var(--space-5);justify-content:space-between">
+          <div class="segmented" role="tablist"><a class="tab" role="tab" aria-selected="true" href="#navs">全部</a><a class="tab" role="tab" href="#navs">花器</a><a class="tab" role="tab" href="#navs">杯盘</a><a class="tab" role="tab" href="#navs">织物</a></div>
+          <nav class="pagination" aria-label="分页"><a href="#navs" aria-label="上一页"><svg width="16" height="16"><use href="#i-left"/></svg></a><a href="#navs">1</a><a href="#navs" aria-current="page">2</a><a href="#navs">3</a><a href="#navs" aria-label="下一页"><svg width="16" height="16"><use href="#i-right"/></svg></a></nav>
+        </div>
+      </div>
+    </div>
+    <div class="grid-2" style="grid-template-columns:280px 1fr;margin-top:var(--space-5)">
+      <div class="panel" style="padding:var(--space-4)">
+        <nav class="nav" aria-label="我的账户">
+          <a class="nav-item" href="#navs" aria-current="page"><svg><use href="#i-box"/></svg>我的订单<span class="badge">1</span></a>
+          <a class="nav-item" href="#navs"><svg><use href="#i-heart"/></svg>收藏</a>
+          <a class="nav-item" href="#navs"><svg><use href="#i-pin"/></svg>收货地址</a>
+          <a class="nav-item" href="#navs"><svg><use href="#i-gift"/></svg>礼品卡</a>
+        </nav>
+      </div>
+      <div class="panel">
+        <div class="row" style="justify-content:space-between;margin-bottom:var(--space-4)">
+          <div><p class="caption">订单 TC-24117 · 11 月 6 日</p><p class="h2" style="margin-top:4px">在路上了，后天到</p></div>
+          <span class="tag tag-primary">运输中</span>
+        </div>
+        <div class="progress" style="margin-bottom:var(--space-3)"><i style="width:66%"></i></div>
+        <div class="steps"><span class="done">已下单</span><span class="done">出窑打包</span><span class="now">运输中</span><span>签收</span></div>
+        <div class="card-footer"><div class="item"><span class="thumb"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"><use href="#vase"/></svg></span><div><p>灰釉粗陶花器</p><p class="caption">灰釉 · 高 18 cm · ×1</p></div></div><a class="btn btn-secondary btn-sm" href="#table">物流详情</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="modal">
+    <div class="sec-head"><span class="sec-no">11</span><h2 class="h1">弹窗</h2><p>20 圆角、32 内边距、衬线标题。只问一件事，按钮写清后果。</p></div>
+    <div class="stage">
+      <div class="ghost" aria-hidden="true"><i></i><div><i style="width:40%"></i><i style="width:80%;height:28px"></i><i></i><i style="width:90%"></i><i style="width:60%"></i><i style="width:50%;height:44px;margin-top:16px;border-radius:10px"></i></div></div>
+      <div class="modal-scrim">
+        <div class="modal" role="dialog" aria-labelledby="m1">
+          <div class="modal-header"><h3 class="modal-title" id="m1">把它移出购物袋？</h3><button class="btn btn-ghost btn-icon btn-sm" aria-label="关闭" style="text-decoration:none"><svg><use href="#i-x"/></svg></button></div>
+          <div class="modal-body">
+            <div class="item" style="margin-bottom:var(--space-4)"><span class="thumb"><svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"><use href="#vase"/></svg></span><div><p>灰釉粗陶花器</p><p class="caption">限量 30 件，移出后不再为你保留</p></div></div>
+            <label class="check"><input type="checkbox">放进「我的收藏」，以后再看</label>
+          </div>
+          <div class="modal-footer"><button class="btn btn-secondary">留着</button><button class="btn btn-danger">移出</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="avatar">
+    <div class="sec-head"><span class="sec-no">12</span><h2 class="h1">头像</h2><p>圆形、衬线首字；底色在沙、浅陶、浅橄榄里轮换。</p></div>
+    <div class="panel">
+      <div class="row" style="gap:var(--space-7)">
+        <div class="row" style="gap:var(--space-3)"><span class="avatar avatar-lg avatar-primary">苏</span><span class="avatar">林</span><span class="avatar avatar-sm avatar-accent">禾</span></div>
+        <div class="row" style="gap:var(--space-3)"><span class="avatar-group"><span class="avatar">苏</span><span class="avatar avatar-primary">宋</span><span class="avatar avatar-accent">叶</span><span class="avatar" style="font-family:var(--font-sans);font-size:var(--text-sm)">+9</span></span><span class="caption">12 位手艺人</span></div>
+        <div class="row" style="gap:var(--space-3)"><span class="avatar avatar-lg avatar-accent">苏</span><div><p class="h3">苏木</p><p class="caption">窑主 · 做陶第 14 年</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="empty">
+    <div class="sec-head"><span class="sec-no">13</span><h2 class="h1">空状态</h2><p>一幅小小的线条插画、一句温和的话、一个去处。</p></div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="empty">
+          <div class="empty-art"><svg viewBox="0 0 120 96" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="60" cy="86" rx="40" ry="5" fill="#F2EBE1" stroke="none"/><path d="M28 40h64l-7 42H35z" stroke="#2B201B" stroke-width="2"/><path d="M42 40c0-14 8-24 18-24s18 10 18 24" stroke="#2B201B" stroke-width="2"/><path d="M33 54h54M35 68h50" stroke="#CBB9A6" stroke-width="2"/><path d="M48 40v42M60 40v42M72 40v42" stroke="#CBB9A6" stroke-width="2"/><path d="M92 18c4 6 2 12-4 14M96 30c6 0 9 5 8 10" stroke="#626B33" stroke-width="2"/></svg></div>
+          <h3 class="empty-title">购物袋还是空的</h3>
+          <p class="empty-text">逛逛这周新出窑的器物，或者从收藏里挑一件。</p>
+          <div class="row" style="justify-content:center"><a class="btn" href="#cards">看看新品</a><a class="btn btn-ghost" href="#navs">我的收藏</a></div>
+        </div>
+      </div>
+      <div class="card card-quiet">
+        <div class="empty">
+          <div class="empty-art"><svg viewBox="0 0 120 96" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="60" cy="86" rx="34" ry="5" fill="#E9DCCB" stroke="none"/><path d="M50 30h20c-1 4-1.5 7-1.5 10 13 5 17 17 13 28-2 7-6 10-11 10H50c-5 0-9-3-11-10-4-11 0-23 13-28 0-3-.5-6-2-10z" stroke="#AE4F3B" stroke-width="2"/><path d="M42 58c12 4 24 4 36 0" stroke="#AE4F3B" stroke-width="2"/><path d="M82 22l6-6M86 30h8M36 22l-6-6" stroke="#CBB9A6" stroke-width="2"/></svg></div>
+          <h3 class="empty-title">这个系列还在窑里</h3>
+          <p class="empty-text">「赭石」系列 12 月 8 日开窑，留个提醒，出窑第一时间告诉你。</p>
+          <button class="btn btn-secondary">出窑提醒我</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="dark">
+    <div class="sec-head"><span class="sec-no">14</span><h2 class="h1">深色</h2><p>&lt;html data-theme="dark"&gt;：夜里的窑。深赭底、亮一点的陶土，组件不用改。</p></div>
+    <div class="dark-panel" data-theme="dark">
+      <article class="card">
+        <span class="card-media" aria-hidden="true"><svg><use href="#candle"/></svg></span>
+        <div class="row" style="justify-content:space-between"><h3 class="card-title">雪松香薰蜡烛</h3><span class="price"><small>¥</small>128</span></div>
+        <p class="card-meta">燃烧约 40 小时</p>
+        <div class="card-footer"><span class="tag tag-accent">大豆蜡</span><button class="btn btn-sm">加入购物袋</button></div>
+      </article>
+      <div style="display:grid;gap:var(--space-4);align-content:start">
+        <p class="overline">夜间阅读</p>
+        <p class="h1">睡前点一支，房间里有雪松和旧书的味道。</p>
+        <div class="alert alert-success"><svg><use href="#i-ok"/></svg><p class="alert-title">包裹已经出发</p><p class="alert-text">预计 11 月 9 日送到。</p></div>
+        <div class="row"><button class="btn">立即购买</button><button class="btn btn-secondary">收藏</button><label class="switch"><input type="checkbox" role="switch" checked>礼物模式</label></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot"><div class="wrap"><b>陶土 Terracotta</b><span>设计系统 1.0 · 2026 年 11 月 · CC0-1.0</span></div></footer>
+</body>
+</html>

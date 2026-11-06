@@ -1,0 +1,15 @@
+{
+  "format": 1,
+  "type": "system",
+  "title": { "zh": "软糖 Gumdrop", "en": "Gumdrop" },
+  "description": {
+    "zh": "给年轻消费类 App 的设计系统：葡萄紫配柠檬黄和一组糖果色，大圆角、圆体字，按钮底下垫一条厚台阶，带底部标签栏、贴纸和深色版。",
+    "en": "A playful design system for young consumer apps: grape and lemon with a set of candy colors, big radii, rounded type, chunky buttons with a solid bottom ledge, a tab bar, stickers and a dark theme."
+  },
+  "categories": ["social", "health"],
+  "tags": ["onboarding", "profile", "feed", "form", "empty-state", "illustration", "dark-mode"],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": { "login": "orderg-x", "id": 271418316 },
+  "ai": { "generated": true, "tool": "dsh-design-studio@0.11.0" }
+}

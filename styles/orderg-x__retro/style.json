@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#F3E6CF",
+    "surface": "#FBF2E2",
+    "text": "#2E1F14",
+    "muted": "#6A5240",
+    "line": "#DDC7A4",
+    "primary": "#B5471D",
+    "accent": "#E0A526",
+    "on": "#FFF6E8",
+    "link": "#2F5D50"
+  },
+  "head": "SERIF",
+  "w": 800,
+  "radius": 14,
+  "shadow": "0 4px 0 #2E1F14",
+  "dzh": "焦橙芥末黄墨绿、粗衬线、颗粒感",
+  "den": "Burnt orange, mustard and teal, fat serif, grain",
+  "nzh": "焦橙、芥末黄、墨绿三色，配粗衬线大标题；彩虹条纹、圆形徽章做装饰；底色叠一层很淡的颗粒噪点；图片调成褪色暖调",
+  "nen": "Burnt orange, mustard and teal with fat serif headlines; rainbow stripes and round badges as decoration; a very light grain over the background; faded warm photos"
+}

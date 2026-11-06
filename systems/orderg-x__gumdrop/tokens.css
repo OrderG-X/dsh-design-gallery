@@ -1,0 +1,146 @@
+/* 设计系统「软糖 Gumdrop」的设计变量：年轻消费类 App。葡萄紫主色 + 柠檬黄点缀 + 一组糖果色，圆润大圆角，按钮有厚实的底边阴影，圆体字。
+   复制到设计目录，每屏 <link rel="stylesheet" href="tokens.css">，再 link components.css */
+:root {
+  /* 颜色：按角色定义（换主题只改这里） */
+  --color-bg: #F6F2FF;              /* 页面背景：淡淡的薰衣草白 */
+  --color-surface: #FFFFFF;         /* 卡片、弹窗、输入框 */
+  --color-surface-2: #EFE9FF;       /* 次一级表面：分组、槽、表头 */
+  --color-text: #23173D;            /* 正文：深葡萄墨（对 bg 15.1:1），也是糖果色块上的字 */
+  --color-muted: #605679;           /* 次要文字（对 bg 6.1:1） */
+  --color-line: #E3DBF7;            /* 卡片边、卡片下面那条「台阶」 */
+  --color-line-strong: #CBBFEF;     /* 输入框、次按钮的边和台阶 */
+  --color-primary: #7A3FF0;         /* 主色：葡萄紫，关键按钮、选中（白字 5.5:1） */
+  --color-primary-hover: #6A30DE;
+  --color-primary-deep: #5424C2;    /* 主按钮底边的厚阴影 */
+  --color-primary-soft: #EFE7FF;
+  --color-primary-ink: #FFFFFF;
+  --color-primary-text: #5424C2;    /* 浅底、白底上的主色字（对 soft 7.3:1） */
+  --color-accent: #FFC21A;          /* 点缀：柠檬黄，奖励、连胜、高亮；上面放深色字 */
+  --color-accent-deep: #D99A00;
+  --color-accent-soft: #FFF3CC;
+  --color-accent-ink: #3B2800;      /* 柠檬黄上的字 */
+  --color-accent-text: #7A5200;     /* 浅柠檬底上的字 */
+  --candy-pink: #FF6FA8;            /* 糖果色：头像、贴纸、插画、分类；上面一律放 --color-text */
+  --candy-mint: #2CCB97;
+  --candy-sky: #4CB0FF;
+  --candy-orange: #FF8A3D;
+  --candy-pink-deep: #D94585;       /* 糖果卡底下的台阶 */
+  --candy-mint-deep: #14A276;
+  --candy-sky-deep: #2288DB;
+  --candy-orange-deep: #D9661A;
+  --candy-ink: #23173D;             /* 糖果色上的字，深浅模式都不变 */
+  --color-success: #08794F;         /* 成功的字；亮色块用 --candy-mint */
+  --color-success-soft: #DDF7EC;
+  --color-warning: #9A5200;
+  --color-warning-soft: #FFF0D6;
+  --color-warning-fill: #FF9F1A;    /* 警告的点、进度条（不放字） */
+  --color-danger: #C21F4A;
+  --color-danger-deep: #8F1234;
+  --color-danger-soft: #FFE6EC;
+  --color-danger-ink: #FFFFFF;
+  --color-inverse: #23173D;         /* 反色：轻提示 */
+  --color-inverse-ink: #FFFFFF;
+  --color-link: #6A30DE;
+  --color-overlay: rgb(35 23 61 / 0.5);
+  --color-focus: rgb(122 63 240 / 0.28);
+
+  /* 字体：圆体。拉丁字母和数字优先 SF Pro Rounded，标题再加 Arial Rounded 兜底；中文落到圆体 / 苹方 */
+  --font-sans: "SF Pro Rounded", ui-rounded, "Yuanti SC", "PingFang SC", "HarmonyOS Sans SC", "MiSans", "Microsoft YaHei", system-ui, sans-serif;
+  --font-display: "SF Pro Rounded", ui-rounded, "Arial Rounded MT Bold", "Yuanti SC", "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-mono: "SF Mono", Menlo, Consolas, monospace;
+
+  /* 字号阶梯 */
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-md: 16px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 28px;
+  --text-3xl: 36px;
+  --text-4xl: 48px;
+
+  /* 字重：圆体要稍微重一点才饱满 */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-bold: 700;
+  --weight-black: 800;
+
+  /* 行高 */
+  --leading-tight: 1.15;
+  --leading-snug: 1.35;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.75;
+
+  /* 间距（4 / 8 的倍数） */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* 控件高度：手指友好 */
+  --control-sm: 40px;
+  --control-md: 48px;
+  --control-lg: 56px;
+
+  /* 圆角：大而圆 */
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-full: 999px;
+
+  /* 阴影：「台阶」式的实心底边 + 少量柔光 */
+  --ledge: 4px;                                         /* 按钮底边厚度 */
+  --shadow-sm: 0 3px 0 var(--color-line);               /* 卡片、标签下面的台阶 */
+  --shadow-md: 0 6px 0 var(--color-line);
+  --shadow-lg: 0 8px 0 rgb(84 36 194 / 0.12), 0 24px 48px -12px rgb(84 36 194 / 0.35);
+  --ring: 0 0 0 4px var(--color-focus);
+
+  /* 动效：有一点回弹 */
+  --ease: cubic-bezier(.34, 1.56, .64, 1);
+  --dur: 180ms;
+}
+
+/* 深色版：<html data-theme="dark">（或给某一块加 data-theme="dark"）。夜里的糖果铺 */
+[data-theme="dark"] {
+  --color-bg: #17102B;
+  --color-surface: #22183D;
+  --color-surface-2: #2C2150;
+  --color-text: #EDE8FF;
+  --color-muted: #ABA2C9;
+  --color-line: #3A2D63;
+  --color-line-strong: #52438A;
+  --color-primary: #A98BFF;
+  --color-primary-hover: #BBA2FF;
+  --color-primary-deep: #6B4BD6;
+  --color-primary-soft: #33245E;
+  --color-primary-ink: #17102B;
+  --color-primary-text: #C9B6FF;
+  --color-accent-soft: #3A2E0F;
+  --color-accent-text: #FFD666;
+  --color-success: #5FE0B0;
+  --color-success-soft: #123A2D;
+  --color-warning: #FFB866;
+  --color-warning-soft: #3B2A12;
+  --color-danger: #FF8FAB;
+  --color-danger-deep: #B83A5C;
+  --color-danger-soft: #3D1A28;
+  --color-danger-ink: #17102B;
+  --color-inverse: #EDE8FF;
+  --color-inverse-ink: #17102B;
+  --color-link: #BBA2FF;
+  --color-overlay: rgb(0 0 0 / 0.6);
+  --color-focus: rgb(169 139 255 / 0.4);
+  --shadow-sm: 0 3px 0 var(--color-line);   /* 变量引用变量要在这里重写一遍，才会取到深色的线色 */
+  --shadow-md: 0 6px 0 var(--color-line);
+  --shadow-lg: 0 8px 0 rgb(0 0 0 / 0.25), 0 24px 48px -12px rgb(0 0 0 / 0.6);
+  --ring: 0 0 0 4px var(--color-focus);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur: 0ms; }
+}

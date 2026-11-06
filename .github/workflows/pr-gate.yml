@@ -1,0 +1,172 @@
+# 投稿闸门：pr-check 跑完后，拿 App token、只检出 main，把检查产物当不可信数据读。
+# PR 能改 pr-check.yml 本身（pull_request 用的是 PR 里的工作流），所以产物可以是伪造的：
+# 闸门自己按 PR 的真实改动重算结构守卫、归属和规则（只读文件、不渲染、不执行投稿内容），产物只能多报问题、提供截图。
+# 定车道、贴审核卡（带截图）、打标签、写「Submission gate」检查；A 车道自动合并。
+name: pr-gate
+
+on:
+  workflow_run:
+    workflows: [pr-check]
+    types: [completed]
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: pr-gate-${{ github.event.workflow_run.head_sha }}
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    if: github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - id: app
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.GALLERY_APP_ID }}
+          private-key: ${{ secrets.GALLERY_APP_PRIVATE_KEY }}
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+
+      - name: 取检查产物
+        uses: actions/download-artifact@v4
+        with:
+          name: check-results
+          path: artifact
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: 核对是哪个 PR（产物里的号要和 GitHub 上的对得上）
+        id: pr
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+          APP_SLUG: ${{ steps.app.outputs.app-slug }}
+        run: |
+          set -euo pipefail
+          n=$(head -c 12 artifact/pr | tr -cd '0-9')
+          [ -n "$n" ] || { echo "产物里没有 PR 号"; exit 1; }
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$n" > pr.json
+          [ "$(jq -r .head.sha pr.json)" = "$RUN_SHA" ] || { echo "PR 已经有新提交，跳过"; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0; }
+          [ "$(jq -r .state pr.json)" = "open" ] || { echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0; }
+          login=$(jq -r .user.login pr.json); id=$(jq -r .user.id pr.json); url=$(jq -r .html_url pr.json)
+          # 机器人代开的 issue 投稿：投稿人和 issue 链接写在 PR 说明里（只有机器人和维护者能改）
+          if [ "$login" = "${APP_SLUG}[bot]" ]; then
+            line=$(jq -r '.body // ""' pr.json | grep -E '^Submitted-by: [A-Za-z0-9-]{1,39} \([0-9]+\)$' | head -1 || true)
+            sub=$(jq -r '.body // ""' pr.json | grep -E '^Submission: https://github\.com/[A-Za-z0-9._-]+/[A-Za-z0-9._-]+/issues/[0-9]+$' | head -1 | cut -d' ' -f2 || true)
+            [ -n "$line" ] && login=$(echo "$line" | sed -E 's/^Submitted-by: ([A-Za-z0-9-]+) .*/\1/') && id=$(echo "$line" | sed -E 's/.*\(([0-9]+)\)$/\1/')
+            [ -n "$sub" ] && url="$sub"
+          fi
+          created=$(gh api "users/$login" --jq .created_at)
+          lower=$(echo "$login" | tr 'A-Z' 'a-z')
+          # 满 7 天的已收录设计有几套
+          prior=$(git log --diff-filter=A --before='7 days ago' --name-only --format= -- "templates/${lower}__*" "systems/${lower}__*" "styles/${lower}__*" | cut -d/ -f1-2 | sort -u | grep -c . || true)
+          # 这个作者（按数字 ID，改名也算同一人）同时在等的、24 小时内交的（直接开的 PR + 机器人代开的 issue 投稿）
+          # 在等的：所有 open PR 分页取全；24 小时内的：按创建时间倒序翻页，翻到早于 24 小时为止
+          since=$(date -u -d '24 hours ago' +%Y-%m-%dT%H:%M:%SZ)
+          gh api --paginate "repos/$GITHUB_REPOSITORY/pulls?state=open&per_page=100" | jq -s 'add // []' > open-pulls.json
+          echo '[]' > recent-pulls.json
+          # 翻到早于 24 小时为止；翻满 30 页还没到（一天三千多个 PR）就算没数全：partial=1，闸门不自动合并、转人工
+          partial=1
+          for page in $(seq 1 30); do
+            gh api "repos/$GITHUB_REPOSITORY/pulls?state=all&sort=created&direction=desc&per_page=100&page=$page" > page.json
+            jq -s 'add' recent-pulls.json page.json > r.tmp && mv r.tmp recent-pulls.json
+            if [ "$(jq length page.json)" -lt 100 ]; then partial=0; break; fi
+            if [ "$(jq -r '.[-1].created_at // ""' page.json)" \< "$since" ]; then partial=0; break; fi
+          done
+          pending=0; today=0
+          eval "$(ID="$id" BOT="${APP_SLUG}[bot]" SINCE="$since" node scripts/gate.mjs --count open-pulls.json recent-pulls.json | grep -E '^(pending|today)=[0-9]+$')"
+          { echo "number=$n"; echo "login=$login"; echo "id=$id"; echo "created=$created"; echo "prior=$prior"; echo "pending=$pending"; echo "today=$today"; echo "partial=$partial"; echo "submission=$url"; } >> "$GITHUB_OUTPUT"
+
+      - name: 可信侧重查（不信产物）：按 PR 的真实改动重算结构守卫、归属、规则
+        if: steps.pr.outputs.skip != 'true'
+        env:
+          RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+          SUBMITTER_LOGIN: ${{ steps.pr.outputs.login }}
+          SUBMITTER_ID: ${{ steps.pr.outputs.id }}
+        run: |
+          set -euo pipefail
+          base=$(jq -r .base.sha pr.json)
+          head_repo=$(jq -r .head.repo.clone_url pr.json)
+          git fetch -q --no-tags "${{ github.server_url }}/${{ github.repository }}.git" "$base"
+          git fetch -q --no-tags "$head_repo" "$RUN_SHA"
+          git diff -z --no-renames --name-status "$base...$RUN_SHA" > trusted-changed.txt
+          # 只把动到的设计目录当数据铺进工作区（HEAD 还是 main，归属按 main 上原来的数字 ID 认）
+          # 按 git 树逐个取普通文件，不用 git archive（.gitattributes 的 export-ignore 能把文件藏起来）；软链接、子模块不取，check 会报「没取到」
+          dirs=$(node scripts/changed.mjs trusted-changed.txt)
+          for d in $dirs; do rm -rf "$d"; done
+          if [ -n "$dirs" ]; then node scripts/extract.mjs . "$RUN_SHA" . $dirs; fi
+          NO_RENDER=1 OUT=trusted node scripts/check.mjs --changed trusted-changed.txt || true
+          test -s trusted/results.json
+
+      - name: 截图推到 review-shots 分支
+        if: steps.pr.outputs.skip != 'true'
+        id: shots
+        env:
+          TOKEN: ${{ steps.app.outputs.token }}
+          N: ${{ steps.pr.outputs.number }}
+          RUN: ${{ github.event.workflow_run.id }}
+        run: |
+          set -euo pipefail
+          mkdir -p stage && node scripts/stage-shots.mjs artifact "stage/$N/$RUN"
+          if [ -z "$(ls -A stage/$N/$RUN 2>/dev/null)" ]; then echo "base=" >> "$GITHUB_OUTPUT"; exit 0; fi
+          remote="https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git init -q shots-repo && cd shots-repo
+          git -c user.name=dsh-design-gallery-bot -c user.email=bot@users.noreply.github.com commit -q --allow-empty -m init >/dev/null
+          if git fetch -q --depth=1 "$remote" review-shots 2>/dev/null; then git checkout -q -B review-shots FETCH_HEAD; else git checkout -q --orphan review-shots; git rm -rq --cached . 2>/dev/null || true; fi
+          cp -R "../stage/$N" .
+          git add "$N"
+          git -c user.name=dsh-design-gallery-bot -c user.email=bot@users.noreply.github.com commit -q -m "shots for #$N"
+          git push -q "$remote" HEAD:review-shots
+          echo "base=https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/review-shots/$N/$RUN" >> "$GITHUB_OUTPUT"
+
+      - name: 定车道、写审核卡
+        if: steps.pr.outputs.skip != 'true'
+        env:
+          PR_AUTHOR_LOGIN: ${{ steps.pr.outputs.login }}
+          PR_AUTHOR_ID: ${{ steps.pr.outputs.id }}
+          ACCOUNT_CREATED_AT: ${{ steps.pr.outputs.created }}
+          PRIOR_MERGED: ${{ steps.pr.outputs.prior }}
+          PENDING: ${{ steps.pr.outputs.pending }}
+          TODAY: ${{ steps.pr.outputs.today }}
+          COUNT_PARTIAL: ${{ steps.pr.outputs.partial }}
+          SHOTS_BASE: ${{ steps.shots.outputs.base }}
+        run: node scripts/gate.mjs artifact/results.json --trusted trusted/results.json --out gate.json
+
+      - name: 写检查、贴卡、打标签、（A 车道）合并
+        if: steps.pr.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          N: ${{ steps.pr.outputs.number }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+          SUBMISSION: ${{ steps.pr.outputs.submission }}
+          APP_SLUG: ${{ steps.app.outputs.app-slug }}
+        run: |
+          set -euo pipefail
+          conclusion=$(jq -r .conclusion gate.json)
+          gh api "repos/$GITHUB_REPOSITORY/check-runs" -f name='Submission gate' -f head_sha="$SHA" -f status=completed -f conclusion="$conclusion" \
+            -f "output[title]=$(jq -r '.lane' gate.json) lane" -f "output[summary]=$(jq -r .comment gate.json | head -c 60000)" >/dev/null
+          jq -r .comment gate.json > card.md
+          # 同一张卡反复更新，不刷屏
+          cid=$(gh api "repos/$GITHUB_REPOSITORY/issues/$N/comments" --paginate --jq ".[] | select(.user.login == \"${APP_SLUG}[bot]\" and (.body | startswith(\"<!-- dsh-gallery-gate -->\"))) | .id" | tail -1)
+          if [ -n "$cid" ]; then gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$cid" -F body=@card.md >/dev/null; else gh pr comment "$N" --body-file card.md >/dev/null; fi
+          # 标签：先去掉闸门自己上次打的（checks / lane / flag / held: author|limit / blocked），再加新的；维护者的 held: maintainer 不动
+          gh api "repos/$GITHUB_REPOSITORY/issues/$N/labels" --jq '.[].name' > labels.txt
+          for l in $(jq -Rr 'select(test("^(checks|lane|flag|blocked): |^held: (author|limit)$")) | @uri' labels.txt); do gh api -X DELETE "repos/$GITHUB_REPOSITORY/issues/$N/labels/$l" >/dev/null || true; done
+          jq -c '{labels: .labels}' gate.json | gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$N/labels" --input - >/dev/null
+          # 维护者 /hold 过的不自动合并（作者再推送也一样）
+          if [ "$(jq -r .automerge gate.json)" = "true" ] && ! grep -qx 'held: maintainer' labels.txt; then
+            gh pr merge "$N" --squash --body "Submission: $SUBMISSION" --match-head-commit "$SHA"
+          fi

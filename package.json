@@ -1,0 +1,19 @@
+{
+  "name": "dsh-design-gallery-repo",
+  "private": true,
+  "type": "module",
+  "description": "Content repository of the DSH design gallery (templates, design systems, style cards) and the bot scripts that check, index, sign and publish them.",
+  "license": "MIT",
+  "scripts": {
+    "check": "node scripts/check.mjs",
+    "index": "node scripts/build-index.mjs",
+    "test": "node --test --test-concurrency=1 test/*.mjs"
+  },
+  "devDependencies": {
+    "dsh-design-studio": "file:../dsh-design-studio",
+    "jsqr": "1.4.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "玻璃质感",
+    "en": "Glass"
+  },
+  "description": {
+    "zh": "柔光底、浮层毛玻璃",
+    "en": "Soft glow background, frosted overlays"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

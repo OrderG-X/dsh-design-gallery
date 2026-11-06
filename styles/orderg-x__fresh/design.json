@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "清新自然",
+    "en": "Fresh"
+  },
+  "description": {
+    "zh": "浅绿底、圆角卡片、轻插画",
+    "en": "Pale green, rounded cards, light illustration"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

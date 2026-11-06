@@ -1,0 +1,48 @@
+:root {
+  /* 颜色：宣纸、墨、朱砂 */
+  --bg: #F5F2EC;
+  --surface: #FBF9F5;
+  --text: #1E1E1C;
+  --muted: #5F5B54;
+  --line: #DAD4C8;
+  --primary: #2F3B37;
+  --accent: #8C2F2B;
+  --on: #F5F2EC;
+  --link: #8C2F2B;
+  --wash: #EDE8DF;
+  --wash-deep: #E3DDD2;
+
+  /* 字体 */
+  --font-sans: "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-serif: "Songti SC", "Noto Serif SC", "Source Han Serif SC", serif;
+  --w-head: 500;
+
+  /* 字号阶梯 */
+  --fs-micro: 11px;
+  --fs-meta: 13px;
+  --fs-body: 15px;
+  --fs-h3: 18px;
+  --fs-h1: 26px;
+  --fs-num: 40px;
+
+  /* 间距 */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --gutter: 24px;
+
+  /* 形状 */
+  --radius: 4px;
+  --radius-pill: 999px;
+  --shadow: none;
+  --hair: 1px solid var(--line);
+
+  /* 手机安全区 */
+  --status-h: 54px;
+  --tab-h: 49px;
+  --home-bar: 34px;
+}

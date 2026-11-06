@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#F3F7F2",
+    "surface": "#FFFFFF",
+    "text": "#1F2A22",
+    "muted": "#56665A",
+    "line": "#DCE6DA",
+    "primary": "#2F7D4F",
+    "accent": "#C9962A",
+    "on": "#FFFFFF",
+    "link": "#2F7D4F"
+  },
+  "head": "SANS",
+  "w": 600,
+  "radius": 14,
+  "shadow": "0 6px 18px rgba(47,125,79,.10)",
+  "dzh": "浅绿底、圆角卡片、轻插画",
+  "den": "Pale green, rounded cards, light illustration",
+  "nzh": "大面积浅色、卡片白底；插画用叶子、阳光这类自然元素；黄色只做小点缀；整体轻、透气",
+  "nen": "Large light areas with white cards; nature motifs (leaves, sunlight) in illustrations; yellow only as a small accent; light and airy"
+}

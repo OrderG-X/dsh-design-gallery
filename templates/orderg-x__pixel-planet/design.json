@@ -1,0 +1,25 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": { "zh": "像素星球", "en": "Pixel Planet" },
+  "description": {
+    "zh": "独立游戏新作发布会的六页幻灯片：像素星球世界观、玩法、上线时间线和测试数据，赛博霓虹风格",
+    "en": "A six-slide launch deck for an indie game: pixel-art world, gameplay, release roadmap and playtest numbers, in a neon cyber style"
+  },
+  "kind": "slides",
+  "screens": [
+    { "file": "01-cover.html", "title": { "zh": "封面", "en": "Cover" } },
+    { "file": "02-world.html", "title": { "zh": "世界观", "en": "World" } },
+    { "file": "03-features.html", "title": { "zh": "三种玩法", "en": "Gameplay" } },
+    { "file": "04-roadmap.html", "title": { "zh": "上线时间线", "en": "Roadmap" } },
+    { "file": "05-numbers.html", "title": { "zh": "测试数据", "en": "Playtest" } },
+    { "file": "06-end.html", "title": { "zh": "星球见", "en": "See you" } }
+  ],
+  "style": "cyber",
+  "categories": ["game"],
+  "tags": ["cover"],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": { "login": "orderg-x", "id": 271418316 },
+  "ai": { "generated": true, "tool": "dsh-design-studio@0.11.0" }
+}

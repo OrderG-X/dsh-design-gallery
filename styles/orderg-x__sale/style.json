@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#FFF5F0",
+    "surface": "#FFFFFF",
+    "text": "#1F1A17",
+    "muted": "#6B5E57",
+    "line": "#F5DDD2",
+    "primary": "#CF2E0E",
+    "accent": "#FFB800",
+    "on": "#FFFFFF",
+    "link": "#C2290B"
+  },
+  "head": "SANS",
+  "w": 800,
+  "radius": 12,
+  "shadow": "0 4px 12px rgba(207,46,14,.12)",
+  "dzh": "红橙主色、大价格、优惠券",
+  "den": "Red-orange, big prices, coupons",
+  "nzh": "价格用大号粗体数字，原价灰色划线；限时、包邮这类小标签用色块；优惠券金黄色带锯齿边，倒计时醒目；信息多但分区清楚，主按钮通栏",
+  "nen": "Big bold price numerals, old price struck through in gray; small colored tags like Limited and Free shipping; gold notched coupons and a prominent countdown; dense but clearly sectioned, full-width main button"
+}

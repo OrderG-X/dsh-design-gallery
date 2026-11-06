@@ -1,0 +1,9 @@
+# 规矩、脚本、词表、工作流只有维护者能改（C 车道）
+/.github/   @OrderG-X
+/scripts/   @OrderG-X
+/policy/    @OrderG-X
+/vocab/     @OrderG-X
+/schema/    @OrderG-X
+/test/      @OrderG-X
+/package.json      @OrderG-X
+/package-lock.json @OrderG-X

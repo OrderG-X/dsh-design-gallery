@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "运动能量",
+    "en": "Sport"
+  },
+  "description": {
+    "zh": "黑底荧光绿、粗斜体、大数字",
+    "en": "Black with volt green, heavy italics, big numbers"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

@@ -1,0 +1,76 @@
+# 定时活：每 6 小时复查挂起的（账号太新、一次交太多）；关掉 14 天没动静的；每周用当前规则重查全部、清理截图分支。
+name: scheduled
+
+on:
+  schedule:
+    - cron: '7 */6 * * *'
+    - cron: '41 2 * * 1' # 每周一
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  recheck-held:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - id: app
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.GALLERY_APP_ID }}
+          private-key: ${{ secrets.GALLERY_APP_PRIVATE_KEY }}
+      - name: 挂起的重跑检查（账号满 7 天、前面的处理完了就放行）；挂起 14 天没动静的关掉
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+        run: |
+          set -euo pipefail
+          now=$(date +%s)
+          { gh pr list --repo "$GITHUB_REPOSITORY" --label 'held: author' --state open --json number,updatedAt,headRefOid --jq '.[] | "\(.number) \(.updatedAt) \(.headRefOid)"'
+            gh pr list --repo "$GITHUB_REPOSITORY" --label 'held: limit' --state open --json number,updatedAt,headRefOid --jq '.[] | "\(.number) \(.updatedAt) \(.headRefOid)"'; } | sort -u | while read -r n upd sha; do
+            age=$(( (now - $(date -d "$upd" +%s)) / 86400 ))
+            if [ "$age" -ge 14 ]; then
+              gh pr close "$n" --repo "$GITHUB_REPOSITORY" --comment "14 天没有动静，先关掉；随时可以重新提交。 / Closed after 14 days without activity; feel free to resubmit." || true
+              continue
+            fi
+            # 重跑这次提交的 pr-check（gate 会跟着重算账号年龄）
+            run=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow pr-check --commit "$sha" --limit 1 --json databaseId --jq '.[0].databaseId // empty')
+            [ -n "$run" ] && gh run rerun "$run" --repo "$GITHUB_REPOSITORY" || true
+          done
+
+  weekly:
+    if: github.event.schedule == '41 2 * * 1' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - id: app
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.GALLERY_APP_ID }}
+          private-key: ${{ secrets.GALLERY_APP_PRIVATE_KEY }}
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: 用当前规则重查全部（不自动删，汇总到跟踪 issue）
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          NO_RENDER: '1'
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          node scripts/check.mjs --all > weekly.txt 2>&1 || true
+          bad=$(grep -c '^✗' weekly.txt || true)
+          held=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --label 'lane: B' --json number --jq length)
+          { echo "### 周报 / Weekly"; echo; echo "- 重查：$bad 套不符合现行规则 / $bad entries fail current rules"; echo "- 等人看（B 车道）：$held / Waiting for review: $held"; echo; echo '```'; grep -E '^(✗|    ✗)' weekly.txt | head -100; echo '```'; } > report.md
+          n=$(gh issue list --repo "$GITHUB_REPOSITORY" --label weekly-report --state open --json number --jq '.[0].number // empty')
+          if [ -n "$n" ]; then gh issue comment "$n" --repo "$GITHUB_REPOSITORY" --body-file report.md; else gh issue create --repo "$GITHUB_REPOSITORY" --title "周报 / Weekly report" --label weekly-report --body-file report.md; fi
+      - name: 清理截图分支（只留最近的）
+        env:
+          TOKEN: ${{ steps.app.outputs.token }}
+        run: |
+          remote="https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          git init -q s && cd s
+          git checkout -q --orphan review-shots
+          git -c user.name=dsh-design-gallery-bot -c user.email=bot@users.noreply.github.com commit -q --allow-empty -m "reset review shots"
+          git push -q -f "$remote" HEAD:review-shots || true

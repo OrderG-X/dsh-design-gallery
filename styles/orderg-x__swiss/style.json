@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#FFFFFF",
+    "surface": "#F1F1F1",
+    "text": "#0A0A0A",
+    "muted": "#545454",
+    "line": "#0A0A0A",
+    "primary": "#D9001B",
+    "accent": "#0A0A0A",
+    "on": "#FFFFFF",
+    "link": "#C2001A"
+  },
+  "head": "GROTESK",
+  "w": 800,
+  "radius": 0,
+  "shadow": "none",
+  "dzh": "白底黑字红色块、严格网格",
+  "den": "White, black type, red blocks, strict grid",
+  "nzh": "12 栏严格网格，全部左对齐不居中；标题超大粗无衬线、字距收紧；红色大色块只用一两处，用 01 02 03 编号和粗黑线分区；没有圆角、阴影和渐变",
+  "nen": "Strict 12-column grid, everything left-aligned; huge bold tightly tracked sans headings; one or two big red blocks, numbered sections and heavy black rules; no radius, shadow or gradient"
+}

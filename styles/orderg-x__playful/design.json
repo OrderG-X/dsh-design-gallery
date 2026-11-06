@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "活泼年轻",
+    "en": "Playful"
+  },
+  "description": {
+    "zh": "粗描边、硬阴影、贴纸感",
+    "en": "Thick outlines, hard shadows, sticker feel"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

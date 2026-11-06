@@ -1,0 +1,56 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": {
+    "zh": "周末去哪",
+    "en": "Weekend Go"
+  },
+  "description": {
+    "zh": "本地周末活动小程序：按城市和分类找活动、看详情选场次、报名后拿电子票，贴纸感插画",
+    "en": "A local weekend-events mini program: browse by city and category, pick a session on the detail page, get an e-ticket after booking, with sticker-style illustrations"
+  },
+  "kind": "miniprogram",
+  "screens": [
+    {
+      "file": "discover.html",
+      "title": {
+        "zh": "发现",
+        "en": "Discover"
+      }
+    },
+    {
+      "file": "detail.html",
+      "title": {
+        "zh": "活动详情",
+        "en": "Event detail"
+      }
+    },
+    {
+      "file": "ticket.html",
+      "title": {
+        "zh": "电子票",
+        "en": "E-ticket"
+      }
+    }
+  ],
+  "style": "playful",
+  "categories": [
+    "event"
+  ],
+  "tags": [
+    "list",
+    "detail",
+    "booking",
+    "illustration"
+  ],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

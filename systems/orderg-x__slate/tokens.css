@@ -1,0 +1,129 @@
+/* 设计系统「青石 Slate」的设计变量：工具软件、后台。冷静的蓝灰，信息密，8px 网格，小圆角。
+   复制到设计目录，每屏 <link rel="stylesheet" href="tokens.css">，再 link components.css */
+:root {
+  /* 颜色：按角色定义（换主题只改这里） */
+  --color-bg: #F3F5F8;              /* 页面背景：带一点蓝的冷灰 */
+  --color-surface: #FFFFFF;         /* 卡片、表格、弹层 */
+  --color-surface-2: #ECEFF3;       /* 次一级表面：表头、分组、侧栏 */
+  --color-text: #17202B;            /* 正文（对 bg 15:1） */
+  --color-muted: #536073;           /* 次要文字（对 bg 5.9:1，别再浅） */
+  --color-line: #DCE1E8;            /* 分割线、卡片边 */
+  --color-line-strong: #A9B3C0;     /* 输入框、勾选框的边 */
+  --color-primary: #2D5E91;         /* 主色：钢青蓝，关键按钮、选中、链接 */
+  --color-primary-hover: #244D78;   /* 主色悬停 / 按下 */
+  --color-primary-soft: #E5EDF6;    /* 主色浅底：选中行、信息提示 */
+  --color-primary-ink: #FFFFFF;     /* 主色上的文字 */
+  --color-accent: #B4572A;          /* 点缀：锈铜，「新」、第二条数据线，一屏一两处 */
+  --color-accent-soft: #F7E9E0;
+  --color-success: #1C7A4D;
+  --color-success-soft: #E2F2E9;
+  --color-warning: #8F6000;
+  --color-warning-soft: #FBF0D6;
+  --color-warning-fill: #D09A1E;    /* 警告的点、进度条（不放字） */
+  --color-danger: #BF3B30;
+  --color-danger-soft: #FBE8E5;
+  --color-danger-ink: #FFFFFF;      /* 危险按钮、红角标上的字 */
+  --color-inverse: #1E2833;         /* 反色底：轻提示、浮动提示 */
+  --color-inverse-ink: #F1F4F8;
+  --color-link: #2D5E91;
+  --color-overlay: rgb(15 22 32 / 0.48); /* 弹窗后面的遮罩 */
+  --color-focus: rgb(45 94 145 / 0.32);  /* 焦点光圈 */
+
+  /* 字体：正文用系统无衬线，数字一律等宽对齐（tabular-nums），编号和代码用等宽 */
+  --font-sans: system-ui, "PingFang SC", "HarmonyOS Sans SC", "MiSans", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --font-display: var(--font-sans);
+  --font-mono: "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+  --numeric: tabular-nums;
+
+  /* 字号阶梯：信息密的界面正文 14px */
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-md: 14px;
+  --text-lg: 16px;
+  --text-xl: 18px;
+  --text-2xl: 22px;
+  --text-3xl: 28px;
+  --text-4xl: 36px;
+
+  /* 字重 */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* 行高 */
+  --leading-tight: 1.25;
+  --leading-snug: 1.4;
+  --leading-normal: 1.55;
+  --leading-relaxed: 1.7;
+
+  /* 间距：8px 网格（4 和 12 是半格，只在控件内部用） */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* 控件高度 */
+  --control-sm: 28px;
+  --control-md: 32px;
+  --control-lg: 40px;
+
+  /* 圆角：小，同类元素一致 */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 999px;
+
+  /* 阴影：靠边框分层，阴影只给浮起来的东西 */
+  --shadow-sm: 0 1px 2px rgb(16 24 40 / 0.06);
+  --shadow-md: 0 1px 2px rgb(16 24 40 / 0.05), 0 4px 12px -2px rgb(16 24 40 / 0.10);
+  --shadow-lg: 0 2px 6px rgb(16 24 40 / 0.06), 0 18px 40px -8px rgb(16 24 40 / 0.24);
+  --ring: 0 0 0 3px var(--color-focus);
+
+  /* 动效 */
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --dur: 160ms;
+}
+
+/* 深色版：<html data-theme="dark">（或给某一块加 data-theme="dark"）。网页要跟随系统时，把选择器换成 @media (prefers-color-scheme: dark) { :root { … } } */
+[data-theme="dark"] {
+  --color-bg: #0F141B;
+  --color-surface: #161D26;
+  --color-surface-2: #1D2631;
+  --color-text: #E6EBF1;
+  --color-muted: #97A3B3;
+  --color-line: #2A3542;
+  --color-line-strong: #45525F;
+  --color-primary: #7AAEE3;
+  --color-primary-hover: #97C1EB;
+  --color-primary-soft: #1C3048;
+  --color-primary-ink: #0F141B;
+  --color-accent: #E39466;
+  --color-accent-soft: #3A2419;
+  --color-success: #5CC795;
+  --color-success-soft: #15301F;
+  --color-warning: #E3B451;
+  --color-warning-soft: #33280F;
+  --color-warning-fill: #D7A73E;
+  --color-danger: #F2837A;
+  --color-danger-soft: #3A1B19;
+  --color-danger-ink: #1A0E0D;
+  --color-inverse: #E6EBF1;
+  --color-inverse-ink: #17202B;
+  --color-link: #7AAEE3;
+  --color-overlay: rgb(0 0 0 / 0.6);
+  --color-focus: rgb(122 174 227 / 0.4);
+  --ring: 0 0 0 3px var(--color-focus);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 1px 2px rgb(0 0 0 / 0.4), 0 6px 16px -4px rgb(0 0 0 / 0.5);
+  --shadow-lg: 0 2px 6px rgb(0 0 0 / 0.4), 0 18px 40px -8px rgb(0 0 0 / 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur: 0ms; }
+}

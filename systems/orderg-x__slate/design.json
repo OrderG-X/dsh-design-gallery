@@ -1,0 +1,33 @@
+{
+  "format": 1,
+  "type": "system",
+  "title": {
+    "zh": "青石 Slate",
+    "en": "Slate"
+  },
+  "description": {
+    "zh": "给控制台和后台用的设计系统：冷静的蓝灰、信息密、等宽数字、8px 网格、小圆角，带深色版。",
+    "en": "A calm blue-grey design system for consoles and admin tools: dense layouts, tabular numbers, an 8px grid, small radii and a dark theme."
+  },
+  "categories": [
+    "saas"
+  ],
+  "tags": [
+    "dashboard",
+    "data-dense",
+    "form",
+    "list",
+    "dark-mode",
+    "settings"
+  ],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

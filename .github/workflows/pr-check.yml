@@ -1,0 +1,86 @@
+# 查投稿 PR：不带任何权限、不碰 secret、不用缓存。
+# 脚本永远用 main 上的（PR 里改的 scripts/ 不会被执行），PR 只把动到的设计目录当数据取出来。
+name: pr-check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+permissions: {}
+
+concurrency:
+  group: pr-check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: 检出 main（脚本和规则）
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          path: main
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 取 PR 改动（只当数据）
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.clone_url }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          git init -q pr && cd pr
+          # 整段历史都取（内容仓库不大）：要按分叉点比，不然 PR 落后 main 时会把 main 新加的当成「删掉了」
+          git fetch -q --no-tags "${{ github.server_url }}/${{ github.repository }}.git" "$BASE_SHA"
+          git fetch -q --no-tags "$HEAD_REPO" "$HEAD_SHA"
+          # -z：路径原样（中文名不加引号、不转八进制）
+          git diff -z --no-renames --name-status "$BASE_SHA...$HEAD_SHA" > ../changed.txt
+          tr '\0' '\t' < ../changed.txt; echo
+          # 只取设计目录（templates/ systems/ styles/ 下的），别的一律不取
+          # 目录名只认合法的（作者__名字）；名字不对的不取，check.mjs 会按 changed.txt 报错
+          dirs=$(node ../main/scripts/changed.mjs ../changed.txt)
+          for d in $dirs; do rm -rf "../main/$d"; done
+          # 按 git 树逐个取普通文件（不用 git archive：它会听投稿里 .gitattributes 的 export-ignore，文件能被藏起来）
+          if [ -n "$dirs" ]; then node ../main/scripts/extract.mjs . "$HEAD_SHA" ../main $dirs; fi
+
+      - name: 装依赖和中文字体
+        working-directory: main
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk >/dev/null
+
+      - name: 检查 + 断网渲染 + 截图
+        working-directory: main
+        env:
+          SUBMITTER_LOGIN: ${{ github.event.pull_request.user.login }}
+          SUBMITTER_ID: ${{ github.event.pull_request.user.id }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_USER_TYPE: ${{ github.event.pull_request.user.type }}
+          OUT: ${{ github.workspace }}/out
+        run: |
+          # 机器人代开的（issue 投稿）：投稿人写在 PR 说明的 Submitted-by 行里
+          if [ "$PR_USER_TYPE" = "Bot" ]; then
+            line=$(printf '%s\n' "$PR_BODY" | grep -E '^Submitted-by: [A-Za-z0-9-]{1,39} \([0-9]+\)$' | head -1 || true)
+            if [ -n "$line" ]; then
+              SUBMITTER_LOGIN=$(echo "$line" | sed -E 's/^Submitted-by: ([A-Za-z0-9-]+) .*/\1/')
+              SUBMITTER_ID=$(echo "$line" | sed -E 's/.*\(([0-9]+)\)$/\1/')
+            fi
+          fi
+          export SUBMITTER_LOGIN SUBMITTER_ID
+          node scripts/check.mjs --changed ../changed.txt || echo "has_errors" > "$OUT/failed"
+          echo "${{ github.event.pull_request.number }}" > "$OUT/pr"
+          echo "${{ github.event.pull_request.head.sha }}" > "$OUT/sha"
+          echo "$SUBMITTER_LOGIN" > "$OUT/submitter"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: check-results
+          path: out/
+          retention-days: 7
+          if-no-files-found: error

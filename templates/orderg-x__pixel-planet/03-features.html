@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="dsh-design" content="slides">
+<title>三种玩法 · 像素星球</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="deck.css">
+<style>
+  .menu {
+    position: absolute;
+    top: 256px;
+    left: 64px;
+    width: 624px;
+    display: grid;
+    row-gap: 16px;
+  }
+  .opt {
+    position: relative;
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    column-gap: 20px;
+    align-items: center;
+    height: 104px;
+    padding: 0 24px 0 40px;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius);
+  }
+  .opt.on { border-color: var(--color-primary); background: var(--color-surface); }
+  .opt.on::before {
+    content: "";
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    margin-top: -8px;
+    border-left: 12px solid var(--color-primary);
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+  }
+  .opt svg { width: 56px; height: 56px; }
+  .opt .en { font-family: var(--font-mono); font-size: var(--text-hud); line-height: 20px; color: var(--color-accent); letter-spacing: 0.12em; text-transform: uppercase; }
+  .opt h2 { margin-top: 2px; font-size: var(--text-body); font-weight: 600; line-height: 32px; }
+  .opt .d { font-size: var(--text-small); line-height: 28px; color: var(--color-muted); }
+  .opt .n { text-align: left; font-family: var(--font-mono); font-size: var(--text-sub); font-weight: 700; line-height: 36px; }
+  .opt .n small { display: block; font-family: var(--font-sans); font-size: var(--text-hud); font-weight: 400; line-height: 20px; color: var(--color-muted); }
+
+  .shot {
+    position: absolute;
+    top: 256px;
+    left: 736px;
+    width: 480px;
+    height: 300px;
+    border: 1px solid var(--color-accent);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .shot svg { position: absolute; inset: 0; width: 480px; height: 300px; }
+  .chip {
+    position: absolute;
+    top: 12px;
+    height: 28px;
+    padding: 0 10px;
+    background: rgba(11, 11, 22, 0.85);
+    font-family: var(--font-mono);
+    font-size: var(--text-hud);
+    line-height: 28px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .chip.l { left: 12px; color: var(--color-text); }
+  .chip.r { right: 12px; color: var(--color-accent); }
+  .bar { position: absolute; left: 12px; bottom: 12px; display: flex; gap: 4px; padding: 4px; background: rgba(11, 11, 22, 0.85); }
+  .bar span { width: 32px; height: 32px; border: 1px solid var(--color-line-strong); display: grid; place-items: center; }
+  .bar span::after { content: ""; width: 16px; height: 16px; background: var(--c); }
+  .bar span.on { border-color: var(--color-primary); }
+  .bar .s1 { --c: var(--color-primary); }
+  .bar .s2 { --c: var(--color-accent); }
+  .bar .s3 { --c: var(--color-muted); }
+  .bar .s4 { --c: #3A2458; }
+  .bar .s5 { --c: var(--color-line-strong); }
+  .bar .s6 { --c: var(--color-text); }
+  .cap {
+    position: absolute;
+    top: 572px;
+    left: 736px;
+    font-family: var(--font-mono);
+    font-size: var(--text-hud);
+    line-height: 24px;
+    color: var(--color-muted);
+  }
+</style>
+</head>
+<body>
+<main class="slide">
+  <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+  <header class="hud t">
+    <span class="rec">Pixel Planet <i>//</i> 新作发布会</span>
+    <a class="pg" href="04-roadmap.html">[ 03 / 06 ]</a>
+  </header>
+
+  <p class="kicker">03 // Gameplay</p>
+  <h1 class="title">三种玩法，都围着这颗星球转</h1>
+
+  <ol class="menu">
+    <li class="opt on">
+      <svg class="px" viewBox="0 0 10 9" aria-hidden="true"><use href="art.svg#ico-build"/></svg>
+      <div>
+        <p class="en">01 Build</p>
+        <h2>挖掘与建造</h2>
+        <p class="d">地表到地下 7 层，每格都能拆能盖</p>
+      </div>
+      <p class="n">320+<small>种方块</small></p>
+    </li>
+    <li class="opt">
+      <svg class="px" viewBox="0 0 10 9" aria-hidden="true"><use href="art.svg#ico-explore"/></svg>
+      <div>
+        <p class="en">02 Explore</p>
+        <h2>昼夜探险</h2>
+        <p class="d">12 分钟一个昼夜，夜里遗迹会亮</p>
+      </div>
+      <p class="n">40+<small>种生物</small></p>
+    </li>
+    <li class="opt">
+      <svg class="px" viewBox="0 0 13 8" aria-hidden="true"><use href="art.svg#ico-coop"/></svg>
+      <div>
+        <p class="en">03 Co-op</p>
+        <h2>四人联机</h2>
+        <p class="d">一人挖矿、一人种地、两人修飞船</p>
+      </div>
+      <p class="n">1–4<small>人同屏</small></p>
+    </li>
+  </ol>
+
+  <figure class="shot">
+    <svg class="px" viewBox="0 0 96 60" role="img" aria-label="实机画面：机器人在地下第 3 层挖矿，地面上是自己盖的小屋"><use href="art.svg#scene"/></svg>
+    <span class="chip l">Depth 32m · Layer 03</span>
+    <span class="chip r">◆ 1,284</span>
+    <div class="bar" aria-hidden="true">
+      <span class="on s1"></span>
+      <span class="s2"></span>
+      <span class="s3"></span>
+      <span class="s4"></span>
+      <span class="s5"></span>
+      <span class="s6"></span>
+    </div>
+  </figure>
+  <p class="cap">实机画面 · 开发中，不代表最终品质</p>
+
+  <footer class="hud b">
+    <span>Echo-8 Studio</span>
+    <span>2026.11.20</span>
+  </footer>
+</main>
+</body>
+</html>

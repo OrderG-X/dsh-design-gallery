@@ -1,0 +1,56 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": {
+    "zh": "慢呼吸",
+    "en": "Slow Breath"
+  },
+  "description": {
+    "zh": "宣纸水墨风的冥想睡眠 App：今日练习、呼吸引导、练习记录三屏",
+    "en": "An ink-and-paper meditation and sleep app: today, guided breathing and journal"
+  },
+  "kind": "app",
+  "screens": [
+    {
+      "file": "home.html",
+      "title": {
+        "zh": "今日",
+        "en": "Today"
+      }
+    },
+    {
+      "file": "session.html",
+      "title": {
+        "zh": "练习中",
+        "en": "In session"
+      }
+    },
+    {
+      "file": "journal.html",
+      "title": {
+        "zh": "记录",
+        "en": "Journal"
+      }
+    }
+  ],
+  "style": "ink",
+  "categories": [
+    "health"
+  ],
+  "tags": [
+    "profile",
+    "chart",
+    "calendar",
+    "illustration"
+  ],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

@@ -1,0 +1,94 @@
+# 维护者命令：在 PR / issue 里回 /approve /hold /reject /feature /trust /takedown /restore …
+# 先用 API 确认评论人有 write 以上权限；命令只取评论第一行，经环境变量传。
+name: chatops
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions: {}
+
+jobs:
+  run:
+    if: startsWith(github.event.comment.body, '/') && github.event.comment.user.type != 'Bot'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - id: app
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.GALLERY_APP_ID }}
+          private-key: ${{ secrets.GALLERY_APP_PRIVATE_KEY }}
+
+      - name: 是不是维护者
+        id: who
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          ACTOR: ${{ github.event.comment.user.login }}
+        run: |
+          perm=$(gh api "repos/$GITHUB_REPOSITORY/collaborators/$ACTOR/permission" --jq .permission 2>/dev/null || echo none)
+          case "$perm" in admin|maintain|write) echo "ok=true" >> "$GITHUB_OUTPUT" ;; *) echo "不是维护者（$perm），不理"; echo "ok=false" >> "$GITHUB_OUTPUT" ;; esac
+
+      - uses: actions/checkout@v4
+        if: steps.who.outputs.ok == 'true'
+        with:
+          token: ${{ steps.app.outputs.token }}
+
+      - uses: actions/setup-node@v4
+        if: steps.who.outputs.ok == 'true'
+        with:
+          node-version: 22
+
+      - name: 解析命令、改规矩文件
+        if: steps.who.outputs.ok == 'true'
+        env:
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          IS_PR: ${{ github.event.issue.pull_request != null }}
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          # /trust @x、/untrust @x：先查 x 的数字 id（信任按 id 记）
+          first=$(printf '%s\n' "$COMMENT_BODY" | head -1)
+          u=$(printf '%s' "$first" | sed -nE 's/^\/(un)?trust @([A-Za-z0-9-]{1,39})[[:space:]]*$/\2/p')
+          if [ -n "$u" ]; then TARGET_ID=$(gh api "users/$u" --jq .id 2>/dev/null || echo 0); export TARGET_ID; fi
+          node scripts/chatops.mjs --apply --out action.json
+          cat action.json
+
+      - name: 照做
+        if: steps.who.outputs.ok == 'true'
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          N: ${{ github.event.issue.number }}
+          ACTOR: ${{ github.event.comment.user.login }}
+        run: |
+          set -euo pipefail
+          a=$(jq -r .action action.json)
+          say() { printf '%s\n' "$1" > reply.md; gh issue comment "$N" --repo "$GITHUB_REPOSITORY" --body-file reply.md >/dev/null; }
+          case "$a" in
+            none) exit 0 ;;
+            error) say "⚠ $(jq -r .msg action.json)" ;;
+            merge)
+              # 检查没过的不合（维护者也不行：先让作者改）
+              sha=$(gh pr view "$N" --json headRefOid --jq .headRefOid)
+              c=$(gh api "repos/$GITHUB_REPOSITORY/commits/$sha/check-runs?check_name=Submission%20gate" --jq '.check_runs[0].conclusion // "none"')
+              if [ "$c" != "success" ] && [ "$c" != "neutral" ]; then say "⚠ 检查没过或还没跑完（$c），先不合并。 / Checks have not passed ($c), not merging."; exit 0; fi
+              body=$(gh pr view "$N" --json body --jq .body)
+              sub=$(printf '%s\n' "$body" | grep -E '^Submission: https://github\.com/[A-Za-z0-9._-]+/[A-Za-z0-9._-]+/issues/[0-9]+$' | head -1 || true)
+              [ -n "$sub" ] || sub="Submission: $(gh pr view "$N" --json url --jq .url)"
+              gh pr edit "$N" --add-label reviewed --remove-label 'held: maintainer' >/dev/null 2>&1 || true
+              # 只合检查过的那一版：查完到合并之间作者又推了，就不合（会重新检查）
+              gh pr merge "$N" --squash --match-head-commit "$sha" --body "$(printf '%s\nApproved-by: %s' "$sub" "$ACTOR")" ;;
+            hold)
+              gh issue edit "$N" --add-label 'held: maintainer' >/dev/null
+              jq -r .text action.json > reply.md; gh issue comment "$N" --body-file reply.md >/dev/null ;;
+            close)
+              jq -r .text action.json > reply.md; gh issue comment "$N" --body-file reply.md >/dev/null
+              if [ "$(jq -r '.issue.pull_request != null' "$GITHUB_EVENT_PATH")" = "true" ]; then gh pr close "$N" >/dev/null; else gh issue close "$N" --reason 'not planned' >/dev/null; fi ;;
+            feature|unfeature|trust|untrust|takedown|restore)
+              f=$(jq -r .changed action.json)
+              if [ -z "$f" ] || [ "$f" = "null" ] || git diff --quiet -- "$f"; then say "没有要改的。 / Nothing to change."; exit 0; fi
+              git -c user.name=dsh-design-gallery-bot -c user.email=bot@users.noreply.github.com commit -q -m "$a by $ACTOR (#$N)" -- "$f"
+              git push -q origin HEAD:main
+              if [ "$a" = "takedown" ] || [ "$a" = "restore" ]; then gh workflow run publish.yml --ref main >/dev/null; fi
+              say "✓ 已处理：$a / Done: $a" ;;
+          esac

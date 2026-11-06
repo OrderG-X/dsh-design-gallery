@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "电商促销",
+    "en": "Sale"
+  },
+  "description": {
+    "zh": "红橙主色、大价格、优惠券",
+    "en": "Red-orange, big prices, coupons"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

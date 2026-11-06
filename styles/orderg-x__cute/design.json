@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "可爱卡通",
+    "en": "Cute"
+  },
+  "description": {
+    "zh": "粉黄糖果色、大圆角、圆体字",
+    "en": "Candy pink and yellow, big radii, rounded type"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

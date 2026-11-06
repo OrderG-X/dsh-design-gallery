@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "瑞士网格",
+    "en": "Swiss grid"
+  },
+  "description": {
+    "zh": "白底黑字红色块、严格网格",
+    "en": "White, black type, red blocks, strict grid"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

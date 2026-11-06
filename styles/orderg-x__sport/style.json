@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#0E0F11",
+    "surface": "#1A1C20",
+    "text": "#F4F5F6",
+    "muted": "#A1A5AD",
+    "line": "#2B2E35",
+    "primary": "#C8FF2E",
+    "accent": "#FF5A1F",
+    "on": "#0E0F11",
+    "link": "#C8FF2E"
+  },
+  "head": "SANS",
+  "w": 900,
+  "radius": 6,
+  "shadow": "none",
+  "dzh": "黑底荧光绿、粗斜体、大数字",
+  "den": "Black with volt green, heavy italics, big numbers",
+  "nzh": "标题超粗斜体、全大写、字距收紧；荧光绿只给主按钮、进度和关键数字；配速心率这类数字做得很大，可用斜切色块；照片高对比有动感，橙色只做警示",
+  "nen": "Heavy italic, all-caps, tightly tracked headings; volt green only on the main button, progress and key numbers; big pace and heart-rate numbers, slanted blocks are fine; high-contrast action photos, orange only for alerts"
+}

@@ -1,0 +1,100 @@
+# 网页表单投稿：issue 里拖进 zip → 机器人转成 PR。
+# 第一步不带任何权限（下载、解包、修、查，不渲染）；第二步拿 App token，把产物当不可信数据再查一遍再开 PR。
+# issue 的标题和正文只经环境变量传，绝不拼进 run:。
+name: issue-intake
+
+on:
+  issues:
+    types: [opened, edited]
+
+permissions: {}
+
+concurrency:
+  group: intake-${{ github.event.issue.number }}
+  cancel-in-progress: true
+
+jobs:
+  unpack:
+    if: contains(github.event.issue.labels.*.name, 'submission') && github.event.issue.state == 'open'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: 下载、解包、规范化、检查
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_AUTHOR_LOGIN: ${{ github.event.issue.user.login }}
+          ISSUE_AUTHOR_ID: ${{ github.event.issue.user.id }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: node scripts/intake.mjs --out out/intake
+      - uses: actions/upload-artifact@v4
+        with:
+          name: intake
+          path: out/intake/
+          retention-days: 3
+
+  open-pr:
+    needs: unpack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    permissions:
+      contents: read
+    steps:
+      - id: app
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.GALLERY_APP_ID }}
+          private-key: ${{ secrets.GALLERY_APP_PRIVATE_KEY }}
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - uses: actions/download-artifact@v4
+        with:
+          name: intake
+          path: artifact
+      - name: 再查一遍，放进工作区
+        id: apply
+        env:
+          ISSUE_AUTHOR_LOGIN: ${{ github.event.issue.user.login }}
+          ISSUE_AUTHOR_ID: ${{ github.event.issue.user.id }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+        run: |
+          node scripts/intake-apply.mjs artifact --reply reply.md
+          rm -rf artifact node_modules
+      - name: 开 PR
+        if: steps.apply.outputs.ok == 'true'
+        id: cpr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ steps.app.outputs.token }}
+          branch: ${{ steps.apply.outputs.branch }}
+          add-paths: ${{ steps.apply.outputs.dir }}
+          commit-message: "submit: ${{ steps.apply.outputs.dir }}"
+          title: "投稿 / Submission: ${{ steps.apply.outputs.title }}"
+          body: |
+            Submitted-by: ${{ github.event.issue.user.login }} (${{ github.event.issue.user.id }})
+            Submission: ${{ github.event.issue.html_url }}
+
+            由网页表单投稿自动生成。 / Opened automatically from a web-form submission.
+          labels: submission
+      - name: 回复投稿人
+        if: always()
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          N: ${{ github.event.issue.number }}
+          PR_URL: ${{ steps.cpr.outputs.pull-request-url }}
+        run: |
+          [ -f reply.md ] || echo "### ✗ 没处理成 / Could not process" > reply.md
+          if [ -n "$PR_URL" ]; then printf '\nPR: %s\n' "$PR_URL" >> reply.md; fi
+          gh issue comment "$N" --repo "$GITHUB_REPOSITORY" --body-file reply.md

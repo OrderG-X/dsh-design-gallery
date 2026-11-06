@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "深色高级",
+    "en": "Dark luxe"
+  },
+  "description": {
+    "zh": "近黑底、香槟金点缀、大图",
+    "en": "Near-black, champagne gold accents, big imagery"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

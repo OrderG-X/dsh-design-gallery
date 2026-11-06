@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="dsh-design" content="slides">
+<title>封面 · 像素星球</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="deck.css">
+<style>
+  .stars { position: absolute; inset: 0; width: 1280px; height: 720px; opacity: 0.8; }
+  .planet { position: absolute; top: 72px; left: 680px; width: 576px; height: 576px; }
+  .copy { position: absolute; top: 116px; left: 64px; width: 600px; }
+  .copy .k {
+    font-family: var(--font-mono);
+    font-size: var(--text-small);
+    line-height: 28px;
+    color: var(--color-accent);
+    letter-spacing: 0.12em;
+  }
+  .copy h1 {
+    margin-top: 20px;
+    font-family: var(--font-mono);
+    font-size: 120px;
+    font-weight: 800;
+    line-height: 0.96;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    text-shadow: var(--glitch);
+  }
+  .copy .zh {
+    margin-top: 24px;
+    font-size: var(--text-title);
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: 0.3em;
+  }
+  .copy .tag { margin-top: 16px; color: var(--color-muted); font-size: var(--text-body); line-height: 1.5; }
+  .copy .btn { margin-top: 32px; }
+</style>
+</head>
+<body>
+<main class="slide">
+  <svg class="px stars" viewBox="0 0 160 90" preserveAspectRatio="none" aria-hidden="true"><use href="art.svg#stars"/></svg>
+  <svg class="px planet" viewBox="0 0 48 48" role="img" aria-label="一颗带光环的像素星球"><use href="art.svg#planet"/></svg>
+
+  <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+  <header class="hud t">
+    <span class="rec">Echo-8 Studio <i>//</i> 新作发布会</span>
+    <a class="pg" href="02-world.html">[ 01 / 06 ]</a>
+  </header>
+
+  <section class="copy">
+    <p class="k">2026.11.20 · 首次公开</p>
+    <h1>Pixel<br>Planet</h1>
+    <p class="zh">像素星球</p>
+    <p class="tag">一颗 64×64 格的星球，等你一格一格把它点亮。</p>
+    <a class="btn" href="02-world.html"><span class="tri" aria-hidden="true"></span>Press Start</a>
+  </section>
+
+  <footer class="hud b">
+    <span>Build 0.9.4</span>
+    <span>PC / 主机 · 2027 春</span>
+  </footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+  "c": {
+    "bg": "#EAF0F6",
+    "surface": "#F7F9FC",
+    "text": "#10151C",
+    "muted": "#4F5B69",
+    "line": "#D5DEE8",
+    "primary": "#CC4520",
+    "accent": "#2B6CB0",
+    "on": "#FFFFFF",
+    "link": "#2B6CB0"
+  },
+  "head": "SANS",
+  "w": 600,
+  "radius": 18,
+  "shadow": "0 10px 30px rgba(16,21,28,.10)",
+  "dzh": "柔光底、浮层毛玻璃",
+  "den": "Soft glow background, frosted overlays",
+  "nzh": "底色加两三团柔和光斑，别用紫蓝渐变；只有浮层、卡片、标签栏用毛玻璃；毛玻璃是半透明白加模糊和 1px 白描边；正文区用实色，玻璃上的字照样要够深",
+  "nen": "Two or three soft light blobs on the background, not a purple-blue gradient; frosted glass only on overlays, cards and tab bars; glass = translucent white, blur and a 1px white border; solid elsewhere, text on glass stays dark",
+  "bgImage": "radial-gradient(circle at 20% 15%, #FFD9C7 0, transparent 45%), radial-gradient(circle at 85% 70%, #C9E2FF 0, transparent 50%)"
+}

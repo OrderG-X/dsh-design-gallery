@@ -1,0 +1,136 @@
+# 发布：main 有新内容 / 每晚兜底 / 下架时手动触发 → 建目录、签名、发 npm（trusted publishing，不存 token）。
+# 分两个 job：
+#   shots   开浏览器截投稿的图。没有签名钥匙、没有发布权限、只能读仓库；产物（图）按不可信处理
+#   publish 不开浏览器：只收真是 JPEG/WebP、不超大小的图，图的 sha256 写进签好名的目录；签名私钥只在 publish 环境里
+name: publish
+
+on:
+  push:
+    branches: [main]
+    paths: ['templates/**', 'systems/**', 'styles/**', 'policy/**', 'vocab/**']
+  schedule:
+    - cron: '23 18 * * *' # 北京时间 02:23
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  shots:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 装依赖、中文字体
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk >/dev/null
+
+      - name: 截图（断网浏览器）
+        run: node scripts/build-index.mjs --render-only --out shots
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shots
+          path: shots/
+          retention-days: 1
+          if-no-files-found: error
+
+  publish:
+    needs: shots
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    environment: publish
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      - name: 装依赖；npm 要新到支持 trusted publishing（这个 job 不装字体、不开浏览器）
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm install -g npm@^11.5.1 --no-audit --no-fund
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: shots
+          path: shots
+
+      - name: 取上一版目录、算版本号
+        id: prev
+        run: node scripts/prev.mjs --out prev
+
+      - name: 建目录
+        id: build
+        env:
+          PREV: ${{ steps.prev.outputs.has_prev == 'true' && 'prev/index.json' || '' }}
+          PACKS_VERSION: ${{ steps.prev.outputs.packs_version }}
+        run: |
+          args="--out dist --packs-version $PACKS_VERSION --shots-from shots"
+          [ -n "$PREV" ] && args="$args --prev $PREV"
+          node scripts/build-index.mjs $args
+
+      - name: 没变化就不发
+        id: changed
+        env:
+          NEW: ${{ steps.build.outputs.content_sha }}
+          OLD: ${{ steps.prev.outputs.prev_sha }}
+        run: |
+          if [ "$NEW" = "$OLD" ]; then echo "目录内容没变，不发"; echo "go=false" >> "$GITHUB_OUTPUT"; else echo "go=true" >> "$GITHUB_OUTPUT"; fi
+
+      - name: 签名
+        if: steps.changed.outputs.go == 'true'
+        env:
+          GALLERY_SIGNING_KEY: ${{ secrets.GALLERY_SIGNING_KEY }}
+        run: node scripts/sign.mjs sign dist/catalog/index.json
+
+      # 先发内容批次（目录指着它），再发目录
+      - name: 发内容批次包
+        if: steps.changed.outputs.go == 'true' && steps.build.outputs.packs_version != ''
+        working-directory: dist/packs
+        run: npm publish --provenance --access public
+
+      - name: 发目录包
+        if: steps.changed.outputs.go == 'true'
+        working-directory: dist/catalog
+        env:
+          V: ${{ steps.prev.outputs.catalog_version }}
+        run: |
+          npm version "$V" --no-git-tag-version --allow-same-version >/dev/null
+          npm publish --provenance --access public
+
+      - name: 叫国内镜像同步、到各镜像取一遍确认
+        if: steps.changed.outputs.go == 'true'
+        env:
+          V: ${{ steps.prev.outputs.catalog_version }}
+          PV: ${{ steps.build.outputs.packs_version }}
+        run: |
+          for p in dsh-design-gallery dsh-design-gallery-packs; do
+            curl -fsS -X PUT "https://registry-direct.npmmirror.com/-/package/$p/syncs" >/dev/null || echo "npmmirror 同步接口没响应（$p）"
+          done
+          sleep 60
+          for r in https://registry.npmmirror.com https://mirrors.cloud.tencent.com/npm https://repo.huaweicloud.com/repository/npm https://registry.npmjs.org; do
+            got=$(curl -fsS -m 20 -H 'Accept: application/vnd.npm.install-v1+json' "$r/dsh-design-gallery" | jq -r '."dist-tags".latest' 2>/dev/null || echo '?')
+            echo "$r → $got（要 $V）"
+          done

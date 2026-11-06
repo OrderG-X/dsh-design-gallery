@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "复古",
+    "en": "Retro"
+  },
+  "description": {
+    "zh": "焦橙芥末黄墨绿、粗衬线、颗粒感",
+    "en": "Burnt orange, mustard and teal, fat serif, grain"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

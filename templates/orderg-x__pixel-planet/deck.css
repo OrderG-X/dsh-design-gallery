@@ -1,0 +1,108 @@
+*, *::before, *::after { box-sizing: border-box; }
+html, body { width: 1280px; height: 720px; margin: 0; overflow: hidden; }
+body {
+  background-color: var(--color-bg);
+  background-image:
+    linear-gradient(var(--color-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
+  background-size: 32px 32px;
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+h1, h2, h3, p, ol, ul, dl, dd, figure { margin: 0; padding: 0; }
+ol, ul { list-style: none; }
+svg.px { display: block; shape-rendering: crispEdges; }
+
+.slide { position: relative; width: 1280px; height: 720px; overflow: hidden; }
+
+/* 四角取景框 */
+.corner { position: absolute; width: 24px; height: 24px; border: 0 solid var(--color-accent); }
+.corner.tl { top: 32px; left: 32px; border-top-width: 2px; border-left-width: 2px; }
+.corner.tr { top: 32px; right: 32px; border-top-width: 2px; border-right-width: 2px; }
+.corner.bl { bottom: 32px; left: 32px; border-bottom-width: 2px; border-left-width: 2px; }
+.corner.br { bottom: 32px; right: 32px; border-bottom-width: 2px; border-right-width: 2px; }
+
+/* 顶 / 底 HUD：每页一样 */
+.hud {
+  position: absolute;
+  left: 64px;
+  right: 64px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 24px;
+  font-family: var(--font-mono);
+  font-size: var(--text-hud);
+  line-height: 24px;
+  color: var(--color-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.hud.t { top: 64px; }
+.hud.b { bottom: 64px; }
+.hud i { font-style: normal; color: var(--color-primary); }
+.hud .rec::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  background: var(--color-primary);
+  vertical-align: 1px;
+}
+.hud .pg { color: var(--color-accent); }
+.hud .pg:hover { color: var(--color-text); }
+
+/* 标题：位置每页一样 */
+.kicker {
+  position: absolute;
+  top: 116px;
+  left: 64px;
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  line-height: 28px;
+  color: var(--color-accent);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.title {
+  position: absolute;
+  top: 152px;
+  left: 64px;
+  font-family: var(--font-mono);
+  font-size: var(--text-title);
+  font-weight: var(--weight-head);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  word-spacing: -0.35em;
+  text-shadow: var(--glitch-soft);
+}
+
+.mono { font-family: var(--font-mono); }
+.muted { color: var(--color-muted); }
+
+/* 主按钮：唯一发光的按钮 */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  height: 52px;
+  padding: 0 24px;
+  border-radius: var(--radius);
+  background: rgba(255, 46, 136, 0.12);
+  color: var(--color-text);
+  box-shadow: var(--glow);
+  font-family: var(--font-mono);
+  font-size: var(--text-small);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: background 200ms cubic-bezier(.2, .8, .2, 1);
+}
+.btn:hover { background: rgba(255, 46, 136, 0.24); }
+.btn:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 4px; }
+.btn .tri { width: 0; height: 0; border-left: 12px solid var(--color-primary); border-top: 8px solid transparent; border-bottom: 8px solid transparent; }

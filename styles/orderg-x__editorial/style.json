@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#F4F1EA",
+    "surface": "#FFFFFF",
+    "text": "#111111",
+    "muted": "#555555",
+    "line": "#111111",
+    "primary": "#C8231B",
+    "accent": "#111111",
+    "on": "#FFFFFF",
+    "link": "#C8231B"
+  },
+  "head": "SERIF",
+  "w": 700,
+  "radius": 2,
+  "shadow": "none",
+  "dzh": "大标题、黑线栅格、红色点题",
+  "den": "Big headlines, black-rule grid, a red accent",
+  "nzh": "标题很大、粗细对比强烈；用粗细两种黑线分栏；版式不对称、留白多；红色只点一两处，几乎不用圆角和阴影",
+  "nen": "Very large headlines with strong weight contrast; thick and thin black rules for columns; asymmetric layout with space; red in one or two places, almost no radius or shadow"
+}

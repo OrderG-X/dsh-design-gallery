@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "粗野主义",
+    "en": "Brutalist"
+  },
+  "description": {
+    "zh": "亮黄底、黑粗框、硬阴影、等宽字",
+    "en": "Bright yellow, thick black borders, hard shadows, monospace"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

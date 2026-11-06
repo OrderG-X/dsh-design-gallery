@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="dsh-design" content="slides">
+<title>星球见 · 像素星球</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="deck.css">
+<style>
+  .stars { position: absolute; inset: 0; width: 1280px; height: 720px; opacity: 0.8; }
+  .planet { position: absolute; top: 120px; left: 832px; width: 384px; height: 384px; }
+  .ship { position: absolute; top: 152px; left: 736px; width: 96px; height: 48px; }
+  .trail { position: absolute; top: 172px; left: 640px; width: 96px; height: 8px; background: repeating-linear-gradient(90deg, transparent 0 8px, var(--color-primary) 8px 16px); opacity: 0.6; }
+  .end { position: absolute; top: 140px; left: 64px; width: 720px; }
+  .end h1 {
+    font-family: var(--font-mono);
+    font-size: 104px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    text-shadow: var(--glitch);
+  }
+  .end .zh { margin-top: 28px; font-size: var(--text-sub); font-weight: 600; line-height: 1.3; }
+  .end .btn { margin-top: 32px; }
+  .info {
+    position: absolute;
+    left: 64px;
+    top: 520px;
+    width: 1152px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 24px;
+  }
+  .info div { border-top: 1px solid var(--color-line-strong); padding-top: 12px; }
+  .info dt { font-family: var(--font-mono); font-size: var(--text-hud); line-height: 24px; color: var(--color-accent); letter-spacing: 0.12em; text-transform: uppercase; }
+  .info dd { margin-top: 4px; font-size: var(--text-small); line-height: 30px; }
+</style>
+</head>
+<body>
+<main class="slide">
+  <svg class="px stars" viewBox="0 0 160 90" preserveAspectRatio="none" aria-hidden="true"><use href="art.svg#stars"/></svg>
+  <svg class="px planet" viewBox="0 0 48 48" role="img" aria-label="像素星球"><use href="art.svg#planet"/></svg>
+  <span class="trail" aria-hidden="true"></span>
+  <svg class="px ship" viewBox="0 0 16 8" role="img" aria-label="飞向星球的小飞船"><use href="art.svg#ship"/></svg>
+
+  <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+  <header class="hud t">
+    <span class="rec">Pixel Planet <i>//</i> 新作发布会</span>
+    <a class="pg" href="01-cover.html">[ 06 / 06 ]</a>
+  </header>
+
+  <section class="end">
+    <h1>See you<br>on P-64</h1>
+    <p class="zh">2027 年 3 月 21 日，星球见。</p>
+    <a class="btn" href="01-cover.html"><span class="tri" aria-hidden="true"></span>Continue?</a>
+  </section>
+
+  <dl class="info">
+    <div><dt>Play</dt><dd>现场试玩：B 区 12 号台，每场 20 分钟</dd></div>
+    <div><dt>Q&amp;A</dt><dd>接下来 15 分钟，制作组现场答疑</dd></div>
+    <div><dt>Wishlist</dt><dd>今天起开放预约，正式版第一天就能玩</dd></div>
+  </dl>
+
+  <footer class="hud b">
+    <span>Echo-8 Studio</span>
+    <span>2026.11.20</span>
+  </footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "柔和立体",
+    "en": "Soft UI"
+  },
+  "description": {
+    "zh": "同色底、凸起凹陷的柔光阴影",
+    "en": "Same-color surfaces with raised and pressed soft shadows"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

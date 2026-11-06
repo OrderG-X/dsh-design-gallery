@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="miniprogram">
+<title>电子票 · 周末去哪</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body class="ticket-page">
+<header class="mp-top ruled">
+  <div class="mp-status"><span>9:41</span><span class="mp-sys"><svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M8 2.2c2.5 0 4.8 1 6.5 2.6l1.2-1.3A11 11 0 0 0 8 .4 11 11 0 0 0 .3 3.5l1.2 1.3A9.3 9.3 0 0 1 8 2.2z"/><path d="M8 5.8c1.5 0 2.9.6 3.9 1.5l1.2-1.3A7.4 7.4 0 0 0 8 4a7.4 7.4 0 0 0-5.1 2l1.2 1.3c1-.9 2.4-1.5 3.9-1.5z"/><path d="M8 9.3c.6 0 1.2.2 1.6.6L8 11.6 6.4 9.9c.4-.4 1-.6 1.6-.6z"/></svg><svg width="27" height="13" viewBox="0 0 27 13" aria-hidden="true"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="currentColor" opacity=".45"/><rect x="2" y="2" width="18" height="9" rx="2"/><path d="M25 4.5v4c.8-.3 1.5-1.1 1.5-2s-.7-1.7-1.5-2z" opacity=".5"/></svg></span></div>
+  <div class="mp-nav"><a class="mp-back" href="detail.html" aria-label="返回活动详情"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></a><h1>电子票</h1></div>
+</header>
+<main class="mp-page">
+  <section class="done">
+    <svg class="confetti" viewBox="0 0 343 110" aria-hidden="true">
+      <path d="M22 26l10 4-4 10z" fill="#FF6A3D" stroke="#1D1B3A" stroke-width="2" stroke-linejoin="round"/>
+      <circle cx="312" cy="22" r="6" fill="#1F9E92" stroke="#1D1B3A" stroke-width="2"/>
+      <path d="M290 78c4-6 10-6 14 0s10 6 14 0" fill="none" stroke="#1D1B3A" stroke-width="2.4" stroke-linecap="round"/>
+      <rect x="18" y="80" width="12" height="12" rx="2" fill="#D3EFEB" stroke="#1D1B3A" stroke-width="2" transform="rotate(18 24 86)"/>
+      <path d="M326 52l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#FF6A3D" stroke="#1D1B3A" stroke-width="1.8" stroke-linejoin="round"/>
+    </svg>
+    <span class="badge" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.5 12.5l4 4 9-9"/></svg></span>
+    <h2 class="round">报名成功！</h2>
+    <p>票已放进「票夹」，开场前 2 小时提醒你</p>
+  </section>
+
+  <section class="ticket card" aria-label="电子票">
+    <div class="t-head">
+      <p class="t-kind"><span class="sticker tilt-l">早鸟票</span><span class="num">No. WG-1108-0732</span></p>
+      <h3 class="round">黄昏草地音乐会</h3>
+      <p class="t-sub">不插电专场 · 小树林音乐社</p>
+    </div>
+    <dl class="t-grid">
+      <div><dt>场次</dt><dd class="num">11月8日 周六</dd><dd class="sm">16:30 开演</dd></div>
+      <div><dt>入场</dt><dd class="num">16:00 起</dd><dd class="sm">东草坪 B 口</dd></div>
+      <div><dt>入场人</dt><dd>林小满</dd><dd class="sm">1 人 · 1 张</dd></div>
+      <div><dt>实付</dt><dd class="num">¥68</dd><dd class="sm">开场前 24 小时可退</dd></div>
+    </dl>
+    <div class="perf" aria-hidden="true"></div>
+    <div class="t-code">
+      <div class="code-box"><b class="round">入场码</b><span>到场出示</span></div>
+      <div class="code-side"><p>检票时给工作人员看这里，截图也能用</p><span class="sticker teal tilt-r">距开场 1 天</span></div>
+    </div>
+  </section>
+
+  <section class="notes card">
+    <h3 class="round">注意事项</h3>
+    <ol>
+      <li><b>1</b><p>16:00 开始检票，建议提前 30 分钟到。</p></li>
+      <li><b>2</b><p>草坪上不能带玻璃瓶，野餐垫随意。</p></li>
+      <li><b>3</b><p>下雨改到东门玻璃温室，照常开演。</p></li>
+      <li><b>4</b><p>开场前 24 小时可免费退票。</p></li>
+    </ol>
+  </section>
+</main>
+
+<div class="mp-actionbar">
+  <a class="btn-ghost home" href="discover.html">回首页</a>
+  <button class="btn-primary cal"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>加入日历</button>
+</div>
+
+<style>
+.ticket-page .mp-page { padding-top: 16px; padding-bottom: 136px; }
+.done { position: relative; text-align: center; padding: 8px 0 20px; }
+.confetti { position: absolute; left: 0; top: 0; width: 100%; height: 110px; }
+.badge { position: relative; width: 56px; height: 56px; margin: 0 auto; display: grid; place-items: center; border: var(--stroke); border-radius: 50%; background: var(--color-primary); box-shadow: var(--shadow); transform: rotate(-8deg); }
+.badge .ico { width: 30px; height: 30px; stroke-width: 3; }
+.done h2 { position: relative; margin-top: 12px; font-size: var(--text-2xl); font-weight: 800; line-height: 1.25; }
+.done p { position: relative; margin-top: 4px; color: var(--color-muted); }
+
+.ticket { position: relative; margin-right: 4px; overflow: visible; }
+.t-head { padding: 14px 16px 14px; border-bottom: var(--stroke); border-radius: 18px 18px 0 0; background: var(--color-primary); }
+.t-kind { display: flex; align-items: center; justify-content: space-between; }
+.t-kind .sticker { height: 24px; font-size: var(--text-sm); }
+.t-kind .num { font-size: var(--text-sm); font-weight: 700; }
+.t-head h3 { margin-top: 10px; font-size: var(--text-xl); font-weight: 800; line-height: 1.3; }
+.t-sub { font-size: var(--text-sm); font-weight: 600; }
+.t-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin: 0; padding: 14px 16px 16px; }
+.t-grid dt { font-size: var(--text-sm); color: var(--color-muted); }
+.t-grid dd { margin: 0; font-weight: 800; line-height: 1.4; }
+.t-grid dd.sm { font-size: var(--text-sm); font-weight: 400; color: var(--color-muted); }
+.perf { position: relative; height: 2px; margin: 0 18px; background: repeating-linear-gradient(90deg, var(--color-line) 0 8px, transparent 8px 14px); }
+.perf::before, .perf::after { content: ""; position: absolute; top: -12px; width: 26px; height: 26px; border: var(--stroke); border-radius: 50%; background: var(--color-bg); }
+.perf::before { left: -34px; clip-path: inset(0 0 0 50%); }
+.perf::after { right: -34px; clip-path: inset(0 50% 0 0); }
+.t-code { display: flex; align-items: center; gap: 16px; padding: 16px; }
+.code-box { flex-shrink: 0; width: 132px; height: 132px; display: grid; place-content: center; gap: 2px; border: 2px dashed var(--color-line); border-radius: 16px; background: var(--color-accent-soft); text-align: center; }
+.code-box b { font-size: var(--text-xl); font-weight: 800; }
+.code-box span { font-size: var(--text-sm); color: var(--color-muted); }
+.code-side { flex: 1; min-width: 0; }
+.code-side p { font-size: var(--text-sm); color: var(--color-muted); }
+.code-side .sticker { margin-top: 12px; }
+
+.notes { margin-top: 20px; margin-right: 4px; padding: 14px 16px 8px; }
+.notes h3 { font-size: var(--text-lg); font-weight: 800; margin-bottom: 4px; }
+.notes li { display: flex; gap: 10px; align-items: flex-start; padding: 6px 0; }
+.notes b { flex-shrink: 0; width: 22px; height: 22px; display: grid; place-items: center; border: var(--stroke); border-radius: 50%; background: var(--color-accent-soft); font-family: var(--font-round); font-size: var(--text-sm); line-height: 1; }
+.notes p { padding-top: 1px; }
+
+.home { flex: 0 0 auto; padding: 0 22px; }
+.cal { flex: 1; }
+.cal .ico { width: 20px; height: 20px; }
+</style>
+</body>
+</html>

@@ -1,0 +1,51 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": {
+    "zh": "Tapeworks 播客剪辑",
+    "en": "Tapeworks"
+  },
+  "description": {
+    "zh": "近黑底、香槟金点缀的英文播客剪辑桌面软件：多轨时间线配检查器和逐字稿，剧集库网格",
+    "en": "A near-black, champagne-gold podcast editing desktop app: a multitrack timeline with inspector and transcript, plus an episode library grid"
+  },
+  "kind": "desktop",
+  "screens": [
+    {
+      "file": "editor.html",
+      "title": {
+        "zh": "剪辑",
+        "en": "Editor"
+      }
+    },
+    {
+      "file": "library.html",
+      "title": {
+        "zh": "剧集库",
+        "en": "Library"
+      }
+    }
+  ],
+  "style": "dark",
+  "categories": [
+    "media"
+  ],
+  "tags": [
+    "dark-mode",
+    "dashboard",
+    "data-dense",
+    "gallery",
+    "list",
+    "detail"
+  ],
+  "lang": "en",
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.11.0"
+  }
+}

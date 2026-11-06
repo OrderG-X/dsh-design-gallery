@@ -1,0 +1,20 @@
+[
+  { "id": "food", "zh": "餐饮", "en": "Food & drink" },
+  { "id": "retail", "zh": "零售电商", "en": "Retail & shop" },
+  { "id": "saas", "zh": "工具软件", "en": "SaaS & tools" },
+  { "id": "business", "zh": "企业官网", "en": "Business" },
+  { "id": "education", "zh": "教育学习", "en": "Education" },
+  { "id": "health", "zh": "健康运动", "en": "Health & fitness" },
+  { "id": "travel", "zh": "旅行出行", "en": "Travel" },
+  { "id": "media", "zh": "内容资讯", "en": "Media & news" },
+  { "id": "social", "zh": "社交社区", "en": "Social & community" },
+  { "id": "portfolio", "zh": "作品集", "en": "Portfolio" },
+  { "id": "event", "zh": "活动", "en": "Events" },
+  { "id": "finance", "zh": "记账理财", "en": "Personal finance" },
+  { "id": "home", "zh": "家居生活", "en": "Home & living" },
+  { "id": "kids", "zh": "亲子", "en": "Kids & family" },
+  { "id": "pets", "zh": "宠物", "en": "Pets" },
+  { "id": "game", "zh": "游戏娱乐", "en": "Games & fun" },
+  { "id": "beauty", "zh": "美业", "en": "Beauty" },
+  { "id": "nonprofit", "zh": "公益", "en": "Nonprofit" }
+]

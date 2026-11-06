@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#F5F7FB",
+    "surface": "#FFFFFF",
+    "text": "#0F172A",
+    "muted": "#55657D",
+    "line": "#E2E8F0",
+    "primary": "#2457F5",
+    "accent": "#0F8F8E",
+    "on": "#FFFFFF",
+    "link": "#2457F5"
+  },
+  "head": "SANS",
+  "w": 600,
+  "radius": 8,
+  "shadow": "0 1px 3px rgba(15,23,42,.08)",
+  "dzh": "冷灰蓝、信息密、数字清楚",
+  "den": "Cool gray-blue, dense info, crisp numbers",
+  "nzh": "信息密度高但对齐严格；数字用等宽数字，表格行高 44–48；状态用小色点和标签；主色只给主操作",
+  "nen": "Dense but strictly aligned; tabular numbers and 44–48px table rows; status as small dots and tags; primary color only for the main action"
+}

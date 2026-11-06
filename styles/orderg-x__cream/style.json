@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#FAF5EE",
+    "surface": "#FFFDF9",
+    "text": "#3A2F28",
+    "muted": "#76675C",
+    "line": "#EEE3D5",
+    "primary": "#8C5E3C",
+    "accent": "#E7C9A6",
+    "on": "#FFFFFF",
+    "link": "#8A5A36"
+  },
+  "head": "ROUND",
+  "w": 700,
+  "radius": 22,
+  "shadow": "0 10px 30px rgba(140,94,60,.10)",
+  "dzh": "奶白燕麦焦糖、大圆角、柔光",
+  "den": "Milk, oat and caramel, big radii, soft light",
+  "nzh": "只用奶白、燕麦、焦糖三色；圆角大，多用圆形和胶囊形；阴影又大又淡、带暖色，字用深咖啡色；照片和插画柔光低对比，整体软、暖、安静",
+  "nen": "Milk, oat and caramel only; big radii, lots of circles and pills; large faint warm shadows, dark coffee text instead of black; soft low-contrast photos and illustrations, calm and warm overall"
+}

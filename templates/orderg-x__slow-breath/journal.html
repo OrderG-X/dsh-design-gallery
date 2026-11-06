@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="app">
+<title>记录 · 慢呼吸</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app.css">
+<style>
+  .j-top { display: flex; align-items: center; justify-content: space-between; padding-top: var(--space-4); }
+  .j-top h1 { font-size: var(--fs-h1); line-height: 1.3; letter-spacing: .3em; }
+  .pen { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; padding: 0 var(--space-4); border-radius: var(--radius-pill); box-shadow: inset 0 0 0 1px var(--line); font-size: var(--fs-meta); letter-spacing: .12em; }
+  .pen .ico { width: 18px; height: 18px; }
+
+  .seg { margin-top: var(--space-5); display: flex; gap: var(--space-5); border-bottom: var(--hair); }
+  .seg a, .seg span { position: relative; display: inline-flex; align-items: center; min-height: 44px; font-size: var(--fs-body); color: var(--muted); letter-spacing: .12em; }
+  .seg .on { color: var(--text); font-weight: 600; }
+  .seg .on::after { content: ""; position: absolute; left: 0; right: .12em; bottom: -1px; height: 2px; background: var(--primary); }
+
+  .chart-card { margin-top: var(--space-5); }
+  .chart-head { display: flex; align-items: flex-end; justify-content: space-between; }
+  .total { display: flex; align-items: baseline; gap: var(--space-1); margin-top: var(--space-1); }
+  .total b { font-family: var(--font-serif); font-weight: var(--w-head); font-size: var(--fs-num); line-height: 1.1; }
+  .delta { display: inline-flex; align-items: center; gap: var(--space-1); font-size: var(--fs-meta); color: var(--muted); padding-bottom: var(--space-1); }
+  .delta .ico { width: 16px; height: 16px; }
+
+  .chart { position: relative; height: 166px; margin-top: var(--space-5); }
+  .gl { position: absolute; left: 24px; right: 0; height: 0; border-top: 1px solid var(--line); }
+  .gl em { position: absolute; left: -24px; top: 0; width: 16px; transform: translateY(-50%); font-style: normal; text-align: right; font-size: var(--fs-micro); line-height: 16px; color: var(--muted); }
+  .gl-20 { top: 20px; }
+  .gl-10 { top: 80px; }
+  .gl-0 { top: 140px; border-top-color: rgba(95, 91, 84, .5); }
+  .bars, .days { position: absolute; left: 24px; right: 0; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, 1fr); }
+  .bars { top: 0; height: 140px; }
+  .bars li { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; }
+  .bars .v { font-size: var(--fs-micro); line-height: 16px; color: var(--muted); margin-bottom: var(--space-1); font-variant-numeric: tabular-nums; }
+  .bars i { display: block; width: 10px; border-radius: 5px 5px 1px 1px; background: var(--primary); opacity: .88; }
+  .bars .today i { background: var(--accent); opacity: 1; }
+  .bars .today .v, .days .today { color: var(--accent); font-weight: 600; }
+  .bars .future i { height: 2px; width: 10px; border-radius: 1px; background: var(--line); opacity: 1; }
+  .days { top: 148px; text-align: center; font-size: var(--fs-micro); line-height: 16px; color: var(--muted); }
+  .h84 { height: 84px; } .h90 { height: 90px; } .h120 { height: 120px; } .h48 { height: 48px; } .h114 { height: 114px; } .h60 { height: 60px; }
+
+  .section-head.j-head { margin-top: var(--space-6); }
+  .kv { margin-top: var(--space-6); display: grid; grid-template-columns: repeat(3, 1fr); border-top: var(--hair); border-bottom: var(--hair); }
+  .kv div { padding: var(--space-4) 0 var(--space-4) var(--space-4); }
+  .kv div:first-child { padding-left: 0; }
+  .kv div + div { border-left: var(--hair); }
+  .kv b { display: block; font-family: var(--font-serif); font-weight: var(--w-head); font-size: var(--fs-h1); line-height: 1.3; }
+  .kv small { font-size: var(--fs-meta); color: var(--muted); }
+
+  .moods { list-style: none; margin: 0; padding: 0; }
+  .moods li { display: grid; grid-template-columns: 36px 44px 1fr; gap: var(--space-4); padding: var(--space-4) 0; border-top: var(--hair); }
+  .moods li:last-child { border-bottom: var(--hair); }
+  .m-date { text-align: center; line-height: 1.2; }
+  .m-date b { display: block; font-family: var(--font-serif); font-weight: var(--w-head); font-size: var(--fs-h1); }
+  .m-date span { font-size: var(--fs-micro); color: var(--muted); }
+  .m-ink { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-serif); font-size: var(--fs-h3); color: var(--text); background: radial-gradient(circle at 44% 46%, rgba(47, 59, 55, .16), rgba(47, 59, 55, .09) 45%, rgba(47, 59, 55, .03) 64%, transparent 71%); }
+  .m-txt { min-width: 0; }
+  .m-line { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-2); }
+  .m-src { display: inline-block; margin-top: var(--space-2); font-size: var(--fs-micro); color: var(--muted); letter-spacing: .08em; padding: 0 var(--space-2); line-height: 22px; border-radius: var(--radius); box-shadow: inset 0 0 0 1px var(--line); }
+  .m-line b { font-weight: 600; }
+  .note { margin-top: var(--space-1); line-height: 1.7; }
+</style>
+</head>
+<body>
+<svg class="sprite" aria-hidden="true">
+  <symbol id="i-today" viewBox="0 0 24 24"><path d="M3 18h18"/><path d="M7 18a5 5 0 0 1 10 0"/><path d="M12 6.5v2.5M5.8 10.2l1.6 1.4M18.2 10.2l-1.6 1.4"/></symbol>
+  <symbol id="i-course" viewBox="0 0 24 24"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v16H5.5A1.5 1.5 0 0 1 4 18.5z"/><path d="M20 5.5A1.5 1.5 0 0 0 18.5 4H13v16h5.5a1.5 1.5 0 0 0 1.5-1.5z"/></symbol>
+  <symbol id="i-journal" viewBox="0 0 24 24"><rect x="5" y="3.5" width="14" height="17" rx="1.5"/><path d="M8.5 8.5h7M8.5 12h7M8.5 15.5h4"/></symbol>
+  <symbol id="i-me" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c1.2-3.6 4-5.5 7-5.5s5.8 1.9 7 5.5"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M5 19l1-4.5L15.5 5a2.1 2.1 0 0 1 3 3L9 17.5z"/><path d="M13.5 7l3 3"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 18V6M7 11l5-5 5 5"/></symbol>
+</svg>
+
+<header class="status" aria-hidden="true">
+  <span class="status-time">9:41</span>
+  <span class="status-icons">
+    <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx=".8"/><rect x="5" y="5.5" width="3" height="6.5" rx=".8"/><rect x="10" y="3" width="3" height="9" rx=".8"/><rect x="15" y="0" width="3" height="12" rx=".8"/></svg>
+    <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1.5 4.3a9.5 9.5 0 0 1 13 0"/><path d="M4 7.1a6 6 0 0 1 8 0"/><circle cx="8" cy="10" r="1.3" fill="currentColor" stroke="none"/></svg>
+    <svg width="27" height="12" viewBox="0 0 27 12"><rect x=".5" y=".5" width="23" height="11" rx="3.2" fill="none" stroke="currentColor" stroke-opacity=".4"/><rect x="2" y="2" width="17" height="8" rx="1.8" fill="currentColor"/><path d="M25 4v4c.8-.3 1.4-1.1 1.4-2s-.6-1.7-1.4-2z" fill="currentColor" fill-opacity=".4"/></svg>
+  </span>
+</header>
+
+<main class="page">
+  <div class="j-top">
+    <h1 class="head">记录</h1>
+    <button class="pen" type="button"><svg class="ico"><use href="#i-pen"/></svg>记一笔</button>
+  </div>
+
+  <nav class="seg" aria-label="时间范围">
+    <span class="on" aria-current="true">本周</span>
+    <span>本月</span>
+    <span>全年</span>
+  </nav>
+
+  <section class="chart-card" aria-label="本周练习时长">
+    <div class="chart-head">
+      <div>
+        <p class="meta">11 月 2 日 – 8 日 · 练习时长</p>
+        <p class="total"><b>86</b><span class="meta">分钟</span></p>
+      </div>
+      <p class="delta"><svg class="ico"><use href="#i-up"/></svg>比上周多 14 分钟</p>
+    </div>
+    <div class="chart">
+      <div class="gl gl-20" aria-hidden="true"><em>20</em></div>
+      <div class="gl gl-10" aria-hidden="true"><em>10</em></div>
+      <div class="gl gl-0" aria-hidden="true"><em>0</em></div>
+      <ol class="bars">
+        <li><span class="v">14</span><i class="h84"></i></li>
+        <li><span class="v">15</span><i class="h90"></i></li>
+        <li><span class="v">20</span><i class="h120"></i></li>
+        <li><span class="v">8</span><i class="h48"></i></li>
+        <li><span class="v">19</span><i class="h114"></i></li>
+        <li class="today"><span class="v">10</span><i class="h60"></i></li>
+        <li class="future"><i></i></li>
+      </ol>
+      <ol class="days" aria-hidden="true"><li>一</li><li>二</li><li>三</li><li>四</li><li>五</li><li class="today">今天</li><li>日</li></ol>
+    </div>
+  </section>
+
+  <section class="kv" aria-label="本周概况">
+    <div><span class="meta">练习</span><b>9<small> 次</small></b></div>
+    <div><span class="meta">平均入睡</span><b>17<small> 分钟</small></b></div>
+    <div><span class="meta">连续</span><b>13<small> 天</small></b></div>
+  </section>
+
+  <div class="section-head j-head">
+    <h2 class="head">心情</h2>
+    <span class="more">十一月</span>
+  </div>
+  <ul class="moods">
+    <li>
+      <div class="m-date"><b>7</b><span>周六</span></div>
+      <span class="m-ink" aria-hidden="true">静</span>
+      <div class="m-txt">
+        <p class="m-line"><b>平静</b><span class="meta">09:41</span></p>
+        <p class="note">呼到第五轮，肩膀慢慢松下来了。窗外有鸟叫。</p>
+        <span class="m-src">山间晨雾 · 10 分钟</span>
+      </div>
+    </li>
+    <li>
+      <div class="m-date"><b>6</b><span>周五</span></div>
+      <span class="m-ink" aria-hidden="true">倦</span>
+      <div class="m-txt">
+        <p class="m-line"><b>疲惫</b><span class="meta">23:12</span></p>
+        <p class="note">加班到很晚。听着雨声，没几分钟就睡着了。</p>
+        <span class="m-src">听雨入眠 · 15 分钟</span>
+      </div>
+    </li>
+    <li>
+      <div class="m-date"><b>5</b><span>周四</span></div>
+      <span class="m-ink" aria-hidden="true">躁</span>
+      <div class="m-txt">
+        <p class="m-line"><b>烦躁</b><span class="meta">22:48</span></p>
+        <p class="note">脑子停不下来。数息数到四十几，才慢慢静了。</p>
+        <span class="m-src">月下数息 · 8 分钟</span>
+      </div>
+    </li>
+    <li>
+      <div class="m-date"><b>4</b><span>周三</span></div>
+      <span class="m-ink" aria-hidden="true">安</span>
+      <div class="m-txt">
+        <p class="m-line"><b>安稳</b><span class="meta">07:30</span></p>
+        <p class="note">睡够七个半小时，醒来不想动。躺在床上做完的。</p>
+        <span class="m-src">松风身体扫描 · 20 分钟</span>
+      </div>
+    </li>
+  </ul>
+</main>
+
+<nav class="tabbar" aria-label="主导航">
+  <a class="tab" href="home.html"><svg class="ico"><use href="#i-today"/></svg>今日</a>
+  <span class="tab"><svg class="ico"><use href="#i-course"/></svg>课程</span>
+  <a class="tab is-on" href="journal.html" aria-current="page"><svg class="ico"><use href="#i-journal"/></svg>记录</a>
+  <span class="tab"><svg class="ico"><use href="#i-me"/></svg>我的</span>
+</nav>
+</body>
+</html>

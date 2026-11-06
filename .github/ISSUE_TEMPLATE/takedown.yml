@@ -1,0 +1,30 @@
+name: 版权下架申请 / Copyright takedown request
+description: 你是版权方，要求下架某套设计 / You own the rights and want a design removed
+title: "下架申请 / Takedown: "
+labels: [takedown]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        我们收到后 24 小时内先从目录里隐藏，核实后从仓库删除。
+        We hide the design from the catalog within 24 hours of receiving this, then delete it after review.
+  - type: input
+    id: id
+    attributes:
+      label: 设计 id / Design id
+    validations:
+      required: true
+  - type: textarea
+    id: original
+    attributes:
+      label: 原作在哪 / Where is the original work
+      description: 原作的链接或说明 / Link to or description of your original work
+    validations:
+      required: true
+  - type: checkboxes
+    id: statement
+    attributes:
+      label: 声明 / Statement
+      options:
+        - label: 我是版权方或其授权代表，以上信息属实 / I am the rights holder or authorized to act for them, and the information above is accurate
+          required: true

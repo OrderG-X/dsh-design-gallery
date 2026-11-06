@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#FFF4F6",
+    "surface": "#FFFFFF",
+    "text": "#3A2540",
+    "muted": "#7A5E80",
+    "line": "#F3D3DD",
+    "primary": "#FF7AA8",
+    "accent": "#FFC93C",
+    "on": "#3A2540",
+    "link": "#C2366F"
+  },
+  "head": "ROUND",
+  "w": 800,
+  "radius": 24,
+  "shadow": "0 6px 0 #F3C4D3",
+  "dzh": "粉黄糖果色、大圆角、圆体字",
+  "den": "Candy pink and yellow, big radii, rounded type",
+  "nzh": "圆角很大、字胖胖的；按钮像糖果，底下一道同色系厚阴影；配简单几何画的小动物或角色插画；只用粉黄两色，主色按钮上用深色字",
+  "nen": "Very round corners and chubby type; candy-like buttons with a thick same-hue shadow; small animal or mascot illustrations in simple SVG shapes; pink and yellow only, dark text on the primary button"
+}

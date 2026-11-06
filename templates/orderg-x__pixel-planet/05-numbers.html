@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="dsh-design" content="slides">
+<title>测试数据 · 像素星球</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="deck.css">
+<style>
+  .hero { position: absolute; top: 264px; left: 64px; width: 520px; }
+  .hero .big {
+    font-family: var(--font-mono);
+    font-size: 200px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: var(--color-primary);
+    text-shadow: var(--glow-text);
+  }
+  .hero .k { margin-top: 20px; font-size: var(--text-sub); font-weight: 600; line-height: 1.3; }
+  .hero .d { margin-top: 8px; font-size: var(--text-small); line-height: 30px; color: var(--color-muted); }
+
+  .side {
+    position: absolute;
+    top: 264px;
+    left: 640px;
+    width: 576px;
+  }
+  .side li {
+    display: grid;
+    grid-template-columns: 224px 1fr;
+    column-gap: 24px;
+    align-items: baseline;
+    height: 104px;
+    padding-top: 20px;
+    border-top: 1px solid var(--color-line-strong);
+  }
+  .side .v { font-family: var(--font-mono); font-size: var(--text-title); font-weight: 700; line-height: 56px; white-space: nowrap; }
+  .side .v small { font-size: var(--text-body); margin-left: 4px; color: var(--color-muted); }
+  .side .l { font-size: var(--text-body); line-height: 1.4; }
+  .side .l span { display: block; font-size: var(--text-hud); color: var(--color-muted); line-height: 24px; }
+
+  .src {
+    position: absolute;
+    left: 64px;
+    top: 588px;
+    font-size: var(--text-hud);
+    line-height: 24px;
+    color: var(--color-muted);
+  }
+</style>
+</head>
+<body>
+<main class="slide">
+  <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+  <header class="hud t">
+    <span class="rec">Pixel Planet <i>//</i> 新作发布会</span>
+    <a class="pg" href="06-end.html">[ 05 / 06 ]</a>
+  </header>
+
+  <p class="kicker">05 // Playtest</p>
+  <h1 class="title">一测 3,000 人，94% 愿意推荐给朋友</h1>
+
+  <div class="hero">
+    <p class="big">94%</p>
+    <p class="k">愿意推荐给朋友</p>
+    <p class="d">测试结束后问卷，回收 2,412 份</p>
+  </div>
+
+  <ol class="side">
+    <li>
+      <p class="v">2.6<small>小时</small></p>
+      <p class="l">平均每次玩多久<span>最长一位玩了 9 小时</span></p>
+    </li>
+    <li>
+      <p class="v">71%</p>
+      <p class="l">第二天还会回来<span>第 7 天仍有 46%</span></p>
+    </li>
+    <li>
+      <p class="v">2,140</p>
+      <p class="l">平均每人挖掉的格子<span>相当于把半颗星球翻了一遍</span></p>
+    </li>
+  </ol>
+
+  <p class="src">数据来自 2026 年 8 月一测：14 天，3,000 名玩家</p>
+
+  <footer class="hud b">
+    <span>Echo-8 Studio</span>
+    <span>2026.11.20</span>
+  </footer>
+</main>
+</body>
+</html>

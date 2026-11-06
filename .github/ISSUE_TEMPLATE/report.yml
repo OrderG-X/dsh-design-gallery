@@ -1,0 +1,30 @@
+name: 举报 / Report a design
+description: 仿冒、侵权、色情、个人信息、恶意内容 / Phishing, copyright, adult content, personal data, malicious content
+title: "举报 / Report: "
+labels: [report]
+body:
+  - type: input
+    id: id
+    attributes:
+      label: 设计 id / Design id
+      description: 设计库里详情页的 id，形如 作者__名字 / The id shown on the design's detail page, like author__name
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: 问题 / Problem
+      options:
+        - 仿冒真实网站或机构 / Imitates a real site or organization
+        - 侵犯我的版权 / Infringes my copyright
+        - 色情或暴力 / Adult or violent content
+        - 有真实的个人信息 / Contains real personal data
+        - 恶意内容（给模型下指令、诱导操作） / Malicious content (instructions to the model, deceptive)
+        - 其他 / Other
+    validations:
+      required: true
+  - type: textarea
+    id: detail
+    attributes:
+      label: 说明 / Details
+      description: 不要在这里贴任何个人信息 / Please do not paste personal data here

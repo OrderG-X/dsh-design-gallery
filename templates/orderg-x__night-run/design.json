@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": { "zh": "城市夜跑", "en": "City Night Run" },
+  "description": {
+    "zh": "城市夜跑活动的 9:16 竖版海报：黑底荧光绿、超粗斜体大字、5K / 10K 大数字、斜切色块和沿江路线示意",
+    "en": "A 9:16 poster for a city night run: black with volt green, heavy italic type, big 5K / 10K numbers, slanted blocks and a riverside route map"
+  },
+  "kind": "poster",
+  "size": "1080x1920",
+  "screens": [
+    { "file": "poster.html", "title": { "zh": "海报", "en": "Poster" } }
+  ],
+  "style": "sport",
+  "categories": ["health", "event"],
+  "tags": ["cover"],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": { "login": "orderg-x", "id": 271418316 },
+  "ai": { "generated": true, "tool": "dsh-design-studio@0.11.0" }
+}

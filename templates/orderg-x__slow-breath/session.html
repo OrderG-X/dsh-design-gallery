@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="app">
+<title>练习中 · 慢呼吸</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app.css">
+<style>
+  body { display: flex; flex-direction: column; }
+  .bar { display: grid; grid-template-columns: 44px 1fr 44px; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-4) 0; }
+  .icon-btn { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; color: var(--text); }
+  .bar-title { text-align: center; line-height: 1.4; }
+  .bar-title b { display: block; font-size: var(--fs-h3); }
+
+  .session { flex: 1; display: flex; flex-direction: column; align-items: center; padding: var(--space-4) var(--gutter) calc(var(--home-bar) + var(--space-4)); }
+
+  .breath { position: relative; width: min(296px, 76vw); aspect-ratio: 1; }
+  .breath svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+  .breath-wash { animation: breathe 16s cubic-bezier(.45, 0, .55, 1) infinite; transform-origin: 50% 50%; }
+  @keyframes breathe {
+    0% { transform: scale(.88); }
+    25%, 50% { transform: scale(1); }
+    75%, 100% { transform: scale(.88); }
+  }
+  .breath-core { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .breath-word { font-size: var(--fs-num); line-height: 1.2; letter-spacing: .3em; margin-right: -.3em; }
+  .breath-count { margin-top: var(--space-1); font-size: var(--fs-meta); color: var(--muted); letter-spacing: .12em; }
+
+  .phases { list-style: none; margin: var(--space-6) 0 0; padding: 0; display: flex; align-items: center; }
+  .phases li { padding: 0 var(--space-4); font-size: var(--fs-meta); color: var(--muted); letter-spacing: .12em; text-align: center; line-height: 1.5; }
+  .phases li + li { border-left: var(--hair); }
+  .phases li b { display: block; font-family: var(--font-serif); font-weight: var(--w-head); font-size: var(--fs-h3); letter-spacing: 0; }
+  .phases .now { color: var(--text); }
+  .phases .now b { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+
+  .guide { margin-top: var(--space-4); text-align: center; color: var(--muted); line-height: 1.7; }
+
+  .rounds { list-style: none; margin: var(--space-6) 0 0; padding: 0; display: flex; gap: 10px; }
+  .rounds li { width: 8px; height: 8px; border-radius: 50%; background: var(--line); }
+  .rounds .done { background: var(--primary); opacity: .82; }
+  .rounds .now { background: transparent; box-shadow: inset 0 0 0 1.5px var(--primary); transform: scale(1.25); }
+  .rounds-label { margin-top: var(--space-2); font-size: var(--fs-micro); color: var(--muted); letter-spacing: .2em; }
+
+  .timer { width: 100%; margin-top: auto; padding-top: var(--space-5); }
+  .timer-row { display: flex; align-items: baseline; justify-content: space-between; }
+  .timer-num { font-size: var(--fs-h1); line-height: 1.2; letter-spacing: .06em; font-variant-numeric: tabular-nums; }
+  .timer .meta { letter-spacing: .08em; font-variant-numeric: tabular-nums; }
+  .progress { position: relative; height: 1px; margin-top: var(--space-3); background: var(--line); }
+  .progress i { position: absolute; left: 0; top: -.5px; height: 2px; width: 38%; background: var(--primary); }
+
+  .controls { width: 100%; margin-top: var(--space-5); display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: end; }
+  .ctrl { display: flex; flex-direction: column; align-items: center; gap: var(--space-2); font-size: var(--fs-meta); color: var(--muted); letter-spacing: .2em; padding-left: .2em; }
+  .ctrl-btn { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 0 1px var(--line); color: var(--text); background: var(--surface); }
+  .ctrl-main { color: var(--text); }
+  .ctrl-main .ctrl-btn { width: 76px; height: 76px; background: var(--primary); color: var(--on); box-shadow: none; }
+  .ctrl-main .ico { width: 28px; height: 28px; stroke-width: 2; }
+</style>
+</head>
+<body>
+<svg class="sprite" aria-hidden="true">
+  <defs>
+    <filter id="bleed" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation=".7"/></filter>
+    <filter id="cloud" x="-40%" y="-40%" width="180%" height="180%"><feGaussianBlur stdDeviation="16"/></filter>
+  </defs>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
+  <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9.5v5h3.2L11.5 18V6L7.2 9.5z"/><path d="M15 9.5a3.6 3.6 0 0 1 0 5M17.6 7a7.2 7.2 0 0 1 0 10"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 6.5v11M15 6.5v11"/></symbol>
+  <symbol id="i-stop" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="1.5"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M12 4.5a5 5 0 0 0-5 5v3.2L5.5 16h13L17 12.7V9.5a5 5 0 0 0-5-5z"/><path d="M10 18.5a2 2 0 0 0 4 0"/></symbol>
+</svg>
+
+<header class="status" aria-hidden="true">
+  <span class="status-time">9:41</span>
+  <span class="status-icons">
+    <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx=".8"/><rect x="5" y="5.5" width="3" height="6.5" rx=".8"/><rect x="10" y="3" width="3" height="9" rx=".8"/><rect x="15" y="0" width="3" height="12" rx=".8"/></svg>
+    <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1.5 4.3a9.5 9.5 0 0 1 13 0"/><path d="M4 7.1a6 6 0 0 1 8 0"/><circle cx="8" cy="10" r="1.3" fill="currentColor" stroke="none"/></svg>
+    <svg width="27" height="12" viewBox="0 0 27 12"><rect x=".5" y=".5" width="23" height="11" rx="3.2" fill="none" stroke="currentColor" stroke-opacity=".4"/><rect x="2" y="2" width="17" height="8" rx="1.8" fill="currentColor"/><path d="M25 4v4c.8-.3 1.4-1.1 1.4-2s-.6-1.7-1.4-2z" fill="currentColor" fill-opacity=".4"/></svg>
+  </span>
+</header>
+
+<nav class="bar">
+  <a class="icon-btn" href="home.html" aria-label="收起"><svg class="ico"><use href="#i-close"/></svg></a>
+  <div class="bar-title">
+    <b class="head">山间晨雾</b>
+    <span class="meta">方块呼吸 · 晨间唤醒</span>
+  </div>
+  <button class="icon-btn" type="button" aria-label="背景声音"><svg class="ico"><use href="#i-sound"/></svg></button>
+</nav>
+
+<main class="session">
+  <div class="breath" role="img" aria-label="吸气，还剩 1 秒">
+    <svg class="breath-wash" viewBox="0 0 320 320" aria-hidden="true">
+      <circle cx="160" cy="160" r="112" fill="#2F3B37" opacity=".08" filter="url(#cloud)"/>
+      <ellipse cx="122" cy="192" rx="74" ry="52" fill="#2F3B37" opacity=".07" filter="url(#cloud)"/>
+      <ellipse cx="204" cy="128" rx="66" ry="46" fill="#2F3B37" opacity=".06" filter="url(#cloud)"/>
+    </svg>
+    <svg viewBox="0 0 320 320" aria-hidden="true">
+      <circle cx="160" cy="160" r="140" fill="none" stroke="#DAD4C8" stroke-width="1"/>
+      <circle cx="160" cy="160" r="112" fill="none" stroke="#DAD4C8" stroke-width="1" stroke-dasharray="1 6"/>
+      <g fill="none" stroke="#2F3B37" stroke-linecap="round" filter="url(#bleed)" transform="rotate(-90 160 160)">
+        <circle cx="160" cy="160" r="140" stroke-width="7" stroke-opacity=".86" stroke-dasharray="659.7 1000"/>
+        <circle cx="160" cy="160" r="144.2" stroke-width="1.4" stroke-opacity=".34" stroke-dasharray="560 1000" stroke-dashoffset="-12"/>
+        <circle cx="160" cy="160" r="135.8" stroke-width="1.2" stroke-opacity=".3" stroke-dasharray="610 1000" stroke-dashoffset="-6"/>
+      </g>
+      <circle cx="160" cy="20" r="5.2" fill="#2F3B37" fill-opacity=".9" filter="url(#bleed)"/>
+      <circle cx="20" cy="160" r="7" fill="#8C2F2B"/>
+    </svg>
+    <div class="breath-core">
+      <p class="head breath-word">吸气</p>
+      <p class="breath-count">还剩 1 秒</p>
+    </div>
+  </div>
+
+  <ol class="phases" aria-label="方块呼吸节奏">
+    <li class="now"><b>4</b>吸气</li>
+    <li><b>4</b>屏息</li>
+    <li><b>4</b>呼气</li>
+    <li><b>4</b>屏息</li>
+  </ol>
+
+  <p class="guide">用鼻子慢慢吸，让小腹像潮水一样涨起来</p>
+
+  <ol class="rounds" aria-label="第 5 轮，共 8 轮"><li class="done"></li><li class="done"></li><li class="done"></li><li class="done"></li><li class="now"></li><li></li><li></li><li></li></ol>
+  <p class="rounds-label">第 5 轮 · 共 8 轮</p>
+
+  <div class="timer">
+    <div class="timer-row">
+      <p class="head timer-num">06:12</p>
+      <p class="meta">剩余 · 共 10 分钟</p>
+    </div>
+    <div class="progress" aria-hidden="true"><i></i></div>
+  </div>
+
+  <div class="controls">
+    <a class="ctrl" href="journal.html"><span class="ctrl-btn"><svg class="ico"><use href="#i-stop"/></svg></span>结束</a>
+    <button class="ctrl ctrl-main" type="button"><span class="ctrl-btn"><svg class="ico"><use href="#i-pause"/></svg></span>暂停</button>
+    <button class="ctrl" type="button"><span class="ctrl-btn"><svg class="ico"><use href="#i-bell"/></svg></span>提示音</button>
+  </div>
+</main>
+</body>
+</html>

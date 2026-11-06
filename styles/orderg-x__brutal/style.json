@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#FFEF5C",
+    "surface": "#FFFFFF",
+    "text": "#000000",
+    "muted": "#3B3B3B",
+    "line": "#000000",
+    "primary": "#000000",
+    "accent": "#FF5C39",
+    "on": "#FFEF5C",
+    "link": "#1F3FD1"
+  },
+  "head": "MONO",
+  "w": 800,
+  "radius": 0,
+  "shadow": "5px 5px 0 #000000",
+  "dzh": "亮黄底、黑粗框、硬阴影、等宽字",
+  "den": "Bright yellow, thick black borders, hard shadows, monospace",
+  "nzh": "卡片和按钮 3px 黑粗边框加大偏移硬阴影，不模糊；标题用很大的等宽字；亮黄、白、橙红撞色，元素可故意错位叠放；不用渐变、圆角和柔和阴影，链接带下划线",
+  "nen": "3px black borders and big unblurred offset shadows on cards and buttons; large monospace headings; loud yellow, white and red-orange, deliberate offsets and overlaps are fine; no gradients, radius or soft shadows, and links are underlined"
+}

@@ -1,0 +1,32 @@
+/* 周末去哪 · 设计变量（活泼年轻） */
+:root {
+  --color-bg: #FFF7E8;
+  --color-surface: #FFFFFF;
+  --color-text: #1D1B3A;
+  --color-muted: #5D5A82;
+  --color-line: #1D1B3A;
+  --color-primary: #FF6A3D;
+  --color-primary-soft: #FFE0D3;
+  --color-on-primary: #1D1B3A;
+  --color-accent: #1F9E92;
+  --color-accent-soft: #D3EFEB;
+  --color-link: #137167;
+
+  --font-round: "SF Pro Rounded", "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-sans: "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+
+  --text-xs: 10px;
+  --text-sm: 12px;
+  --text-md: 14px;
+  --text-lg: 17px;
+  --text-xl: 20px;
+  --text-2xl: 26px;
+
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-full: 999px;
+
+  --stroke: 2px solid var(--color-line);
+  --shadow: 4px 4px 0 #1D1B3A;
+  --shadow-sm: 2px 2px 0 #1D1B3A;
+}
