@@ -225,6 +225,32 @@ test('同一个名字不能跨类型：检查拒、建目录两边都不收', as
   fs.rmSync(path.join(FAKE, 'styles/alice-1__sample'), { recursive: true })
 })
 
+test('离线种子：只带挑中的模板（每种类型一套）、全部风格卡、文件和目录对得上；挑错了报错', async () => {
+  const { buildSeed } = await import('../scripts/build-seed.mjs')
+  putEntry('templates/alice-1__seeda', goodFiles())
+  putEntry('templates/alice-1__seedb', goodFiles({ title: { zh: '抹茶二号', en: 'Matcha Two' } }))
+  putEntry('styles/alice-1__seedmint', { 'design.json': { format: 1, type: 'style', title: { zh: '薄荷', en: 'Mint' }, description: { zh: '清爽的薄荷绿' }, license: 'CC0-1.0', author: { login: 'alice-1', id: 42 }, ai: { generated: true, tool: 'dsh-design-studio@0.11.0' } }, 'style.json': { c: { bg: '#ffffff', surface: '#f4fbf8', text: '#10221b', muted: '#3f5a50', line: '#d6e7e0', primary: '#1f7a5c', accent: '#f2a541', on: '#ffffff', link: '#1f7a5c' }, head: 'ROUND', w: 700, radius: 12, shadow: 'none' } })
+  const out = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-seed-'))
+  const seed = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-seed-out-'))
+  try {
+    const b = await build({ out, render: false })
+    assert.ok(!b.skipped.some((x) => /seed/.test(x.id)), JSON.stringify(b.skipped))
+    const r = buildSeed({ from: out, out: seed, pick: { templates: ['alice-1__seeda'] } })
+    assert.equal(r.designs, 1)
+    const ix = JSON.parse(fs.readFileSync(path.join(seed, 'index.json'), 'utf8'))
+    assert.deepEqual(ix.designs.map((e) => e.id), ['alice-1__seeda'])
+    assert.deepEqual(ix.systems, [])
+    assert.ok(ix.styles.some((e) => e.id === 'alice-1__seedmint'))
+    const e = ix.designs[0]
+    for (const f of e.files) assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(seed, e.pack.path, f.p))).digest('hex'), f.sha256)
+    assert.ok(b.index.designs.some((x) => x.id === 'alice-1__seedb'))
+    assert.throws(() => buildSeed({ from: out, out: seed, pick: { templates: ['alice-1__seeda', 'alice-1__seedb'] } }), /每种类型只挑一套/)
+    assert.throws(() => buildSeed({ from: out, out: seed, pick: { templates: ['alice-1__nope'] } }), /没有/)
+  } finally {
+    for (const d of [out, seed, path.join(FAKE, 'templates/alice-1__seeda'), path.join(FAKE, 'templates/alice-1__seedb'), path.join(FAKE, 'styles/alice-1__seedmint')]) fs.rmSync(d, { recursive: true, force: true })
+  }
+})
+
 test('改动列表：-z 格式（中文名原样）、只列合法的设计目录', () => {
   const z = ['A', 'templates/alice-1__matcha/assets/抹茶 图.svg', 'M', 'templates/alice-1__matcha/home.html', 'D', 'styles/bob__mint/style.json', 'R100', 'templates/a__old/x.html', 'templates/a__new1/x.html', 'A', 'templates/Bad Name/a.html', 'M', 'README.md', ''].join('\0')
   const c = parseChanged(Buffer.from(z))
@@ -727,6 +753,7 @@ test('维护者命令：解析、改规矩文件', () => {
   assert.equal(parseCommand('hello'), null)
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-pol-'))
   fs.cpSync(path.join(REAL, 'policy'), path.join(root, 'policy'), { recursive: true })
+  fs.writeFileSync(path.join(root, 'policy/featured.json'), '[]') // 真的精选单子有内容，这里从空的开始
   const now = new Date('2026-11-06T00:00:00Z')
   assert.equal(applyPolicy({ action: 'takedown', id: 'a__bcd', reason: 'policy' }, { root, now }), 'policy/denylist.json')
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(root, 'policy/denylist.json'))), [{ id: 'a__bcd', at: '2026-11-06T00:00:00.000Z', reason: 'policy' }])
