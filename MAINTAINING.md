@@ -41,10 +41,17 @@
 
 ## 换签名钥匙
 
-1. 本机生成新钥匙：`node scripts/sign.mjs keygen ~/新钥匙.pem`，记下打出来的公钥。
-2. 先发一版设计台，把新公钥加进它钉的公钥列表（旧的先留着）。等一周大家都更新了。
-3. `policy/keys.json` 里加上新公钥；GitHub 仓库 Settings → Environments → publish → 把 `GALLERY_SIGNING_KEY` 换成新私钥。
-4. 下一版设计台再去掉旧公钥。
+插件里钉了两把公钥：现用的，和一把备用的（备用私钥在维护者自己手上，没放进 GitHub）。
+
+**平常换（或现用私钥泄露了）：换成备用的那把**
+
+1. GitHub 仓库 Settings → Environments → publish → 把 `GALLERY_SIGNING_KEY` 换成备用私钥；`policy/keys.json` 换成备用公钥，推到 main。下一次发布起就用它签，已经装了的插件都认。
+2. 再生成一把新的备用：`node scripts/sign.mjs keygen ~/新备用.pem`，记下公钥。下一版设计台把旧的现用公钥换成新备用公钥。
+
+**两把都不能用了（备用私钥也丢了）**
+
+1. 生成新钥匙，先发一版设计台把新公钥加进钉的列表，等一周大家都更新了。
+2. 再照上面第 1 步换掉 GitHub 里的私钥和 `policy/keys.json`。
 
 ## 第一次配置（只做一次）
 
