@@ -1,0 +1,42 @@
+:root {
+  --color-bg: #F4EFE4;
+  --color-surface: #FFFDF7;
+  --color-text: #2A2622;
+  --color-muted: #5C554C;
+  --color-line: #D9CFBE;
+  --color-primary: #B23A48;
+  --color-accent: #2F6E8E;
+  --color-on: #FFF6E8;
+  --color-link: #2F6E8E;
+  --color-kraft: #D3B588;
+  --color-news: #ECE4D1;
+  --color-mustard: #E0A53C;
+  --color-tape: rgba(231, 216, 170, .82);
+  --color-rule: #E8DFCF;
+
+  --font-head: "Songti SC", "Noto Serif SC", "Source Han Serif SC", "STSong", serif;
+  --font-sans: "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-hand: "Kaiti SC", "STKaiti", "KaiTi", "Songti SC", serif;
+  --font-type: "American Typewriter", "Courier New", ui-monospace, monospace;
+  --font-num: "Iowan Old Style", Georgia, "Songti SC", serif;
+  --weight-head: 900;
+
+  --text-sm: 24px;
+  --text-md: 28px;
+  --text-lg: 40px;
+  --text-act: 58px;
+  --text-tile: 112px;
+  --text-hero: 400px;
+
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --safe: 56px;
+
+  --radius: 4px;
+  --shadow: drop-shadow(2px 3px 0 rgba(42, 38, 34, .16));
+  --shadow-lift: drop-shadow(3px 6px 0 rgba(42, 38, 34, .14));
+}
