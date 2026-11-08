@@ -1,0 +1,49 @@
+/* 甲上 · 设计变量（柔光凸起） */
+:root {
+  --color-bg: #E9EDF2;
+  --color-surface: #E9EDF2;
+  --color-well: #E3E8EE;
+  --color-hi: #FFFFFF;
+  --color-lo: #C8CED6;
+  --color-text: #2D3440;
+  --color-muted: #556072;
+  --color-faint: #7A8496;
+  --color-line: #D3D9E1;
+  --color-primary: #3E5BD8;
+  --color-primary-deep: #2E46B4;
+  --color-primary-soft: #DCE3F8;
+  --color-on-primary: #FFFFFF;
+  --color-accent: #22A06B;
+  --color-accent-deep: #157548;
+  --color-accent-soft: #D3EADF;
+  --color-link: #3E5BD8;
+
+  --font-round: "SF Pro Rounded", ui-rounded, "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-num: "SF Pro Rounded", ui-rounded, -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-md: 13px;
+  --text-body: 15px;
+  --text-lg: 17px;
+  --text-xl: 20px;
+  --text-2xl: 26px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-full: 999px;
+
+  --shadow: 6px 6px 14px #C8CED6, -6px -6px 14px #FFFFFF;
+  --shadow-sm: 3px 3px 7px #C8CED6, -3px -3px 7px #FFFFFF;
+  --shadow-in: inset 4px 4px 9px #C8CED6, inset -4px -4px 9px #FFFFFF;
+  --shadow-in-sm: inset 2px 2px 5px #C8CED6, inset -2px -2px 5px #FFFFFF;
+  --shadow-primary: 4px 6px 14px rgba(62, 91, 216, .32), -4px -4px 10px #FFFFFF;
+}
