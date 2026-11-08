@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "美拉德",
+    "en": "Maillard"
+  },
+  "description": {
+    "zh": "焦糖、咖啡、奶茶一路棕，温暖克制",
+    "en": "Caramel, coffee and milk-tea browns, warm and restrained"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "claude-opus-5-5"
+  }
+}
