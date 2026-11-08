@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "蓝图线稿",
+    "en": "Blueprint"
+  },
+  "description": {
+    "zh": "网格底、细线框、尺寸标注，像工程图纸",
+    "en": "Grid paper, hairline frames and dimension marks, like a technical drawing"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "claude-opus-5-5"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "c": {
+    "bg": "#F4F7FB",
+    "surface": "#FFFFFF",
+    "text": "#0E1A2B",
+    "muted": "#4A5A70",
+    "line": "#B9C8DC",
+    "primary": "#1748C9",
+    "accent": "#E8590C",
+    "on": "#FFFFFF",
+    "link": "#1748C9"
+  },
+  "head": "MONO",
+  "w": 700,
+  "radius": 0,
+  "shadow": "none",
+  "dzh": "网格底、细线框、尺寸标注，像工程图纸",
+  "den": "Grid paper, hairline frames and dimension marks, like a technical drawing",
+  "nzh": "把结构露出来：细线框、网格底、尺寸标注和编号，像工程图纸；只用一个主蓝和一个警示橙，其余全靠线；块不加阴影不加圆角，用 1px 线分区；数字、标签用等宽字，标题可以很大",
+  "nen": "Expose the structure: hairlines, grid paper, dimension marks and numbering; one blue plus one warning orange, everything else is line work; no shadows or radii, split areas with 1px rules; monospace for numbers and labels, headings can go big",
+  "bgImage": "repeating-linear-gradient(0deg, #E4EBF4 0, #E4EBF4 1px, transparent 1px, transparent 24px), repeating-linear-gradient(90deg, #E4EBF4 0, #E4EBF4 1px, transparent 1px, transparent 24px)"
+}
