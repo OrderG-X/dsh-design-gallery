@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#F3E9DC",
+    "surface": "#FBF6EF",
+    "text": "#2E1E14",
+    "muted": "#6A5546",
+    "line": "#E2D2BF",
+    "primary": "#7A4A2A",
+    "accent": "#6B7B3A",
+    "on": "#FFFFFF",
+    "link": "#8A4B22"
+  },
+  "head": "SERIF",
+  "w": 600,
+  "radius": 12,
+  "shadow": "0 8px 24px rgba(74,44,24,.12)",
+  "dzh": "焦糖、咖啡、奶茶一路棕，温暖克制",
+  "den": "Caramel, coffee and milk-tea browns, warm and restrained",
+  "nzh": "整套只用焦糖、咖啡、奶茶、燕麦这一路棕色，深浅拉开层次；点缀色最多一个（橄榄绿或酒红），面积很小；标题用衬线，正文无衬线，留白多显得高级；适合咖啡、秋冬穿搭、家居、香氛",
+  "nen": "Only the caramel-coffee-milk-tea-oat range of browns, with clear light and dark steps; at most one small accent (olive or wine); serif headings, sans body, generous white space; suits coffee, autumn fashion, home and fragrance"
+}
