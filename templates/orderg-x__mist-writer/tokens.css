@@ -1,0 +1,50 @@
+:root {
+  --bg: #F7F2F7;
+  --surface: #FFFFFF;
+  --paper: rgba(255, 255, 255, .78);
+  --veil: rgba(255, 255, 255, .5);
+  --veil-2: rgba(255, 255, 255, .66);
+  --text: #2A2235;
+  --muted: #5E5470;
+  --line: #E9DDEB;
+  --line-soft: rgba(201, 176, 210, .32);
+  --primary: #A23B72;
+  --primary-soft: rgba(162, 59, 114, .1);
+  --accent: #4F7CAC;
+  --on: #FFFFFF;
+  --link: #5B4FA8;
+
+  --pink: #FFD3E6;
+  --lilac: #E4D8FF;
+  --sky: #D3E4FF;
+  --glow-pink: rgba(255, 196, 223, .75);
+  --glow-lilac: rgba(214, 196, 255, .7);
+  --glow-sky: rgba(186, 214, 255, .7);
+
+  --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, sans-serif;
+  --serif: "Iowan Old Style", "Songti SC", "Noto Serif SC", "STSong", "Source Han Serif SC", serif;
+
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-md: 15px;
+  --fs-body: 17px;
+  --fs-h2: 22px;
+  --fs-xl: 40px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  --radius: 24px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
+  --radius-xs: 8px;
+  --shadow: 0 0 40px rgba(214, 160, 214, .35);
+  --shadow-soft: 0 8px 30px rgba(170, 130, 190, .14);
+  --halo: 0 0 18px rgba(255, 190, 222, .9);
+  --ease: cubic-bezier(.2, .8, .2, 1);
+}

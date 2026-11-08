@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="desktop mac">
+<title>写作 · 雾笺</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app.css">
+<style>
+.mist .g1 { width: 560px; height: 440px; left: -160px; top: -140px; background: var(--glow-pink); }
+.mist .g2 { width: 520px; height: 520px; left: 640px; top: 260px; background: var(--glow-lilac); opacity: .8; }
+.mist .g3 { width: 480px; height: 420px; left: -120px; top: 560px; background: var(--glow-sky); }
+.mist .g4 { width: 420px; height: 360px; left: 980px; top: -120px; background: var(--glow-sky); opacity: .75; }
+
+.win { position: relative; z-index: 1; display: grid; grid-template-columns: 256px minmax(0, 1fr) 288px; height: 100vh; }
+
+.side { display: flex; flex-direction: column; padding: 12px 16px 16px; min-height: 0; }
+.side-top { height: 40px; display: flex; justify-content: flex-end; align-items: center; }
+.brand { display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 4px; }
+.brand b { font: 300 var(--fs-h2)/1 var(--serif); letter-spacing: .12em; text-shadow: var(--halo); }
+.brand .ib { margin-left: auto; }
+.search { margin-top: 12px; height: 36px; display: flex; align-items: center; gap: 8px; padding: 0 8px 0 12px; border-radius: 999px; background: var(--veil); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .85); color: var(--muted); }
+.search span { flex: 1; white-space: nowrap; }
+.lbl { display: flex; align-items: center; height: 20px; margin: 20px 8px 6px; font-size: var(--fs-xs); color: var(--muted); letter-spacing: .14em; white-space: nowrap; }
+.lbl .ib { margin-left: auto; width: 24px; height: 24px; margin-right: -4px; }
+.folders a { display: flex; align-items: center; gap: 10px; height: 32px; padding: 0 10px; border-radius: 12px; white-space: nowrap; transition: background .2s var(--ease); }
+.folders a:hover { background: var(--veil); }
+.folders svg { color: var(--muted); }
+.folders .n { margin-left: auto; font-size: var(--fs-xs); color: var(--muted); }
+.folders .on { background: var(--veil-2); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), 0 0 24px rgba(245, 180, 214, .35); font-weight: 500; }
+.folders .on svg { color: var(--primary); }
+
+.drafts { display: flex; flex-direction: column; gap: 4px; }
+.draft { display: block; padding: 9px 12px 10px; border-radius: 16px; transition: background .2s var(--ease); }
+.draft:hover { background: var(--veil); }
+.draft .t { display: flex; align-items: baseline; gap: 8px; }
+.draft .t b { font: 400 var(--fs-md)/1.4 var(--serif); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.draft .t span { margin-left: auto; font-size: var(--fs-xs); color: var(--muted); white-space: nowrap; }
+.draft p { margin-top: 2px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.draft.on { background: var(--surface); box-shadow: 0 0 0 1px rgba(255, 255, 255, .9), 0 6px 28px rgba(220, 160, 205, .32); }
+.draft.on .t b { color: var(--primary); }
+
+.streak { margin-top: auto; padding: 14px 16px; border-radius: 20px; background: var(--veil); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .8); }
+.streak .row { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+.streak .row b { font: 400 var(--fs-md)/1 var(--serif); }
+.streak .row span { margin-left: auto; font-size: var(--fs-xs); color: var(--muted); }
+.week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 12px; }
+.week span { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: var(--fs-xs); color: var(--muted); }
+.week i { width: 22px; height: 22px; border-radius: 50%; background: rgba(233, 221, 235, .7); }
+.week .l1 { background: linear-gradient(135deg, #FFE2EE, #EDE3FF); }
+.week .l2 { background: linear-gradient(135deg, #FFC9E0, #DCCBFF); }
+.week .l3 { background: linear-gradient(135deg, #F49AC4, #B9A2F2); box-shadow: 0 0 12px rgba(240, 150, 200, .55); }
+.week .today { color: var(--primary); font-weight: 500; }
+
+.desk { display: flex; flex-direction: column; min-width: 0; padding: 0 0 16px; }
+.bar { height: 52px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 4px 0 8px; }
+.crumb { display: flex; align-items: center; gap: 6px; color: var(--muted); white-space: nowrap; }
+.crumb svg.i { width: 14px; height: 14px; }
+.crumb b { color: var(--text); font-weight: 500; }
+.bar .tag { margin-left: 4px; }
+.spacer { flex: 1; }
+.sync { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-xs); color: var(--muted); white-space: nowrap; margin-right: 4px; }
+.sync svg { color: var(--accent); }
+
+.sheet { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; background: var(--paper); border-radius: var(--radius); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .9), var(--shadow); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px); overflow: hidden; }
+.page { flex: 1; min-height: 0; overflow: hidden; padding: 44px 0 0; }
+.col { position: relative; width: 568px; margin: 0 auto; }
+.kick { font-size: var(--fs-xs); color: var(--muted); letter-spacing: .1em; white-space: nowrap; }
+.col h1 { margin-top: 10px; font: 300 var(--fs-xl)/1.25 var(--serif); letter-spacing: .08em; text-shadow: 0 0 24px rgba(255, 186, 220, .85); }
+.epi { margin-top: 14px; padding-left: 14px; font: 400 var(--fs-md)/1.7 var(--serif); color: var(--muted); border-left: 2px solid transparent; border-image: linear-gradient(#F4A9CB, #B8C9F5) 1; }
+.prose { margin-top: 26px; font: 400 var(--fs-body)/1.92 var(--serif); }
+.prose p { position: relative; text-indent: 2em; margin-bottom: 12px; text-align: justify; }
+.prose h2 { margin: 26px 0 10px; font: 300 var(--fs-h2)/1.4 var(--serif); letter-spacing: .06em; text-shadow: 0 0 18px rgba(255, 196, 223, .9); }
+.prose mark { background: linear-gradient(transparent 58%, rgba(255, 190, 220, .75) 58%); color: inherit; padding: 0 1px; }
+.prose .cm { text-decoration: underline dotted var(--link); text-decoration-thickness: 1.5px; text-underline-offset: 6px; }
+.prose .now { position: relative; }
+.gut { position: absolute; display: grid; place-items: center; color: var(--muted); text-indent: 0; line-height: 1; }
+.gut.drag { left: -40px; top: 4px; width: 24px; height: 24px; border-radius: 8px; background: var(--veil-2); }
+.gut.cmt { right: -66px; top: 36px; gap: 4px; display: flex; align-items: center; height: 26px; padding: 0 9px 0 7px; border-radius: 999px; background: var(--surface); color: var(--link); box-shadow: 0 4px 16px rgba(150, 130, 210, .22); font-size: var(--fs-xs); font-weight: 500; }
+.gut.cmt svg { width: 14px; height: 14px; }
+
+.foot { height: 40px; flex: none; display: flex; align-items: center; gap: 16px; padding: 0 20px; font-size: var(--fs-xs); color: var(--muted); white-space: nowrap; box-shadow: 0 -1px 0 var(--line-soft); background: rgba(255, 255, 255, .45); }
+.foot b { color: var(--text); font-weight: 500; }
+.foot .dot { width: 6px; height: 6px; border-radius: 50%; background: #9FC7A8; box-shadow: 0 0 6px #9FC7A8; }
+.foot .r { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+
+.panel { display: flex; flex-direction: column; gap: 12px; padding: 0 16px 16px 16px; min-height: 0; }
+.panel-top { height: 52px; flex: none; display: flex; align-items: center; justify-content: flex-end; gap: 6px; margin-bottom: -12px; }
+.me { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; font: 400 var(--fs-xs)/1 var(--serif); color: var(--text); background: linear-gradient(135deg, #FFD9EA, #D9E4FF); box-shadow: 0 0 0 2px #fff; }
+
+.goal { padding: 16px 18px 16px; }
+.ring { position: relative; width: 132px; height: 132px; margin: 8px auto 0; }
+.ring svg { width: 132px; height: 132px; transform: rotate(-90deg); }
+.ring .c { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.ring .c b { font: 400 var(--fs-h2)/1.1 var(--serif); letter-spacing: .02em; }
+.ring .c span { font-size: var(--fs-xs); color: var(--muted); }
+.goal .left { margin-top: 8px; text-align: center; font-size: var(--fs-xs); color: var(--muted); }
+.goal .left b { color: var(--primary); font-weight: 500; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 14px; padding-top: 12px; box-shadow: 0 -1px 0 var(--line-soft); }
+.stats div { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.stats b { font: 400 var(--fs-body)/1.2 var(--serif); white-space: nowrap; }
+.stats span { font-size: var(--fs-xs); color: var(--muted); white-space: nowrap; }
+
+.outline { padding: 14px 10px 10px; }
+.outline .card-h { padding: 0 8px; margin-bottom: 6px; }
+.outline li > a { display: flex; align-items: center; gap: 10px; height: 32px; padding: 0 8px; border-radius: 12px; white-space: nowrap; }
+.outline li > a:hover { background: var(--veil-2); }
+.outline .k { width: 18px; height: 18px; border-radius: 50%; flex: none; display: grid; place-items: center; box-shadow: inset 0 0 0 1.5px var(--line); }
+.outline .k svg { width: 12px; height: 12px; stroke-width: 2.2; color: #fff; }
+.outline .done .k { background: linear-gradient(135deg, #F4A9CB, #B9A7F0); box-shadow: none; }
+.outline .cur > a { background: var(--surface); box-shadow: 0 4px 20px rgba(230, 160, 205, .3); }
+.outline .cur .k { box-shadow: inset 0 0 0 1.5px var(--primary); }
+.outline .cur .k::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--primary); }
+.outline .nm { font-family: var(--serif); font-size: var(--fs-md); }
+.outline .w { margin-left: auto; font-size: var(--fs-xs); color: var(--muted); }
+.outline .todo .nm { color: var(--muted); }
+.outline .todo .k { box-shadow: inset 0 0 0 1.5px var(--line); background: repeating-linear-gradient(45deg, transparent 0 3px, rgba(233, 221, 235, .9) 3px 4px); }
+.outline .sub { margin: 2px 0 4px 36px; }
+.outline .sub a { display: flex; align-items: center; height: 26px; gap: 8px; color: var(--muted); white-space: nowrap; }
+.outline .sub a::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: currentColor; opacity: .6; }
+.outline .sub .here { color: var(--primary); }
+
+.fmt { position: absolute; left: -6px; top: 76px; display: flex; align-items: center; gap: 2px; height: 40px; padding: 0 6px; border-radius: 999px; background: rgba(255, 255, 255, .92); box-shadow: 0 0 0 1px rgba(255, 255, 255, .95), 0 10px 32px rgba(200, 140, 190, .3); text-indent: 0; font: 400 var(--fs-sm)/1 var(--font); white-space: nowrap; }
+.fmt::before { content: ""; position: absolute; left: 56px; top: -5px; width: 10px; height: 10px; transform: rotate(45deg); background: #fff; border-radius: 2px; }
+.fmt a { position: relative; height: 28px; min-width: 28px; padding: 0 6px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; gap: 4px; color: var(--muted); }
+.fmt a:hover { background: var(--bg); color: var(--text); }
+.fmt .b { font-weight: 700; color: var(--text); }
+.fmt .it { font-family: var(--serif); font-style: italic; }
+.fmt .on { color: var(--primary); background: var(--primary-soft); }
+.fmt .sw { width: 14px; height: 14px; border-radius: 50%; }
+.fmt .sep { width: 1px; height: 18px; margin: 0 4px; background: var(--line); }
+.fmt svg.i { width: 14px; height: 14px; }
+.idea { padding: 14px 18px 16px; }
+.idea p { margin-top: 6px; font: 400 var(--fs-md)/1.7 var(--serif); }
+.idea .src { margin-top: 6px; display: flex; align-items: center; gap: 6px; font-size: var(--fs-xs); color: var(--muted); white-space: nowrap; }
+.idea .src svg { width: 14px; height: 14px; }
+</style>
+</head>
+<body>
+<div class="mist" aria-hidden="true"><i class="g1"></i><i class="g2"></i><i class="g3"></i><i class="g4"></i></div>
+<div class="win">
+  <aside class="side" aria-label="文稿">
+    <div class="side-top"><a class="ib" href="#" title="收起侧栏"><svg class="i" aria-hidden="true"><use href="icons.svg#sidebar"></use></svg></a></div>
+    <div class="brand">
+      <span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 10c2.5-2 5-2 8 0s5.5 2 8 0"/><path d="M6 15c2-1.5 4-1.5 6 0s4 1.5 6 0"/></svg></span>
+      <b>雾笺</b>
+      <a class="ib" href="#" title="新文稿"><svg class="i" aria-hidden="true"><use href="icons.svg#plus"></use></svg></a>
+    </div>
+    <div class="search"><svg class="i" aria-hidden="true"><use href="icons.svg#search"></use></svg><span>搜索文稿与句子</span><kbd>⌘K</kbd></div>
+
+    <div class="lbl">文集</div>
+    <nav class="folders" aria-label="文集">
+      <a href="#"><svg class="i" aria-hidden="true"><use href="icons.svg#docs"></use></svg>全部文稿<span class="n num">128</span></a>
+      <a href="write.html" class="on"><svg class="i" aria-hidden="true"><use href="icons.svg#folder"></use></svg>散文集 · 冬<span class="n num">14</span></a>
+      <a href="#"><svg class="i" aria-hidden="true"><use href="icons.svg#folder"></use></svg>读书札记<span class="n num">36</span></a>
+      <a href="#"><svg class="i" aria-hidden="true"><use href="icons.svg#folder"></use></svg>旅途手记<span class="n num">21</span></a>
+      <a href="#"><svg class="i" aria-hidden="true"><use href="icons.svg#star"></use></svg>收藏的句子<span class="n num">57</span></a>
+    </nav>
+
+    <div class="lbl">最近编辑<a class="ib" href="#" title="排序"><svg class="i" aria-hidden="true"><use href="icons.svg#sort"></use></svg></a></div>
+    <div class="drafts">
+      <a class="draft on" href="write.html"><div class="t"><b>雾里的灯</b><span>刚刚</span></div><p>我提着那盏灯走回渡口，雾里有人向我点头。</p></a>
+      <a class="draft" href="#"><div class="t"><b>冬至前的面馆</b><span>昨天</span></div><p>汤是凌晨四点开始熬的，窗上的水汽…</p></a>
+      <a class="draft" href="#"><div class="t"><b>晾在阳台的毛衣</b><span>11月5日</span></div><p>晒过太阳的毛线，有一种很软的味道。</p></a>
+      <a class="draft" href="#"><div class="t"><b>河面结冰的第一天</b><span>10月30日</span></div><p>冰很薄，薄到能看见底下慢慢走的水。</p></a>
+    </div>
+
+    <div class="streak">
+      <div class="row"><b>连续写作 12 天</b><span>本周 4,180 字</span></div>
+      <div class="week">
+        <span><i class="l2"></i>一</span><span><i class="l1"></i>二</span><span><i class="l3"></i>三</span><span><i class="l1"></i>四</span><span><i class="l2"></i>五</span><span><i class="l2"></i>六</span><span class="today"><i class="l3"></i>日</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="desk">
+    <header class="bar">
+      <div class="crumb"><svg class="i" aria-hidden="true"><use href="icons.svg#folder"></use></svg>散文集 · 冬<svg class="i" aria-hidden="true"><use href="icons.svg#chev-r"></use></svg><b>雾里的灯</b></div>
+      <span class="tag">第三稿</span>
+      <span class="spacer"></span>
+      <span class="sync"><svg class="i" aria-hidden="true"><use href="icons.svg#cloud"></use></svg>已同步 · 刚刚</span>
+      <a class="ib" href="#" title="排版"><svg class="i" aria-hidden="true"><use href="icons.svg#type"></use></svg></a>
+      <a class="ib" href="#" title="批注"><svg class="i" aria-hidden="true"><use href="icons.svg#note"></use></svg></a>
+      <a class="pill glow" href="focus.html"><svg class="i" aria-hidden="true"><use href="icons.svg#focus"></use></svg>专注模式</a>
+      <a class="ib" href="#" title="分享"><svg class="i" aria-hidden="true"><use href="icons.svg#share"></use></svg></a>
+      <a class="ib" href="#" title="更多"><svg class="i" aria-hidden="true"><use href="icons.svg#more"></use></svg></a>
+    </header>
+
+    <section class="sheet" aria-label="编辑器">
+      <div class="page">
+        <div class="col">
+          <div class="kick">11 月 8 日 · 周日 · 清晨 6:40 开始写</div>
+          <h1>雾里的灯</h1>
+          <p class="epi">雾不是来藏东西的，它只是让一切慢下来。</p>
+          <div class="prose">
+            <p>十一月的早晨，雾总比人先醒。推开窗，对面的屋顶只剩一条浅浅的灰线，像有人用铅笔描过，又后悔了，拿橡皮擦去了一半。</p>
+            <p>楼下早点铺的灯已经亮了。旧式的灯罩上有一道裂纹，光从裂纹里漏出来，在雾里化成一团毛茸茸的橘色。老板娘说，这盏灯比她女儿还大两岁。</p>
+            <h2>二、渡口</h2>
+            <p>去渡口要走二十分钟。雾里的路没有远近，只有前后：前面一盏灯，后面一盏灯，中间是我。每走过一盏，<span class="cm">它就从一个光点慢慢变成一个人的轮廓</span>：修车的、卖豆浆的、背着书包打哈欠的孩子。<span class="gut cmt"><svg class="i" aria-hidden="true"><use href="icons.svg#note"></use></svg>1</span></p>
+            <p class="now"><span class="gut drag"><svg class="i" aria-hidden="true"><use href="icons.svg#drag"></use></svg></span>渡船的汽笛响了两声。我忽然想，雾也许并不是要把世界藏起来，<mark>它只是把世界放慢</mark>，慢到我们终于肯看清一盏灯<span class="caret"></span>
+              <span class="fmt" aria-label="格式"><a class="b" href="#">B</a><a class="it" href="#">I</a><a class="it" href="#" title="引用">“”</a><i class="sep"></i><a class="on" href="#" title="粉雾高亮"><i class="sw" style="background:#FFC4DE"></i>高亮</a><a href="#" title="雾紫"><i class="sw" style="background:#DCCFFF"></i></a><a href="#" title="天蓝"><i class="sw" style="background:#C9DCFF"></i></a><i class="sep"></i><a href="#"><svg class="i" aria-hidden="true"><use href="icons.svg#note"></use></svg>批注</a><a href="#"><svg class="i" aria-hidden="true"><use href="icons.svg#search"></use></svg>查词</a></span></p>
+          </div>
+        </div>
+      </div>
+      <div class="foot">
+        <span><b class="num">2,846</b> 字</span><span>约 9 分钟读完</span><span>第 4 段 · 第 2 节</span>
+        <div class="r"><span>宋体 · 17</span><span style="display:inline-flex;align-items:center;gap:6px"><i class="dot"></i>自动保存于 08:26</span></div>
+      </div>
+    </section>
+  </main>
+
+  <aside class="panel" aria-label="写作进度">
+    <div class="panel-top">
+      <a class="ib" href="#" title="夜间"><svg class="i" aria-hidden="true"><use href="icons.svg#moon"></use></svg></a>
+      <span class="me" title="小禾">禾</span>
+    </div>
+
+    <section class="card goal">
+      <div class="card-h"><h3>字数目标</h3><span class="r">本篇 4,000 字</span></div>
+      <div class="ring">
+        <svg viewBox="0 0 132 132" aria-hidden="true">
+          <defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F49AC4"/><stop offset=".55" stop-color="#C3A6F2"/><stop offset="1" stop-color="#8FB3EE"/></linearGradient></defs>
+          <circle cx="66" cy="66" r="56" fill="none" stroke="#F1E6F3" stroke-width="10"/>
+          <circle cx="66" cy="66" r="56" fill="none" stroke="url(#rg)" stroke-width="10" stroke-linecap="round" stroke-dasharray="249.8 351.9"/>
+        </svg>
+        <div class="c"><b class="num">2,846</b><span>已完成 71%</span></div>
+      </div>
+      <p class="left">还差 <b class="num">1,154</b> 字，照今天的速度约 40 分钟</p>
+      <div class="stats">
+        <div><b class="num">+612</b><span>今日</span></div>
+        <div><b class="num">48′</b><span>专注</span></div>
+        <div><b class="num">3</b><span>稿次</span></div>
+      </div>
+    </section>
+
+    <section class="card outline">
+      <div class="card-h"><h3>大纲</h3><span class="r">4 节</span></div>
+      <ul>
+        <li class="done"><a href="#"><span class="k"><svg class="i" aria-hidden="true"><use href="icons.svg#check"></use></svg></span><span class="nm">一、清晨六点</span><span class="w num">612</span></a></li>
+        <li class="cur"><a href="#"><span class="k"></span><span class="nm">二、渡口</span><span class="w num">1,138</span></a>
+          <div class="sub"><a href="#">二十分钟的路</a><a href="#" class="here">汽笛响了两声</a></div>
+        </li>
+        <li><a href="#"><span class="k"></span><span class="nm">三、卖灯的人</span><span class="w num">1,096</span></a></li>
+        <li class="todo"><a href="#"><span class="k"></span><span class="nm">四、雾散之后</span><span class="w">待写</span></a></li>
+      </ul>
+    </section>
+
+    <section class="card idea">
+      <div class="card-h"><h3>灵感便签</h3><span class="r">3 条</span></div>
+      <p>灯芯烧过的味道，像烤橘子皮。老板娘说那是雾天的香。</p>
+      <div class="src"><svg class="i" aria-hidden="true"><use href="icons.svg#leaf"></use></svg>11 月 6 日 · 记于手机</div>
+    </section>
+  </aside>
+</div>
+</body>
+</html>

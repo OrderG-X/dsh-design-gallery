@@ -1,0 +1,49 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": {
+    "zh": "雾笺 写作",
+    "en": "Mist Writer"
+  },
+  "description": {
+    "zh": "粉雾光晕、留白很多的 Mac 长文写作软件：写作页有文稿侧栏、正在写的散文、字数目标环和大纲，专注模式全屏柔光、打字机高亮当前行并带番茄计时",
+    "en": "A hazy-pink, airy Mac writing app: drafts sidebar, an essay in progress with word-goal ring and outline, and a full-window focus mode with typewriter highlight and timer"
+  },
+  "kind": "desktop",
+  "os": "mac",
+  "screens": [
+    {
+      "file": "write.html",
+      "title": {
+        "zh": "写作",
+        "en": "Writing"
+      }
+    },
+    {
+      "file": "focus.html",
+      "title": {
+        "zh": "专注模式",
+        "en": "Focus mode"
+      }
+    }
+  ],
+  "style": "custom",
+  "categories": [
+    "media"
+  ],
+  "tags": [
+    "article",
+    "list",
+    "detail"
+  ],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "claude-opus-5-5"
+  }
+}
