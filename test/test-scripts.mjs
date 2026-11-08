@@ -741,6 +741,60 @@ test('发布：截图从无权限 job 的产物来，只收真图、不超大小
   assert.ok(!fs.existsSync(path.join(out, 'packs', x.pack.path, '_shots/menu.jpg')))
 })
 
+test('发布：同一提交再建一次，重截的封面字节变了也沿用旧的，目录哈希不变；内容改了照样发', async () => {
+  const id = 'alice-1__steady'
+  const jpg = Buffer.concat([Buffer.from([0xff, 0xd8, 0xff, 0xe0]), Buffer.alloc(40, 1)])
+  const webp = (n) => Buffer.concat([Buffer.from('RIFF'), Buffer.alloc(4), Buffer.from('WEBP'), Buffer.alloc(20, n)])
+  const h = (buf) => crypto.createHash('sha256').update(buf).digest('hex')
+  // 每次截图 job 的产物：封面字节不一样（浏览器渲染不完全确定），体检数也可能抖
+  const shotsOf = (thumb, check) => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-shots-'))
+    fs.mkdirSync(path.join(dir, id))
+    fs.writeFileSync(path.join(dir, id, 'thumb.webp'), thumb)
+    fs.writeFileSync(path.join(dir, id, 'home.jpg'), jpg)
+    fs.writeFileSync(path.join(dir, id, 'check.json'), JSON.stringify(check))
+    return dir
+  }
+  const now = new Date('2026-11-07T12:00:00Z')
+  putEntry(`templates/${id}`, goodFiles({ title: { zh: '稳稳的' } }))
+  try {
+    const out1 = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-dist-'))
+    const b1 = await build({ out: out1, shotsFrom: shotsOf(webp(1), { severe: 0, warn: 1 }), now })
+    const e1 = b1.index.designs.find((y) => y.id === id)
+    assert.equal(e1.thumb.sha256, h(webp(1)))
+    // 发布流程：prev.mjs 把上一版解到 prev/（index.json + thumbs/），build 的 prevDir 就是那里
+    const prevDir = path.join(out1, 'catalog')
+    const prev = JSON.parse(fs.readFileSync(path.join(prevDir, 'index.json'), 'utf8'))
+    const out2 = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-dist-'))
+    const b2 = await build({ out: out2, prev, prevDir, shotsFrom: shotsOf(webp(2), { severe: 0, warn: 2 }), now })
+    assert.equal(contentSha(b2.index), contentSha(prev)) // 「没变化就不发」拦得住
+    assert.equal(b2.packed, 0)
+    const e2 = b2.index.designs.find((y) => y.id === id)
+    assert.deepEqual(e2.thumb, e1.thumb)
+    assert.deepEqual(e2.check, e1.check)
+    assert.ok(fs.readFileSync(path.join(out2, 'catalog', e2.thumb.p)).equals(webp(1)))
+    // 取不到上一版的封面（或对不上）：用这次截的，目录里的哈希和文件一致
+    const out3 = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-dist-'))
+    const b3 = await build({ out: out3, prev, prevDir: '', shotsFrom: shotsOf(webp(2), { severe: 0, warn: 2 }), now })
+    const e3 = b3.index.designs.find((y) => y.id === id)
+    assert.equal(e3.thumb.sha256, h(webp(2)))
+    assert.deepEqual(e3.check, { severe: 0, warn: 2 })
+    assert.ok(fs.readFileSync(path.join(out3, 'catalog', e3.thumb.p)).equals(webp(2)))
+    // 内容真改了（rev 变）：新封面、新批次，目录哈希变 → 照样发
+    putEntry(`templates/${id}`, goodFiles({ title: { zh: '稳稳的（改版）' } }))
+    const out4 = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-dist-'))
+    const b4 = await build({ out: out4, prev, prevDir, shotsFrom: shotsOf(webp(3), { severe: 0, warn: 0 }), now })
+    const e4 = b4.index.designs.find((y) => y.id === id)
+    assert.notEqual(e4.rev, e1.rev)
+    assert.equal(e4.thumb.sha256, h(webp(3)))
+    assert.deepEqual(e4.check, { severe: 0, warn: 0 })
+    assert.equal(b4.packed, 1)
+    assert.notEqual(contentSha(b4.index), contentSha(prev))
+  } finally {
+    fs.rmSync(path.join(FAKE, 'templates', id), { recursive: true, force: true })
+  }
+})
+
 test('维护者命令：解析、改规矩文件', () => {
   assert.deepEqual(parseCommand('/approve', { isPr: true }), { action: 'merge' })
   assert.equal(parseCommand('/approve', { isPr: false }).action, 'error')

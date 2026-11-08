@@ -4,7 +4,7 @@
  *
  *   node scripts/prev.mjs --out prev/
  *     prev/index.json        上一版目录（没有就不写：第一次发布）
- *     prev/thumbs/*.webp     上一版的封面（这次装不下、整条沿用旧版的条目要用）
+ *     prev/thumbs/*.webp     上一版的封面（rev 没变的条目沿用它，不用这次重截的）
  *     GITHUB_OUTPUT：catalog_version / packs_version（今天第几次：YYYY.MDD.RUN）、prev_sha（上一版 index 的内容哈希，不含 serial / generated）
  */
 

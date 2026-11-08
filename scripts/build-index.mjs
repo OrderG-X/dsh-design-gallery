@@ -14,6 +14,7 @@
  *   - 上一版目录里已经发过的 <id>@<rev> 沿用它的批次版本，不重复打包
  *   - serial 只增不减（插件靠它防「旧目录复活已下架的」）
  *   - 封面和每屏截图的 sha256 + 大小也写进目录（签名覆盖），插件只认对得上的图
+ *   - 已经发过的 <id>@<rev> 沿用上一版的封面、截图和体检数（重新截的图字节会变，不沿用就每晚都「有变化」）
  *   - 发布时截图在另一个 job 里做（--render-only），这边 --shots-from 只收真是 JPEG/WebP、不超大小的图，不开浏览器
  */
 
@@ -233,14 +234,19 @@ export async function build({ out, prev = null, prevDir = '', packsVersion = '',
     packBytes += b
     return true
   }
-  // 沿用上一版的条目：封面从上一版目录包里拿（prev.mjs 解到 prevDir/thumbs/），核对哈希；拿不到就不带封面
+  // 上一版的封面：从上一版目录包里拿（prev.mjs 解到 prevDir/thumbs/），大小和哈希都对得上才算；拿不到给 null
+  const oldThumb = (before) => {
+    const t = before && before.thumb
+    if (!t || t.p !== `thumbs/${before.id}.webp` || !prevDir) return null
+    let buf = null
+    try { buf = fs.readFileSync(path.join(prevDir, t.p)) } catch { return null }
+    return buf.length === t.size && sha(buf) === t.sha256 ? buf : null
+  }
+  // 沿用上一版的条目（封面也用旧的）；拿不到旧封面就不带封面
   const keepOld = (before) => {
     const keep = { ...before }
-    const t = before.thumb
-    const want = `thumbs/${before.id}.webp`
-    let buf = null
-    try { if (t && t.p === want && prevDir) buf = fs.readFileSync(path.join(prevDir, want)) } catch { buf = null }
-    if (buf && buf.length === t.size && sha(buf) === t.sha256) fs.writeFileSync(path.join(catDir, want), buf)
+    const buf = oldThumb(before)
+    if (buf) fs.writeFileSync(path.join(catDir, keep.thumb.p), buf)
     else delete keep.thumb
     return keep
   }
@@ -303,9 +309,13 @@ export async function build({ out, prev = null, prevDir = '', packsVersion = '',
     const got = shotsFrom ? readShots(shotsFrom, e.id, screens, { shots: e.type === 'template' })
       : render ? await shoot(e, m, screens)
         : { thumb: null, shots: [], check: { severe: 0, warn: 0 } }
-    const { shots, thumb } = got
-    entry.check = got.check
     const reuse = before && before.rev === rev && before.pack
+    // 同一个 rev 沿用上一版的渲染结果（封面 + 体检数）：浏览器每次截的封面字节不完全一样，
+    // 不沿用的话目录哈希每晚都变、内容没改也会发新版。上一版没封面或取不到时才用这次截的
+    const prevThumb = reuse ? oldThumb(before) : null
+    const thumb = prevThumb || got.thumb
+    const { shots } = got
+    entry.check = prevThumb && before.check ? before.check : got.check
     if (!reuse && !fits(files, shots)) {
       // 这一批装满了（插件读批次包有文件数、大小上限）：这套下次再发。上一版有旧的就整条沿用旧的（封面也用旧的，
       // 不然目录里的封面哈希对不上文件），没有就先不上目录
