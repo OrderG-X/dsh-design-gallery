@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="tablet">
+<title>读绘本 · 小熊绘本</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="ui.css">
+</head>
+<body>
+  <svg class="defs" aria-hidden="true" focusable="false">
+    <defs>
+      <radialGradient id="g-bear" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#CC946A"/><stop offset="1" stop-color="#8E5B3B"/></radialGradient>
+      <radialGradient id="g-muz" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="#FCE6CC"/><stop offset="1" stop-color="#E3B88E"/></radialGradient>
+      <radialGradient id="g-moon" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FFF6D2"/><stop offset="1" stop-color="#F2C24A"/></radialGradient>
+      <radialGradient id="g-leaf" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#AFE2B6"/><stop offset="1" stop-color="#4C9C6C"/></radialGradient>
+      <radialGradient id="g-red" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FFA493"/><stop offset="1" stop-color="#D95343"/></radialGradient>
+      <radialGradient id="g-orange" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FFBA8C"/><stop offset="1" stop-color="#E06C2C"/></radialGradient>
+      <radialGradient id="g-pink" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FFD3D9"/><stop offset="1" stop-color="#E98595"/></radialGradient>
+      <radialGradient id="g-blue" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#C4E2F8"/><stop offset="1" stop-color="#6AA4D6"/></radialGradient>
+      <radialGradient id="g-yellow" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FFEBA6"/><stop offset="1" stop-color="#EFB02C"/></radialGradient>
+      <radialGradient id="g-green" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#C6EAAE"/><stop offset="1" stop-color="#5FAA60"/></radialGradient>
+      <radialGradient id="g-white" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E9DDD3"/></radialGradient>
+      <radialGradient id="g-soil" cx=".4" cy=".2" r=".9"><stop offset="0" stop-color="#C79C76"/><stop offset="1" stop-color="#8B6042"/></radialGradient>
+      <radialGradient id="g-gray" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#B8ACA6"/><stop offset="1" stop-color="#76685F"/></radialGradient>
+      <radialGradient id="g-plum" cx=".4" cy=".2" r=".9"><stop offset="0" stop-color="#6D62AA"/><stop offset="1" stop-color="#4E4488"/></radialGradient>
+      <path id="star5" d="M12 2.8l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.6 6.6 19.5l1.1-6.1-4.5-4.2 6.1-.8z"/>
+      <path id="spark" d="M0-6Q1.2-1.2 6 0Q1.2 1.2 0 6Q-1.2 1.2-6 0Q-1.2-1.2 0-6z"/>
+      <symbol id="bobo" viewBox="0 0 100 100">
+        <circle cx="22" cy="26" r="14" fill="url(#g-bear)"/><circle cx="22" cy="26" r="7" fill="#E7AE86"/>
+        <circle cx="78" cy="26" r="14" fill="url(#g-bear)"/><circle cx="78" cy="26" r="7" fill="#E7AE86"/>
+        <ellipse cx="50" cy="56" rx="38" ry="34" fill="url(#g-bear)"/>
+        <ellipse cx="38" cy="34" rx="11" ry="5" fill="#fff" opacity=".22" transform="rotate(-18 38 34)"/>
+        <ellipse cx="50" cy="68" rx="17" ry="13" fill="url(#g-muz)"/>
+        <ellipse cx="50" cy="62.5" rx="6.5" ry="4.6" fill="#3A2620"/>
+        <path d="M45 70.5q5 4 10 0" fill="none" stroke="#3A2620" stroke-width="2.4" stroke-linecap="round"/>
+        <circle cx="35" cy="51" r="4.2" fill="#2B1C17"/><circle cx="65" cy="51" r="4.2" fill="#2B1C17"/>
+        <circle cx="36.4" cy="49.6" r="1.4" fill="#fff"/><circle cx="66.4" cy="49.6" r="1.4" fill="#fff"/>
+        <ellipse cx="25" cy="64" rx="6" ry="4" fill="#F0907E" opacity=".55"/><ellipse cx="75" cy="64" rx="6" ry="4" fill="#F0907E" opacity=".55"/>
+      </symbol>
+    </defs>
+  </svg>
+  <svg class="defs" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="g-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6E62B3"/><stop offset=".7" stop-color="#A598DA"/></linearGradient>
+      <radialGradient id="g-tree" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#8ACB9F"/><stop offset="1" stop-color="#3C7C61"/></radialGradient>
+      <radialGradient id="g-trunk" cx=".3" cy=".3" r=".9"><stop offset="0" stop-color="#B98458"/><stop offset="1" stop-color="#7C5034"/></radialGradient>
+      <radialGradient id="g-hill" cx=".5" cy=".1" r=".9"><stop offset="0" stop-color="#83BC98"/><stop offset="1" stop-color="#4B8166"/></radialGradient>
+    </defs>
+  </svg>
+
+  <div class="status" aria-hidden="true">
+    <span>9:41&nbsp;&nbsp;11月8日 周日</span>
+    <span class="status-r">
+      <svg viewBox="0 0 17 12"><path d="M8.5 11.2 6.4 9.1a3 3 0 0 1 4.2 0z" fill="currentColor"/><path d="M3.6 6.4a7 7 0 0 1 9.8 0M1 3.8a10.6 10.6 0 0 1 15 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      82%
+      <svg viewBox="0 0 27 12"><rect x=".7" y=".7" width="22.6" height="10.6" rx="3" fill="none" stroke="currentColor" stroke-opacity=".45" stroke-width="1.2"/><rect x="2.4" y="2.4" width="16" height="7.2" rx="1.6" fill="currentColor"/><path d="M25 4.2v3.6c.8-.3 1.3-1 1.3-1.8S25.8 4.5 25 4.2z" fill="currentColor" fill-opacity=".45"/></svg>
+    </span>
+  </div>
+
+  <div class="page reader">
+    <header class="topbar">
+      <a class="btn btn-soft btn-icon" href="shelf.html" aria-label="回到书架"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></a>
+      <div class="topbar-t">
+        <p>Lv.2 入门 · Bobo and the Big Moon</p>
+        <h1>波波和大月亮</h1>
+      </div>
+      <div class="topbar-r">
+        <button class="toggle on" type="button" aria-pressed="true">自动朗读<i></i></button>
+        <button class="toggle on" type="button" aria-pressed="true">中文<i></i></button>
+      </div>
+    </header>
+
+    <section class="spread clay c-white" aria-label="第 6 页">
+      <div class="pages">
+        <svg viewBox="0 0 732 590" aria-hidden="true">
+          <rect width="732" height="590" fill="url(#g-sky)"/>
+          <circle cx="478" cy="122" r="132" fill="#FFF3C4" opacity=".08"/>
+          <circle cx="478" cy="122" r="98" fill="#FFF3C4" opacity=".14"/>
+          <use href="#spark" transform="translate(190 40) scale(.8)" fill="#FFE9A8"/>
+          <use href="#spark" transform="translate(296 92)" fill="#FFE9A8"/>
+          <use href="#spark" transform="translate(356 36) scale(.55)" fill="#fff"/>
+          <use href="#spark" transform="translate(132 96) scale(.5)" fill="#fff"/>
+          <use href="#spark" transform="translate(560 262) scale(.6)" fill="#FFE9A8"/>
+          <g fill="#FFF3C4"><circle cx="40" cy="60" r="2"/><circle cx="250" cy="150" r="2"/><circle cx="404" cy="232" r="1.8"/><circle cx="96" cy="30" r="1.6"/><circle cx="340" cy="180" r="1.6"/><circle cx="380" cy="120" r="1.4"/></g>
+          <circle cx="478" cy="122" r="64" fill="url(#g-moon)"/>
+          <circle cx="452" cy="94" r="7" fill="#EBC05A" opacity=".35"/><circle cx="514" cy="154" r="5" fill="#EBC05A" opacity=".35"/>
+          <path d="M452 120q7-7 14 0M490 120q7-7 14 0M466 140q12 10 24 0" fill="none" stroke="#B9822A" stroke-width="3.2" stroke-linecap="round"/>
+          <ellipse cx="446" cy="140" rx="8" ry="5" fill="#F4A07E" opacity=".5"/><ellipse cx="510" cy="140" rx="8" ry="5" fill="#F4A07E" opacity=".5"/>
+
+          <path d="M0 196Q70 150 150 184T330 236T520 262T732 246V590H0z" fill="#998DD2"/>
+          <circle cx="62" cy="168" r="26" fill="#FFE9A8" opacity=".18"/>
+          <rect x="40" y="150" width="52" height="40" rx="8" fill="#F4E6DA"/>
+          <path d="M32 156 66 126 100 156q2 4-3 4H35q-5 0-3-4z" fill="url(#g-red)"/>
+          <rect x="49" y="162" width="14" height="14" rx="4" fill="#FFD66E"/>
+          <rect x="71" y="168" width="12" height="22" rx="5" fill="#B97D4E"/>
+          <circle cx="112" cy="186" r="12" fill="#7FA98F"/><circle cx="24" cy="190" r="10" fill="#7FA98F"/>
+
+          <path d="M0 362Q130 312 280 344T560 356Q660 352 732 330V590H0z" fill="url(#g-hill)"/>
+          <g fill="#FFE58A"><circle cx="160" cy="292" r="3"/><circle cx="236" cy="270" r="2.6"/><circle cx="318" cy="300" r="3"/><circle cx="400" cy="286" r="2.6"/><circle cx="470" cy="318" r="3"/><circle cx="536" cy="292" r="2.4"/></g>
+          <g fill="#FFE58A" opacity=".25"><circle cx="160" cy="292" r="9"/><circle cx="318" cy="300" r="9"/><circle cx="470" cy="318" r="9"/></g>
+
+          <path d="M600 590L604 560C612 470 600 380 612 300C618 250 612 210 622 176H672C666 226 676 266 672 306C666 400 680 480 694 560L698 590Z" fill="url(#g-trunk)"/>
+          <path d="M616 236Q584 222 566 196" fill="none" stroke="#86573A" stroke-width="14" stroke-linecap="round"/>
+          <g fill="url(#g-tree)"><circle cx="586" cy="118" r="44"/><circle cx="714" cy="104" r="60"/><circle cx="650" cy="148" r="70"/><circle cx="706" cy="212" r="46"/><circle cx="566" cy="182" r="30"/></g>
+          <g fill="#fff" opacity=".16"><ellipse cx="628" cy="112" rx="22" ry="10" transform="rotate(-20 628 112)"/><ellipse cx="572" cy="96" rx="14" ry="7" transform="rotate(-20 572 96)"/><ellipse cx="696" cy="74" rx="18" ry="8" transform="rotate(-20 696 74)"/></g>
+
+          <ellipse cx="626" cy="374" rx="34" ry="42" fill="url(#g-bear)"/>
+          <ellipse cx="624" cy="382" rx="18" ry="24" fill="url(#g-muz)" opacity=".85"/>
+          <ellipse cx="604" cy="418" rx="12" ry="20" fill="url(#g-bear)" transform="rotate(28 604 418)"/>
+          <ellipse cx="652" cy="420" rx="12" ry="20" fill="url(#g-bear)" transform="rotate(-24 652 420)"/>
+          <ellipse cx="596" cy="434" rx="7" ry="5" fill="#E7AE86" transform="rotate(28 596 434)"/>
+          <ellipse cx="660" cy="436" rx="7" ry="5" fill="#E7AE86" transform="rotate(-24 660 436)"/>
+          <ellipse cx="580" cy="350" rx="11" ry="26" fill="url(#g-bear)" transform="rotate(62 580 350)"/>
+          <circle cx="558" cy="338" r="11" fill="url(#g-bear)"/><circle cx="556" cy="337" r="4.5" fill="#E7AE86"/>
+          <use href="#bobo" x="574" y="262" width="100" height="100"/>
+          <ellipse cx="664" cy="352" rx="11" ry="22" fill="url(#g-bear)" transform="rotate(-12 664 352)"/>
+
+          <path d="M524 500h52l-7 26h-38z" fill="url(#g-soil)"/>
+          <path d="M530 502q20-30 40 0" fill="none" stroke="#86573A" stroke-width="4" stroke-linecap="round"/>
+          <ellipse cx="550" cy="500" rx="20" ry="7" fill="url(#g-yellow)"/>
+          <path d="M524 510h52M528 518h44" stroke="#7C5034" stroke-width="1.6" opacity=".5"/>
+          <rect x="414" y="474" width="10" height="22" rx="4" fill="#F4E6DA"/>
+          <path d="M402 478a17 13 0 0 1 34 0z" fill="url(#g-red)"/>
+          <g fill="#fff"><circle cx="412" cy="470" r="2.6"/><circle cx="424" cy="466" r="2"/></g>
+          <rect x="446" y="500" width="7" height="14" rx="3" fill="#F4E6DA"/>
+          <path d="M438 503a11 9 0 0 1 22 0z" fill="url(#g-red)"/>
+          <path d="M380 520q4-12 8 0M396 524q4-12 8 0M480 530q4-12 8 0M704 520q4-12 8 0" fill="none" stroke="#3E7457" stroke-width="2.6" stroke-linecap="round"/>
+        </svg>
+        <div class="gutter"></div>
+        <span class="pno" style="right:18px">12</span>
+
+        <div class="text">
+          <p class="en"><span class="r">“Hello,</span> <mark>Moon<span class="pop">
+            <span class="pop-pic"><svg viewBox="0 0 34 34" aria-hidden="true"><path d="M21 6a11 11 0 1 0 8 16A9 9 0 0 1 21 6z" fill="url(#g-moon)"/></svg></span>
+            <span><b>moon</b><small>/muːn/ · 月亮</small></span>
+            <button class="btn btn-teal btn-icon" type="button" aria-label="听 moon 的发音"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></button>
+          </span></mark>!” says Bobo. He climbs up the tall, tall tree.</p>
+          <p class="zh">“你好呀，月亮！”波波说。他爬上了高高、高高的大树。</p>
+        </div>
+      </div>
+    </section>
+
+    <div class="pager">
+      <a class="btn btn-soft" href="#" aria-label="上一页"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></a>
+      <div class="dots-wrap">
+        <div class="dots" aria-hidden="true"><i class="seen"></i><i class="seen"></i><i class="seen"></i><i class="seen"></i><i class="seen"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <span>第 6 / 12 页 · 还要 3 分钟读完</span>
+      </div>
+      <a class="btn btn-primary" href="#" aria-label="下一页"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></a>
+    </div>
+
+    <div class="acts">
+      <button class="btn btn-primary" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>听这一页</button>
+      <button class="btn btn-teal" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v2.5"/></svg>我来读</button>
+      <button class="btn btn-soft" type="button"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16a8 8 0 1 1 16 0"/><path d="m12 16-3.5-4.5"/></svg>慢一点</button>
+    </div>
+
+    <section class="newwords clay c-butter">
+      <div class="nw-h"><h2>这一页的新词</h2><span>点一下就能听</span></div>
+      <div class="nw">
+        <a href="words.html"><span class="nw-pic" style="background:#5E54A0"><svg viewBox="0 0 34 34" aria-hidden="true"><path d="M21 6a11 11 0 1 0 8 16A9 9 0 0 1 21 6z" fill="url(#g-moon)"/></svg></span><span><b>moon</b><small>月亮</small></span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6"/></svg></a>
+        <a href="words.html"><span class="nw-pic" style="background:var(--mint)"><svg viewBox="0 0 34 34" aria-hidden="true"><rect x="14.5" y="18" width="5" height="12" rx="2" fill="url(#g-trunk)"/><circle cx="17" cy="14" r="10" fill="url(#g-tree)"/></svg></span><span><b>tree</b><small>树</small></span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6"/></svg></a>
+        <a href="words.html"><span class="nw-pic" style="background:var(--peach)"><svg viewBox="0 0 34 34" aria-hidden="true"><path d="M11 30V5M23 30V5M11 11h12M11 18h12M11 25h12" fill="none" stroke="#9A6440" stroke-width="2.8" stroke-linecap="round"/><path d="M28 14V4m-3.5 3.5L28 4l3.5 3.5" fill="none" stroke="#C2410C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span><b>climb</b><small>爬</small></span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6"/></svg></a>
+        <a href="words.html"><span class="nw-pic" style="background:var(--sky)"><svg viewBox="0 0 34 34" aria-hidden="true"><rect x="7" y="4" width="10" height="26" rx="5" fill="url(#g-orange)"/><rect x="20" y="18" width="10" height="12" rx="5" fill="url(#g-blue)"/></svg></span><span><b>tall</b><small>高高的</small></span><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6"/></svg></a>
+      </div>
+    </section>
+  </div>
+</body>
+</html>

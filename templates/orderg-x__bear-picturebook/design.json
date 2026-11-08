@@ -1,0 +1,57 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": {
+    "zh": "小熊绘本",
+    "en": "Bear Picture Books"
+  },
+  "description": {
+    "zh": "给 4–8 岁孩子的英文绘本阅读平板 App：按分级排的书架和每日目标贴纸、带逐词高亮和点读发音的双页绘本、黏土按钮的看图选词小测验",
+    "en": "A tablet English picture-book app for kids 4–8: a levelled bookshelf with daily goals and stickers, a two-page story spread with word highlight and tap-to-hear, and a clay-button picture word quiz"
+  },
+  "kind": "tablet",
+  "screens": [
+    {
+      "file": "shelf.html",
+      "title": {
+        "zh": "书架",
+        "en": "Bookshelf"
+      }
+    },
+    {
+      "file": "read.html",
+      "title": {
+        "zh": "读绘本",
+        "en": "Reading"
+      }
+    },
+    {
+      "file": "words.html",
+      "title": {
+        "zh": "学单词",
+        "en": "Words"
+      }
+    }
+  ],
+  "style": "custom",
+  "categories": [
+    "kids",
+    "education"
+  ],
+  "tags": [
+    "list",
+    "detail",
+    "illustration",
+    "bilingual"
+  ],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "claude-opus-5-5"
+  }
+}
