@@ -1,0 +1,45 @@
+:root {
+  --bg: #0B0B16;
+  --bg-2: #0F0F1E;
+  --surface: #151528;
+  --surface-2: #1B1B33;
+  --hover: #22223F;
+  --text: #E9E6FF;
+  --muted: #A09CC8;
+  --line: #2E2B52;
+  --line-soft: #232142;
+  --primary: #FF2E88;
+  --primary-soft: rgba(255, 46, 136, .14);
+  --accent: #22E1FF;
+  --accent-soft: rgba(34, 225, 255, .12);
+  --warn: #FFC53D;
+  --warn-soft: rgba(255, 197, 61, .13);
+  --ok: #3CF0B4;
+  --ok-soft: rgba(60, 240, 180, .1);
+  --on: #0B0B16;
+  --link: #22E1FF;
+
+  --font: "Segoe UI Variable Text", "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --mono: "Cascadia Mono", "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+
+  --fs-xs: 11px;
+  --fs-sm: 12px;
+  --fs-md: 13px;
+  --fs-lg: 16px;
+  --fs-xl: 20px;
+  --fs-kpi: 28px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+
+  --radius: 2px;
+  --shadow: 0 0 0 1px #FF2E88, 0 0 18px rgba(255, 46, 136, .45);
+  --glow-c: 0 0 12px rgba(34, 225, 255, .55);
+  --glow-m: 0 0 12px rgba(255, 46, 136, .6);
+  --glitch: -1.5px 0 rgba(255, 46, 136, .85), 1.5px 0 rgba(34, 225, 255, .85);
+  --ease: cubic-bezier(.2, .8, .2, 1);
+}
