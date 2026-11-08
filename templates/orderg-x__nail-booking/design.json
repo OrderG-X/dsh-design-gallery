@@ -1,0 +1,57 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": {
+    "zh": "甲上美甲",
+    "en": "Jiashang Nails"
+  },
+  "description": {
+    "zh": "美甲店预约小程序：按分类挑款式，选美甲师、日期和时段，在「我的」看待到店预约和会员积分，柔光凸起风配手绘甲片",
+    "en": "A nail salon booking mini program: browse designs by category, pick a technician, date and time slot, see the upcoming visit and member points, with hand-drawn nail tips"
+  },
+  "kind": "miniprogram",
+  "screens": [
+    {
+      "file": "gallery.html",
+      "title": {
+        "zh": "款式",
+        "en": "Designs"
+      }
+    },
+    {
+      "file": "booking.html",
+      "title": {
+        "zh": "预约",
+        "en": "Booking"
+      }
+    },
+    {
+      "file": "me.html",
+      "title": {
+        "zh": "我的",
+        "en": "Me"
+      }
+    }
+  ],
+  "style": "soft",
+  "categories": [
+    "beauty"
+  ],
+  "tags": [
+    "gallery",
+    "booking",
+    "calendar",
+    "profile",
+    "illustration"
+  ],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "claude-opus-5-5"
+  }
+}
