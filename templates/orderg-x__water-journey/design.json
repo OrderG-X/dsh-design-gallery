@@ -1,0 +1,25 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": { "zh": "水的旅行", "en": "Water's Journey" },
+  "description": {
+    "zh": "小学四年级科学课的六页课件：封面、课前提问、蒸发、凝结成云、水循环图、小测验与作业，手绘水滴角色，粗描边贴纸风",
+    "en": "A six-slide primary school science lesson on the water cycle: cover, warm-up question, evaporation, clouds, a cycle diagram and a quiz, with a drawn droplet mascot in a sticker style"
+  },
+  "kind": "slides",
+  "screens": [
+    { "file": "01-cover.html", "title": { "zh": "封面", "en": "Cover" } },
+    { "file": "02-question.html", "title": { "zh": "先想一想", "en": "Warm-up question" } },
+    { "file": "03-evaporate.html", "title": { "zh": "蒸发", "en": "Evaporation" } },
+    { "file": "04-condense.html", "title": { "zh": "凝结成云", "en": "Condensation" } },
+    { "file": "05-cycle.html", "title": { "zh": "水循环", "en": "Water cycle" } },
+    { "file": "06-quiz.html", "title": { "zh": "小测验", "en": "Quiz & summary" } }
+  ],
+  "style": "playful",
+  "categories": ["education", "kids"],
+  "tags": ["illustration", "cover"],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": { "login": "orderg-x", "id": 271418316 },
+  "ai": { "generated": true, "tool": "claude-opus-5-5" }
+}
