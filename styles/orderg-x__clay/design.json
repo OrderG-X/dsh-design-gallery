@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "黏土质感",
+    "en": "Clay"
+  },
+  "description": {
+    "zh": "鼓鼓的大圆角块、糖果色、捏出来的手感",
+    "en": "Puffy rounded blocks, candy colors, a hand-squeezed feel"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "claude-opus-5-5"
+  }
+}
