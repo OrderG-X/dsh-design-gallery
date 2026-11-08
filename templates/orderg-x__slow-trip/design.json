@@ -1,0 +1,57 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": {
+    "zh": "慢行",
+    "en": "Slow Trip"
+  },
+  "description": {
+    "zh": "小地方慢旅行的行程小程序：行程封面和逐日安排、手绘小镇地图上的当天路线、带进度的打包清单和三人分账，柔光毛玻璃风格",
+    "en": "A slow-travel trip planner mini program: trip cover and day-by-day plan, the day's route on a hand-drawn town map, packing checklist and a three-way budget split, in frosted glass"
+  },
+  "kind": "miniprogram",
+  "screens": [
+    {
+      "file": "overview.html",
+      "title": {
+        "zh": "行程总览",
+        "en": "Trip overview"
+      }
+    },
+    {
+      "file": "route.html",
+      "title": {
+        "zh": "当天路线",
+        "en": "Day route"
+      }
+    },
+    {
+      "file": "pack.html",
+      "title": {
+        "zh": "打包清单",
+        "en": "Packing list"
+      }
+    }
+  ],
+  "style": "glass",
+  "categories": [
+    "travel"
+  ],
+  "tags": [
+    "map",
+    "calendar",
+    "list",
+    "detail",
+    "illustration"
+  ],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "claude-opus-5-5"
+  }
+}

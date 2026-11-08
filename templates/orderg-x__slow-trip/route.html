@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="miniprogram">
+<title>当天路线 · 慢行</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="mp-top">
+  <div class="mp-status"><span>9:41</span><span class="mp-sys"><svg width="18" height="12" viewBox="0 0 18 12" aria-hidden="true"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5.5" width="3" height="6.5" rx="1"/><rect x="10" y="3" width="3" height="9" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true"><path d="M8 2.2c2.5 0 4.8 1 6.5 2.6l1.2-1.3A11 11 0 0 0 8 .4 11 11 0 0 0 .3 3.5l1.2 1.3A9.3 9.3 0 0 1 8 2.2z"/><path d="M8 5.8c1.5 0 2.9.6 3.9 1.5l1.2-1.3A7.4 7.4 0 0 0 8 4a7.4 7.4 0 0 0-5.1 2l1.2 1.3c1-.9 2.4-1.5 3.9-1.5z"/><path d="M8 9.3c.6 0 1.2.2 1.6.6L8 11.6 6.4 9.9c.4-.4 1-.6 1.6-.6z"/></svg><svg width="27" height="13" viewBox="0 0 27 13" aria-hidden="true"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="currentColor" opacity=".45"/><rect x="2" y="2" width="18" height="9" rx="2"/><path d="M25 4.5v4c.8-.3 1.5-1.1 1.5-2s-.7-1.7-1.5-2z" opacity=".5"/></svg></span></div>
+  <div class="mp-nav custom">
+    <button class="day-pick"><b>第 2 天</b><span class="num">11月15日 周日</span><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg></button>
+  </div>
+</header>
+
+<main class="route">
+  <section class="map" aria-label="檐溪手绘地图">
+    <svg class="map-art" viewBox="0 0 375 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <rect width="375" height="420" fill="#F1F3EE"/>
+      <path d="M-10 52c40-10 92-6 132 14s62 52 58 86-30 62-62 80-74 22-128 14z" fill="#D9E8D2"/>
+      <path d="M-10 78c34-8 76-4 106 14s46 42 42 66-26 46-52 58-58 16-96 10" fill="none" stroke="#BCD5B3" stroke-width="1.2"/>
+      <path d="M-10 104c26-6 58-2 80 12s32 32 28 50-20 32-40 40-44 10-68 6" fill="none" stroke="#BCD5B3" stroke-width="1.2"/>
+      <g stroke="#86AD80" stroke-width="1.4" stroke-linecap="round" fill="none">
+        <path d="M24 136v-14M29 138v-17M34 136v-12"/><path d="M128 120v-13M133 122v-16M138 120v-11"/><path d="M40 218v-13M45 220v-16M50 218v-12"/><path d="M112 84v-12M117 86v-15M122 84v-11"/>
+      </g>
+      <path d="M232 92c18-18 58-26 96-20s58 26 52 56-10 64-40 80-70 16-94 2-30-44-28-70 2-36 14-48z" fill="#C8DCF1" stroke="#A9C5E4" stroke-width="1.5"/>
+      <path d="M262 112c14-10 40-12 60-4M252 182c18 10 46 12 70 4" fill="none" stroke="#FFFFFF" stroke-width="1.4" stroke-linecap="round" opacity=".7"/>
+      <ellipse cx="300" cy="150" rx="17" ry="11" fill="#D9E8D2" stroke="#A9C5E4" stroke-width="1"/>
+      <path d="M244 196c-30 14-54 18-78 38s-48 42-86 60-60 20-92 28" fill="none" stroke="#C8DCF1" stroke-width="17" stroke-linecap="round"/>
+      <path d="M232 205c-24 10-44 16-64 32M120 274c-20 12-40 20-62 26" fill="none" stroke="#FFFFFF" stroke-width="1.4" stroke-linecap="round" opacity=".7"/>
+      <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M150 262c40-16 80-26 120-40s60-8 110-2" stroke="#E2DDD2" stroke-width="10"/>
+        <path d="M220 430v-58c2-32-6-60-14-82s-10-34-16-42" stroke="#E2DDD2" stroke-width="10"/>
+        <path d="M150 312c50-12 100-22 150-26s50-2 80 2" stroke="#E2DDD2" stroke-width="9"/>
+        <path d="M150 262c40-16 80-26 120-40s60-8 110-2" stroke="#FFFFFF" stroke-width="7"/>
+        <path d="M220 430v-58c2-32-6-60-14-82s-10-34-16-42" stroke="#FFFFFF" stroke-width="7"/>
+        <path d="M150 312c50-12 100-22 150-26s50-2 80 2" stroke="#FFFFFF" stroke-width="6"/>
+      </g>
+      <g fill="#E8E1D6" stroke="#D3C9BA" stroke-width="1">
+        <rect x="232" y="240" width="30" height="18" rx="3" transform="rotate(-14 247 249)"/><rect x="270" y="232" width="26" height="16" rx="3" transform="rotate(-8 283 240)"/><rect x="304" y="228" width="34" height="18" rx="3" transform="rotate(-4 321 237)"/><rect x="346" y="228" width="30" height="18" rx="3"/>
+        <rect x="228" y="270" width="26" height="22" rx="3" transform="rotate(-8 241 281)"/><rect x="300" y="262" width="34" height="16" rx="3" transform="rotate(-5 317 270)"/><rect x="342" y="262" width="34" height="18" rx="3"/>
+        <rect x="160" y="324" width="26" height="22" rx="3" transform="rotate(-10 173 335)"/><rect x="236" y="300" width="30" height="20" rx="3" transform="rotate(-6 251 310)"/><rect x="276" y="298" width="28" height="22" rx="3" transform="rotate(-3 290 309)"/><rect x="314" y="296" width="30" height="20" rx="3"/><rect x="352" y="298" width="26" height="20" rx="3"/>
+        <rect x="232" y="336" width="34" height="20" rx="3" transform="rotate(-4 249 346)"/><rect x="278" y="332" width="30" height="24" rx="3"/><rect x="318" y="330" width="34" height="22" rx="3"/><rect x="160" y="356" width="40" height="18" rx="3" transform="rotate(-6 180 365)"/><rect x="240" y="372" width="30" height="20" rx="3"/><rect x="282" y="368" width="34" height="22" rx="3"/>
+      </g>
+      <g fill="#A9C79F">
+        <circle cx="168" cy="292" r="7"/><circle cx="178" cy="288" r="5"/><circle cx="340" cy="318" r="5"/><circle cx="214" cy="236" r="5"/><circle cx="64" cy="350" r="7"/><circle cx="76" cy="356" r="5"/><circle cx="34" cy="372" r="6"/>
+      </g>
+      <path d="M112.5 292l-10-25M139 232l24 28" stroke="#8C99A8" stroke-width="14" stroke-linecap="round"/>
+      <path d="M112.5 292l-10-25M139 232l24 28" stroke="#EDE6DB" stroke-width="11" stroke-linecap="round"/>
+      <path d="M14 214c10-18 30-36 66-46" fill="none" stroke="#B49A7E" stroke-width="1.6" stroke-dasharray="2 4" stroke-linecap="round"/>
+      <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M220 372C170 362 130 330 112 290S84 210 80 168C120 156 176 158 222 160M310 210c-4 30-20 56-32 78-22 8-52 18-78 34-10-22-26-50-50-76" stroke="#FFFFFF" stroke-width="7.5"/>
+        <path d="M220 372C170 362 130 330 112 290S84 210 80 168C120 156 176 158 222 160M310 210c-4 30-20 56-32 78-22 8-52 18-78 34-10-22-26-50-50-76" stroke="#CC4520" stroke-width="3.5"/>
+        <path d="M222 160c28-6 52-10 78-10M300 150c4 18 8 40 10 60" stroke="#CC4520" stroke-width="2.6" stroke-dasharray="1 6"/>
+      </g>
+      <g font-family="-apple-system, PingFang SC, Microsoft YaHei, sans-serif" font-size="11" font-weight="600" fill="#4F5B69" letter-spacing="3">
+        <text x="20" y="196">竹径</text>
+        <text x="318" y="204">镜湖</text>
+        <text x="20" y="338">檐溪</text>
+      </g>
+      <g font-family="-apple-system, PingFang SC, Microsoft YaHei, sans-serif" font-size="11.5" font-weight="600" fill="#10151C" stroke="#FFFFFF" stroke-width="3.2" stroke-linejoin="round" paint-order="stroke">
+        <text x="238" y="377">南门早市</text>
+        <text x="97" y="186">半山亭</text>
+        <text x="317" y="155">湖心亭</text>
+        <text x="296" y="293">柿子巷</text>
+        <text x="186" y="344" text-anchor="middle">老邮局</text>
+        <text x="133" y="236" text-anchor="end">落霞桥</text>
+      </g>
+      <g font-family="-apple-system, SF Pro Display, Helvetica Neue, sans-serif" font-size="12" font-weight="700" text-anchor="middle">
+        <circle cx="220" cy="372" r="19" fill="#CC4520" opacity=".16"/>
+        <g fill="#CC4520" stroke="#FFFFFF" stroke-width="2.5"><circle cx="220" cy="372" r="12"/><circle cx="80" cy="168" r="12"/><circle cx="300" cy="150" r="12"/><circle cx="278" cy="288" r="12"/><circle cx="200" cy="322" r="12"/><circle cx="150" cy="246" r="12"/></g>
+        <g fill="#FFFFFF"><text x="220" y="376.5">1</text><text x="80" y="172.5">2</text><text x="300" y="154.5">3</text><text x="278" y="292.5">4</text><text x="200" y="326.5">5</text><text x="150" y="250.5">6</text></g>
+      </g>
+    </svg>
+    <div class="days-seg glass" role="tablist" aria-label="切换天数"><a href="overview.html" role="tab">D1</a><span class="on" role="tab" aria-selected="true">D2</span><span role="tab">D3</span></div>
+    <span class="wx-chip glass"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.5 4.5v1.2M6.8 6.8l.9.9M18.2 6.8l-.9.9"/><path d="M8.6 11.2a4 4 0 0 1 7.6-1.8"/><path d="M8 19.5h9a3.2 3.2 0 0 0 .3-6.4 4.6 4.6 0 0 0-8.9 1A2.7 2.7 0 0 0 8 19.5z"/></svg>多云 16° · 日落 <b class="num">17:03</b></span>
+    <button class="map-btn glass" aria-label="回到我的位置"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><circle cx="12" cy="12" r="7.5"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2"/></svg></button>
+  </section>
+
+  <section class="sheet glass strong" aria-label="当天站点">
+    <i class="grab" aria-hidden="true"></i>
+    <header class="sh-head">
+      <div>
+        <h2>6 站 · 步行 <span class="num">6.2</span> km</h2>
+        <p class="num">07:30 – 17:20 · 摆渡 2 段 · 约 1.1 万步</p>
+      </div>
+      <a class="btn-primary sm" href="#"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.5L20 4l-7.5 16-2-6.5z"/></svg>导航</a>
+    </header>
+    <ol class="stops-r">
+      <li class="stop on">
+        <b class="n num">1</b>
+        <div class="s-body">
+          <p class="s-top"><time class="num">07:30</time><span class="s-name">南门早市</span><em class="pill warm">早餐</em></p>
+          <p class="s-note">豆花配桂花糕，人均 ¥18 · 停 45 分</p>
+        </div>
+      </li>
+      <li class="leg"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="13" cy="4.5" r="1.8"/><path d="M9.5 21l2.2-6.5L14 16v5M11.7 14.5l1-5.5-3.2 1.4-1.4 3M12.7 9l2.2 2.6 2.6.9"/></svg>步行 25 分钟 · 1.6 km · 过石桥上山</li>
+      <li class="stop">
+        <b class="n num">2</b>
+        <div class="s-body">
+          <p class="s-top"><time class="num">09:00</time><span class="s-name">竹径 · 半山亭</span></p>
+          <p class="s-note">石阶 860 级，雨后会滑 · 停 1.5 小时</p>
+        </div>
+      </li>
+      <li class="leg"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="13" cy="4.5" r="1.8"/><path d="M9.5 21l2.2-6.5L14 16v5M11.7 14.5l1-5.5-3.2 1.4-1.4 3M12.7 9l2.2 2.6 2.6.9"/></svg>步行 20 分钟 · 1.1 km</li>
+      <li class="stop">
+        <b class="n num">3</b>
+        <div class="s-body">
+          <p class="s-top"><time class="num">11:20</time><span class="s-name">镜湖摆渡 · 湖心亭</span><em class="pill sky">船票 ¥15</em></p>
+          <p class="s-note">单程 12 分钟，亭里能喝茶 · 停 50 分</p>
+        </div>
+      </li>
+      <li class="leg"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 15.5h17l-2.5 4h-12z"/><path d="M12 15.5V5l5.5 7.5H12"/></svg>摆渡 12 分钟 + 步行 8 分钟</li>
+      <li class="stop">
+        <b class="n num">4</b>
+        <div class="s-body">
+          <p class="s-top"><time class="num">12:40</time><span class="s-name">柿子巷 · 巷尾小厨</span><em class="pill ok">已订</em></p>
+          <p class="s-note">3 人桌，招牌笋干烧肉 · 停 1 小时</p>
+        </div>
+      </li>
+      <li class="leg"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="13" cy="4.5" r="1.8"/><path d="M9.5 21l2.2-6.5L14 16v5M11.7 14.5l1-5.5-3.2 1.4-1.4 3M12.7 9l2.2 2.6 2.6.9"/></svg>步行 10 分钟 · 午后自由逛</li>
+      <li class="stop">
+        <b class="n num">5</b>
+        <div class="s-body">
+          <p class="s-top"><time class="num">15:00</time><span class="s-name">老邮局</span></p>
+          <p class="s-note">寄一张明信片给一年后的自己</p>
+        </div>
+      </li>
+      <li class="leg"><svg class="ico sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="13" cy="4.5" r="1.8"/><path d="M9.5 21l2.2-6.5L14 16v5M11.7 14.5l1-5.5-3.2 1.4-1.4 3M12.7 9l2.2 2.6 2.6.9"/></svg>步行 12 分钟 · 750 m</li>
+      <li class="stop">
+        <b class="n num">6</b>
+        <div class="s-body">
+          <p class="s-top"><time class="num">16:40</time><span class="s-name">落霞桥 · 看日落</span></p>
+          <p class="s-note">日落 17:03，桥东侧台阶视野最好</p>
+        </div>
+      </li>
+    </ol>
+  </section>
+</main>
+
+<nav class="mp-tabbar" aria-label="主导航">
+  <a href="overview.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="7.5" width="17" height="12.5" rx="3"/><path d="M9 7.5v-2A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5v2M3.5 12.5h17"/></svg><span>行程</span></a>
+  <a class="on" href="route.html" aria-current="page"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4.5l-5 2v13l5-2 6 2 5-2v-13l-5 2z"/><path d="M9 4.5v13M15 6.5v13"/></svg><span>路线</span></a>
+  <a href="pack.html"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3.5" width="16" height="17" rx="3"/><path d="M8 9l1.5 1.5L12 8M8 15l1.5 1.5L12 14M14.5 9.5H16M14.5 15.5H16"/></svg><span>清单</span></a>
+  <span class="tab"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20.5c1.3-3.8 4.1-5.6 7.5-5.6s6.2 1.8 7.5 5.6"/></svg><span>我的</span></span>
+</nav>
+
+<style>
+.day-pick { display: inline-flex; align-items: center; gap: 6px; height: 44px; }
+.day-pick b { font-size: var(--text-lg); font-weight: 600; }
+.day-pick span { font-size: var(--text-md); color: var(--color-muted); }
+.route { padding-bottom: 100px; }
+.map { position: relative; aspect-ratio: 375 / 420; margin-top: -88px; overflow: hidden; }
+.map-art { position: absolute; inset: 0; width: 100%; height: 100%; }
+.days-seg { position: absolute; left: 16px; top: 98px; display: flex; gap: 2px; padding: 3px; border-radius: var(--radius-full); }
+.days-seg > * { display: grid; place-items: center; width: 44px; height: 30px; border-radius: var(--radius-full); font: 600 var(--text-md)/1 var(--font-num); color: var(--color-muted); }
+.days-seg .on { background: var(--color-text); color: #FFFFFF; box-shadow: 0 4px 10px rgba(16, 21, 28, .2); }
+.wx-chip { position: absolute; right: 16px; top: 98px; display: inline-flex; align-items: center; gap: 5px; height: 38px; padding: 0 13px 0 11px; border-radius: var(--radius-full); font-size: var(--text-md); font-weight: 500; }
+.wx-chip .ico { color: var(--color-accent-deep); }
+.wx-chip b { font-weight: 600; }
+.map-btn { position: absolute; right: 16px; top: 76.5%; width: 42px; height: 42px; display: grid; place-items: center; border-radius: 50%; color: var(--color-text); }
+.map-btn .ico { width: 22px; height: 22px; }
+
+.sheet { position: relative; z-index: 2; margin-top: -28px; padding: 10px 16px 24px; border-radius: var(--radius-lg) var(--radius-lg) 0 0; border-bottom: 0; box-shadow: 0 -10px 30px rgba(16, 21, 28, .10), inset 0 1px 0 rgba(255, 255, 255, .8); }
+.grab { display: block; width: 36px; height: 4px; margin: 0 auto 10px; border-radius: 2px; background: rgba(79, 91, 105, .3); }
+.sh-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 2px 12px; }
+.sh-head h2 { font-size: var(--text-lg); font-weight: 600; line-height: 1.35; }
+.sh-head p { font-size: var(--text-sm); color: var(--color-muted); }
+.btn-primary.sm { height: 40px; padding: 0 16px; font-size: var(--text-md); }
+.stops-r { position: relative; }
+.stop { position: relative; display: flex; align-items: flex-start; gap: 12px; padding: 10px 12px 10px 10px; border-radius: 16px; }
+.stop.on { background: rgba(255, 255, 255, .85); border: 1px solid #FFFFFF; box-shadow: var(--shadow-sm); }
+.stop:not(.on) { border: 1px solid transparent; }
+.n { display: grid; place-items: center; width: 26px; height: 26px; flex-shrink: 0; margin-top: 1px; border-radius: 50%; background: var(--color-primary); color: var(--color-on-primary); font-size: var(--text-md); font-weight: 700; box-shadow: 0 0 0 3px rgba(204, 69, 32, .14); }
+.s-body { flex: 1; min-width: 0; }
+.s-top { display: flex; align-items: center; gap: 8px; min-height: 28px; }
+.s-top time { font-size: var(--text-body); font-weight: 600; }
+.s-name { flex: 1; min-width: 0; font-size: var(--text-body); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.s-top .pill { font-style: normal; height: 22px; font-size: 11px; padding: 0 8px; }
+.s-note { font-size: var(--text-md); color: var(--color-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.leg { position: relative; display: flex; align-items: center; gap: 6px; height: 30px; padding-left: 48px; font-size: var(--text-sm); color: var(--color-muted); }
+.leg::before { content: ""; position: absolute; left: 23px; top: -6px; bottom: -6px; border-left: 1.5px dashed rgba(204, 69, 32, .45); }
+.leg .ico { width: 14px; height: 14px; stroke-width: 1.8; }
+</style>
+</body>
+</html>

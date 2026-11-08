@@ -1,0 +1,65 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { min-height: 100vh; font-family: var(--font-sans); font-size: var(--text-body); line-height: 1.5; color: var(--color-text); background-color: var(--color-bg); -webkit-font-smoothing: antialiased; }
+/* 底色上三团柔光：左上杏色、右中天蓝、左下米黄 */
+body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(circle 230px at 6% 9%, var(--blob-peach) 0, rgba(255, 211, 190, .55) 45%, rgba(255, 211, 190, 0) 100%),
+    radial-gradient(circle 260px at 104% 48%, var(--blob-sky) 0, rgba(191, 219, 255, .5) 45%, rgba(191, 219, 255, 0) 100%),
+    radial-gradient(circle 220px at 8% 96%, var(--blob-sand) 0, rgba(255, 230, 181, .5) 45%, rgba(255, 230, 181, 0) 100%);
+}
+h1, h2, h3, p, ol, ul, dl, dd { margin: 0; padding: 0; }
+ol, ul { list-style: none; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0; cursor: pointer; }
+svg { display: block; }
+.ico { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex-shrink: 0; }
+.ico.sm { width: 16px; height: 16px; stroke-width: 2; }
+.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.muted { color: var(--color-muted); }
+
+/* 毛玻璃：半透明白 + 模糊 + 1px 白描边，只给卡片、浮层、标签栏 */
+.glass { background: var(--glass); -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur); border: 1px solid var(--glass-edge); box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, .7); }
+.glass.strong { background: var(--glass-strong); }
+
+/* 小程序骨架：状态栏 44 + 导航栏 44，右边 101 让给胶囊 */
+.mp-top { position: sticky; top: 0; z-index: 10; background: rgba(234, 240, 246, .42); -webkit-backdrop-filter: blur(18px) saturate(160%); backdrop-filter: blur(18px) saturate(160%); }
+.mp-status { height: 44px; display: flex; align-items: center; justify-content: space-between; padding: 0 26px 0 32px; font: 600 15px/1 -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
+.mp-sys { display: flex; align-items: center; gap: 6px; }
+.mp-sys svg { fill: currentColor; }
+.mp-nav { position: relative; height: 44px; display: flex; align-items: center; justify-content: center; padding: 0 101px; }
+.mp-nav h1 { font-size: var(--text-lg); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mp-nav.custom { justify-content: flex-start; padding-left: 16px; gap: 8px; }
+.mp-page { padding: 0 16px 108px; }
+
+.mp-tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; height: 84px; padding-bottom: 34px; display: flex; background: rgba(255, 255, 255, .6); -webkit-backdrop-filter: blur(24px) saturate(170%); backdrop-filter: blur(24px) saturate(170%); border-top: 1px solid var(--glass-edge); box-shadow: 0 -8px 24px rgba(16, 21, 28, .06); }
+.mp-tabbar > a, .mp-tabbar > .tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; font-size: var(--text-xs); font-weight: 500; color: var(--color-muted); }
+.mp-tabbar > .on { color: var(--color-primary-deep); font-weight: 600; }
+.mp-tabbar > .on .ico { fill: var(--color-primary-soft); }
+
+/* 通用件 */
+.card { border-radius: var(--radius-md); padding: 16px; }
+.sec-head { display: flex; align-items: baseline; justify-content: space-between; margin: 0 2px 12px; }
+.sec-head h2 { font-size: var(--text-lg); font-weight: 600; }
+.sec-head .more { display: inline-flex; align-items: center; gap: 2px; font-size: var(--text-md); color: var(--color-muted); }
+.pill { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 9px; border-radius: var(--radius-full); font-size: var(--text-sm); font-weight: 500; white-space: nowrap; }
+.pill.sky { background: var(--color-accent-soft); color: var(--color-accent-deep); }
+.pill.warm { background: var(--color-primary-soft); color: var(--color-primary-deep); }
+.pill.ok { background: var(--color-ok-soft); color: var(--color-ok); }
+.pill.line { background: rgba(255, 255, 255, .6); border: 1px solid var(--color-line); color: var(--color-muted); }
+.btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 44px; padding: 0 20px; border-radius: var(--radius-full); background: var(--color-primary); color: var(--color-on-primary); font-size: var(--text-body); font-weight: 600; box-shadow: 0 8px 18px rgba(204, 69, 32, .28); white-space: nowrap; }
+.btn-glass { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 36px; padding: 0 14px; border-radius: var(--radius-full); font-size: var(--text-md); font-weight: 600; white-space: nowrap; }
+
+/* 同行人头像 */
+.who { display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; font-size: var(--text-sm); font-weight: 600; color: var(--color-text); border: 2px solid rgba(255, 255, 255, .95); flex-shrink: 0; }
+.who.he { background: var(--p-he); }
+.who.man { background: var(--p-man); }
+.who.an { background: var(--p-an); }
+.who.sm { width: 22px; height: 22px; font-size: var(--text-xs); border-width: 1.5px; }
+.crew { display: flex; }
+.crew .who + .who { margin-left: -8px; }
+
+/* 品牌字标 */
+.mark { width: 30px; height: 30px; display: grid; place-items: center; border-radius: 10px; color: var(--color-primary); }
+.mark .ico { width: 20px; height: 20px; stroke-width: 2; }
+.brand { font-size: var(--text-xl); font-weight: 600; letter-spacing: .06em; }
