@@ -1,0 +1,22 @@
+{
+  "c": {
+    "bg": "#F4EFE4",
+    "surface": "#FFFDF7",
+    "text": "#2A2622",
+    "muted": "#5C554C",
+    "line": "#D9CFBE",
+    "primary": "#B23A48",
+    "accent": "#2F6E8E",
+    "on": "#FFFFFF",
+    "link": "#2F6E8E"
+  },
+  "head": "SERIF",
+  "w": 700,
+  "radius": 4,
+  "shadow": "2px 3px 0 rgba(42,38,34,.14)",
+  "dzh": "旧纸底、贴纸片、胶带条，像日记本",
+  "den": "Old paper, pasted scraps and tape, like a journal",
+  "nzh": "底色是旧纸，块像贴上去的纸片，稍微歪一两度；用胶带条、标签、剪下来的色块当装饰；标题用衬线粗字，旁边可加小号批注；元素可以互相压一点边，别排得太整齐",
+  "nen": "Old-paper background, blocks like pasted scraps tilted a degree or two; decorate with tape strips, labels and cut-out color shapes; bold serif headings with small side notes; let pieces overlap a little, never perfectly aligned",
+  "bgImage": "repeating-linear-gradient(0deg, transparent 0, transparent 31px, #E8DFCF 31px, #E8DFCF 32px)"
+}

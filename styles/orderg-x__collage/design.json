@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "拼贴手账",
+    "en": "Scrapbook"
+  },
+  "description": {
+    "zh": "旧纸底、贴纸片、胶带条，像日记本",
+    "en": "Old paper, pasted scraps and tape, like a journal"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "claude-opus-5-5"
+  }
+}
