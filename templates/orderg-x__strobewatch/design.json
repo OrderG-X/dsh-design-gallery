@@ -1,0 +1,54 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": {
+    "zh": "Strobewatch 服务监控",
+    "en": "Strobewatch"
+  },
+  "description": {
+    "zh": "近黑底、品红青色霓虹的英文服务监控 Windows 软件：总览有服务健康格、延迟和错误率图、区域图和事件流，事故页有时间线、日志、受影响服务和处置清单",
+    "en": "A neon cyber, dark Windows app for service monitoring: an overview with health grid, latency and error charts, region map and incident feed, plus an incident page with timeline, logs and runbook"
+  },
+  "kind": "desktop",
+  "os": "windows",
+  "screens": [
+    {
+      "file": "overview.html",
+      "title": {
+        "zh": "总览",
+        "en": "Overview"
+      }
+    },
+    {
+      "file": "incident.html",
+      "title": {
+        "zh": "事故",
+        "en": "Incident"
+      }
+    }
+  ],
+  "style": "cyber",
+  "categories": [
+    "saas"
+  ],
+  "tags": [
+    "dashboard",
+    "chart",
+    "data-dense",
+    "dark-mode",
+    "map",
+    "detail",
+    "list"
+  ],
+  "lang": "en",
+  "dark": true,
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "claude-opus-5-5"
+  }
+}

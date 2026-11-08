@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="desktop windows">
+<title>Incident · Strobewatch</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app.css">
+<style>
+.inc { height: 100%; display: grid; grid-template-columns: 272px minmax(0, 1fr) 256px; grid-template-rows: auto minmax(0, 1fr) minmax(0, 1fr); gap: 12px; padding: 16px 20px; }
+.ihead { grid-column: 1 / -1; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; column-gap: 16px; }
+.ihead .rt { display: flex; align-items: flex-end; gap: 16px; }
+.ihead .rb2 { display: flex; align-items: center; justify-content: flex-end; gap: 10px; }
+.crumb { display: flex; align-items: center; gap: 6px; }
+.crumb a { color: var(--link); display: inline-flex; align-items: center; height: 24px; }
+.crumb svg.i { width: 12px; height: 12px; color: var(--muted); }
+.ihead .h1 { margin-top: 2px; }
+.meta { margin-top: 10px; display: flex; align-items: center; gap: 10px; font: var(--fs-sm)/1 var(--mono); color: var(--muted); white-space: nowrap; }
+.meta b { color: var(--text); font-weight: 400; }
+.meta .dot { width: 4px; height: 4px; background: var(--line); box-shadow: inset 0 0 0 1px var(--muted); }
+.ihead .spacer { flex: 1; }
+.elapsed { text-align: right; padding-right: 4px; }
+.elapsed b { display: block; margin-top: 6px; font: 700 var(--fs-xl)/1 var(--mono); color: var(--primary); text-shadow: var(--glow-m); letter-spacing: .04em; }
+.stack { display: flex; align-items: center; }
+.stack .av { box-shadow: 0 0 0 2px var(--bg); }
+.stack { gap: 4px; }
+.stack .more-av { width: 26px; height: 26px; display: grid; place-items: center; font: var(--fs-xs)/1 var(--mono); color: var(--muted); background: var(--surface-2); box-shadow: 0 0 0 2px var(--bg); }
+.acts { display: flex; gap: 8px; }
+
+.tl { grid-column: 1; grid-row: 2 / 4; }
+.events { position: relative; flex: 1; padding: 12px 12px 0 0; overflow: hidden; }
+.events::before { content: ""; position: absolute; left: 76px; top: 18px; bottom: 0; width: 1px; background: linear-gradient(var(--line), var(--line) 85%, transparent); }
+.e { position: relative; display: grid; grid-template-columns: 64px 26px minmax(0, 1fr); align-items: start; min-height: 54px; }
+.e .t { padding-top: 1px; text-align: right; font: var(--fs-sm)/1.4 var(--mono); color: var(--muted); }
+.e .n { justify-self: center; margin-top: 4px; width: 9px; height: 9px; background: var(--bg); border: 1px solid var(--muted); position: relative; z-index: 1; }
+.e .c { min-width: 0; padding-right: 4px; }
+.e .c b { display: block; font-weight: 600; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.e .c span { display: block; font: var(--fs-xs)/1.45 var(--mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.e.bad .n { background: var(--primary); border-color: var(--primary); box-shadow: var(--glow-m); }
+.e.acc .n { border-color: var(--accent); }
+.e.warn .n { border-color: var(--warn); background: var(--warn); }
+.e.ok .n { border-color: var(--ok); }
+.e.now { margin-top: 2px; }
+.e.now .t { color: var(--accent); }
+.e.now .n { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 0 4px rgba(34, 225, 255, .18), var(--glow-c); }
+.e.now .c b { color: var(--accent); }
+
+.impact { grid-column: 2; grid-row: 2; }
+.plot { position: relative; flex: 1; margin: 22px 48px 26px 40px; }
+.plot svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.plot .yl { position: absolute; transform: translateY(-50%); font: var(--fs-xs)/1 var(--mono); color: var(--muted); white-space: nowrap; }
+.plot .yl.l { right: calc(100% + 8px); }
+.plot .yl.r { left: calc(100% + 8px); color: var(--accent); }
+.plot .xl { position: absolute; bottom: -20px; transform: translateX(-50%); font: var(--fs-xs)/1 var(--mono); color: var(--muted); white-space: nowrap; }
+.plot .xl.first { transform: none; }
+.plot .xl.last { transform: translateX(-100%); }
+.plot .mk { position: absolute; top: -18px; font: var(--fs-xs)/1 var(--mono); white-space: nowrap; }
+.plot .mk.lft { transform: translateX(calc(-100% - 4px)); }
+.plot .mk.rgt { transform: translateX(4px); }
+
+.logs { grid-column: 2; grid-row: 3; }
+.q { display: flex; align-items: center; gap: 8px; height: 32px; margin: 10px 12px 6px; padding: 0 8px; background: var(--bg); border: 1px solid var(--line); font: var(--fs-sm)/1 var(--mono); white-space: nowrap; overflow: hidden; }
+.q svg.i { width: 14px; height: 14px; color: var(--muted); }
+.q .k { color: var(--accent); }
+.q .op { color: var(--muted); }
+.q .hits { margin-left: auto; color: var(--muted); font-size: var(--fs-xs); }
+.ll { flex: 1; overflow: hidden; padding: 0 0 6px; font: var(--fs-sm)/20px var(--mono); }
+.ll div { display: grid; grid-template-columns: 58px 28px 124px minmax(0, 1fr); gap: 8px; padding: 0 12px; white-space: nowrap; }
+.ll div:hover { background: var(--hover); }
+.ll span { overflow: hidden; text-overflow: ellipsis; }
+.ll .t { color: var(--muted); }
+.ll .h { color: #C9C4F5; }
+.ll .ERR { color: var(--primary); font-weight: 700; }
+.ll .WRN { color: var(--warn); font-weight: 700; }
+.ll .INF { color: var(--accent); }
+.ll .sel { background: rgba(255, 46, 136, .12); box-shadow: inset 2px 0 0 var(--primary); }
+.tog { display: inline-flex; align-items: center; gap: 6px; font: var(--fs-xs)/1 var(--mono); color: var(--ok); letter-spacing: .1em; text-transform: uppercase; white-space: nowrap; height: 24px; }
+.tog i { width: 22px; height: 12px; border: 1px solid var(--ok); position: relative; }
+.tog i::after { content: ""; position: absolute; right: 2px; top: 2px; width: 6px; height: 6px; background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+
+.aff { grid-column: 3; grid-row: 2; }
+.big { padding: 12px 12px 10px; border-bottom: 1px solid var(--line-soft); }
+.big b { display: block; margin-top: 6px; font: 700 var(--fs-xl)/1 var(--mono); color: var(--primary); text-shadow: var(--glow-m); white-space: nowrap; }
+.big span { display: block; margin-top: 6px; font: var(--fs-xs)/1.3 var(--mono); color: var(--muted); white-space: nowrap; }
+.svc a { display: flex; align-items: center; gap: 8px; height: 30px; padding: 0 12px; border-bottom: 1px solid var(--line-soft); font: var(--fs-sm)/1 var(--mono); white-space: nowrap; }
+.svc a:hover { background: var(--hover); }
+.svc a .r { margin-left: auto; color: var(--muted); font-size: var(--fs-xs); }
+
+.rb { grid-column: 3; grid-row: 3; }
+.prog { display: flex; align-items: center; gap: 8px; padding: 10px 12px 4px; font: var(--fs-xs)/1 var(--mono); color: var(--muted); white-space: nowrap; }
+.prog .bar { flex: 1; height: 4px; background: var(--line); }
+.prog .bar i { display: block; height: 100%; width: 57%; background: var(--accent); box-shadow: var(--glow-c); }
+.steps { padding: 4px 4px 8px; }
+.steps a { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 10px; padding: 6px 8px; align-items: start; }
+.steps a:hover { background: var(--hover); }
+.box { width: 14px; height: 14px; margin-top: 2px; border: 1px solid var(--muted); display: grid; place-items: center; }
+.box svg.i { width: 12px; height: 12px; stroke-width: 2.4; color: var(--on); }
+.steps .done .box { background: var(--accent); border-color: var(--accent); }
+.steps .done b { color: var(--muted); font-weight: 400; text-decoration: line-through; text-decoration-color: rgba(160, 156, 200, .6); }
+.steps b { display: block; font-weight: 600; font-size: var(--fs-sm); line-height: 1.4; }
+.steps span { display: block; font: var(--fs-xs)/1.4 var(--mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.steps .cur .box { border-color: var(--warn); box-shadow: 0 0 0 3px var(--warn-soft); }
+.steps .cur span { color: var(--warn); }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="title">
+    <div class="brand"><svg class="i" aria-hidden="true"><use href="icons.svg#logo"></use></svg><b>STROBEWATCH</b></div>
+    <a class="env" href="#"><i></i>prod-global<svg class="i" aria-hidden="true"><use href="icons.svg#chev-d"></use></svg></a>
+    <div class="cmd"><svg class="i" aria-hidden="true"><use href="icons.svg#search"></use></svg><span>Search services, hosts, incidents…</span><kbd>Ctrl K</kbd></div>
+    <div class="tb-r">
+      <a class="ib" href="#" title="Notifications"><svg class="i" aria-hidden="true"><use href="icons.svg#bell"></use></svg><i class="badge"></i></a>
+      <span class="av" title="Rina Okafor">RO</span>
+    </div>
+  </header>
+
+  <aside class="side" aria-label="Navigation">
+    <nav class="nav">
+      <a href="overview.html"><svg class="i" aria-hidden="true"><use href="icons.svg#overview"></use></svg>Overview</a>
+      <a href="#"><svg class="i" aria-hidden="true"><use href="icons.svg#services"></use></svg>Services<span class="n">48</span></a>
+      <a href="incident.html" class="on"><svg class="i" aria-hidden="true"><use href="icons.svg#incident"></use></svg>Incidents<span class="n hot">2</span></a>
+      <a href="#"><svg class="i" aria-hidden="true"><use href="icons.svg#hosts"></use></svg>Hosts<span class="n">312</span></a>
+      <a href="#"><svg class="i" aria-hidden="true"><use href="icons.svg#logs"></use></svg>Logs</a>
+      <a href="#"><svg class="i" aria-hidden="true"><use href="icons.svg#traces"></use></svg>Traces</a>
+      <a href="#"><svg class="i" aria-hidden="true"><use href="icons.svg#bell"></use></svg>Alert rules<span class="n">17</span></a>
+      <a href="#"><svg class="i" aria-hidden="true"><use href="icons.svg#globe"></use></svg>Status page</a>
+    </nav>
+    <h4 class="caps">Open incidents</h4>
+    <div class="pins">
+      <a href="incident.html" style="background:var(--hover)"><i class="sq bad"></i>INC-2291<span class="n">24m</span></a>
+      <a href="#"><i class="sq warn"></i>INC-2290<span class="n">33m</span></a>
+    </div>
+    <h4 class="caps">Pinned</h4>
+    <div class="pins">
+      <a href="#"><i class="sq warn"></i>pay-adapter<span class="n">340ms</span></a>
+      <a href="#"><i class="sq ok"></i>api-gateway<span class="n">88ms</span></a>
+    </div>
+    <div class="oncall">
+      <div class="caps">On call now</div>
+      <div class="who"><span class="av">RO</span><div><b>Rina Okafor</b><span>Primary · until 18:00</span></div></div>
+      <div class="who"><span class="av v">DK</span><div><b>Dev Kim</b><span>Secondary · payments</span></div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="inc">
+      <div class="ihead">
+        <div>
+          <div class="crumb caps"><a href="overview.html">Incidents</a><svg class="i" aria-hidden="true"><use href="icons.svg#chev-r"></use></svg>INC-2291</div>
+          <h1 class="h1">Elevated 5xx on checkout</h1>
+        </div>
+        <div class="rt">
+          <div class="elapsed"><span class="caps">Elapsed</span><b>00:24:11</b></div>
+          <div class="acts">
+            <a class="btn" href="#"><svg class="i" aria-hidden="true"><use href="icons.svg#page"></use></svg>Page</a>
+            <a class="btn" href="#"><svg class="i" aria-hidden="true"><use href="icons.svg#msg"></use></svg>Post update</a>
+            <a class="btn primary" href="#"><svg class="i" aria-hidden="true"><use href="icons.svg#check"></use></svg>Resolve</a>
+          </div>
+        </div>
+        <div class="meta"><span class="chip bad">sev-2</span><span class="chip acc">monitoring</span><span>opened <b>14:18 UTC</b></span><i class="dot"></i><span>IC <b>Rina Okafor</b></span><i class="dot"></i><span>region <b>ne-2</b></span><i class="dot"></i><span>channel <b>#inc-2291</b></span></div>
+        <div class="rb2 meta"><span>responders</span><div class="stack"><span class="av">RO</span><span class="av v">DK</span><span class="av m">TL</span><span class="av g">MA</span><span class="more-av">+2</span></div></div>
+      </div>
+
+      <section class="panel tl">
+        <div class="ph"><h2>Timeline</h2><div class="r"><span class="lg">9 events</span><a class="ib" href="#" title="Filter" style="width:24px;height:24px"><svg class="i" aria-hidden="true"><use href="icons.svg#filter"></use></svg></a></div></div>
+        <div class="events">
+          <div class="e bad"><span class="t">14:18:04</span><i class="n"></i><div class="c"><b>Alert fired · chk-5xx-burn</b><span>5xx &gt; 2% for 3m · ne-2</span></div></div>
+          <div class="e"><span class="t">14:18:40</span><i class="n"></i><div class="c"><b>Paged Rina Okafor</b><span>primary on-call</span></div></div>
+          <div class="e acc"><span class="t">14:20:12</span><i class="n"></i><div class="c"><b>Acknowledged</b><span>Rina · from mobile</span></div></div>
+          <div class="e bad"><span class="t">14:24:30</span><i class="n"></i><div class="c"><b>Declared SEV-2</b><span>IC Rina · comms Dev Kim</span></div></div>
+          <div class="e warn"><span class="t">14:27:55</span><i class="n"></i><div class="c"><b>Matches deploy v5.12.0</b><span>by Tomás · rolled 14:15</span></div></div>
+          <div class="e acc"><span class="t">14:31:10</span><i class="n"></i><div class="c"><b>Rollback to v5.11.4</b><span>pipeline #8841</span></div></div>
+          <div class="e acc"><span class="t">14:33:20</span><i class="n"></i><div class="c"><b>Drain api-03 requested</b><span>by Tomás · via lb-1</span></div></div>
+          <div class="e"><span class="t">14:36:02</span><i class="n"></i><div class="c"><b>Status page updated</b><span>by Dev Kim · public</span></div></div>
+          <div class="e ok"><span class="t">14:39:47</span><i class="n"></i><div class="c"><b>5xx down to 1.4%</b><span>from 6.1% peak at 14:26</span></div></div>
+          <div class="e now"><span class="t">now</span><i class="n"></i><div class="c"><b>Monitoring</b><span>hold &lt; 0.5% for 10 min</span></div></div>
+        </div>
+      </section>
+
+      <section class="panel impact">
+        <div class="ph"><h2>Impact · 14:00–14:42</h2><div class="r"><span class="lg"><i style="background:#FF2E88"></i>5xx %</span><span class="lg"><i style="background:#22E1FF"></i>p95 ms</span></div></div>
+        <div class="plot">
+          <svg viewBox="0 0 600 200" preserveAspectRatio="none" aria-hidden="true">
+            <defs><linearGradient id="ia" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF2E88" stop-opacity=".45"/><stop offset="1" stop-color="#FF2E88" stop-opacity="0"/></linearGradient></defs>
+            <g stroke="#2E2B52" stroke-width="1"><path d="M0 0H600" vector-effect="non-scaling-stroke"/><path d="M0 50H600" vector-effect="non-scaling-stroke"/><path d="M0 100H600" vector-effect="non-scaling-stroke"/><path d="M0 150H600" vector-effect="non-scaling-stroke"/><path d="M0 200H600" vector-effect="non-scaling-stroke"/></g>
+            <path d="M0.0 192.0 L14.3 190.9 L28.6 191.0 L42.9 191.1 L57.1 192.0 L71.4 193.2 L85.7 191.6 L100.0 192.6 L114.3 191.4 L128.6 190.5 L142.9 192.1 L157.1 192.5 L171.4 190.9 L185.7 191.1 L200.0 193.0 L214.3 193.6 L228.6 195.3 L242.9 185.4 L257.1 175.7 L271.4 168.7 L285.7 152.2 L300.0 135.8 L314.3 122.2 L328.6 108.6 L342.9 91.0 L357.1 76.1 L371.4 47.5 L385.7 53.3 L400.0 55.9 L414.3 58.4 L428.6 53.4 L442.9 59.0 L457.1 66.5 L471.4 77.7 L485.7 93.1 L500.0 106.2 L514.3 118.7 L528.6 131.5 L542.9 142.2 L557.1 155.9 L571.4 168.0 L585.7 173.1 L600.0 170.5 L600 200 L0 200 Z" fill="url(#ia)"/>
+            <path d="M0.0 192.0 L14.3 190.9 L28.6 191.0 L42.9 191.1 L57.1 192.0 L71.4 193.2 L85.7 191.6 L100.0 192.6 L114.3 191.4 L128.6 190.5 L142.9 192.1 L157.1 192.5 L171.4 190.9 L185.7 191.1 L200.0 193.0 L214.3 193.6 L228.6 195.3 L242.9 185.4 L257.1 175.7 L271.4 168.7 L285.7 152.2 L300.0 135.8 L314.3 122.2 L328.6 108.6 L342.9 91.0 L357.1 76.1 L371.4 47.5 L385.7 53.3 L400.0 55.9 L414.3 58.4 L428.6 53.4 L442.9 59.0 L457.1 66.5 L471.4 77.7 L485.7 93.1 L500.0 106.2 L514.3 118.7 L528.6 131.5 L542.9 142.2 L557.1 155.9 L571.4 168.0 L585.7 173.1 L600.0 170.5" fill="none" stroke="#FF2E88" stroke-width="1.75" vector-effect="non-scaling-stroke"/>
+            <path d="M0.0 157.9 L14.3 158.8 L28.6 159.4 L42.9 159.8 L57.1 156.8 L71.4 158.6 L85.7 158.7 L100.0 158.1 L114.3 155.7 L128.6 158.5 L142.9 157.7 L157.1 157.0 L171.4 155.3 L185.7 154.9 L200.0 154.6 L214.3 157.2 L228.6 157.8 L242.9 149.4 L257.1 132.4 L271.4 116.6 L285.7 109.2 L300.0 97.2 L314.3 83.3 L328.6 78.4 L342.9 74.4 L357.1 72.0 L371.4 74.2 L385.7 77.3 L400.0 74.6 L414.3 74.1 L428.6 72.1 L442.9 76.0 L457.1 84.5 L471.4 94.2 L485.7 103.2 L500.0 112.0 L514.3 123.9 L528.6 130.2 L542.9 136.0 L557.1 137.5 L571.4 138.4 L585.7 140.6 L600.0 141.3" fill="none" stroke="#22E1FF" stroke-width="1.5" stroke-dasharray="4 3" vector-effect="non-scaling-stroke"/>
+            <g fill="none" stroke-width="1" vector-effect="non-scaling-stroke"><path d="M214.3 0V200" stroke="#FFC53D" vector-effect="non-scaling-stroke"/><path d="M257.1 0V200" stroke="#FF2E88" vector-effect="non-scaling-stroke"/><path d="M442.9 0V200" stroke="#3CF0B4" vector-effect="non-scaling-stroke"/></g>
+          </svg>
+          <span class="mk lft c-warn" style="left:35.7%">deploy 14:15</span>
+          <span class="mk rgt c-bad" style="left:42.9%">alert 14:18</span>
+          <span class="mk rgt c-ok" style="left:73.8%">rollback 14:31</span>
+          <span class="yl l" style="top:0">8%</span><span class="yl l" style="top:50%">4%</span><span class="yl l" style="top:100%">0</span>
+          <span class="yl r" style="top:0">800</span><span class="yl r" style="top:50%">400</span><span class="yl r" style="top:100%">0</span>
+          <span class="xl first" style="left:0">14:00</span><span class="xl" style="left:35.7%">14:15</span><span class="xl" style="left:71.4%">14:30</span><span class="xl last" style="left:100%">14:42</span>
+        </div>
+      </section>
+
+      <section class="panel logs">
+        <div class="ph"><h2>Logs</h2><span class="lg">checkout · last 5 min</span><div class="r"><span class="tog"><i></i>Live tail</span></div></div>
+        <div class="q"><svg class="i" aria-hidden="true"><use href="icons.svg#search"></use></svg><span><span class="k">service</span><span class="op">:</span>checkout <span class="k">level</span><span class="op">&gt;=</span>warn <span class="k">host</span><span class="op">:</span>api-*</span><span class="hits">1,284 lines</span></div>
+        <div class="ll">
+          <div><span class="t">14:41:58</span><span class="ERR">ERR</span><span class="h">api-03.internal</span><span>502 POST /cart/confirm 3001ms</span></div>
+          <div><span class="t">14:41:57</span><span class="WRN">WRN</span><span class="h">api-03.internal</span><span>retry 2/3 pay-adapter reset</span></div>
+          <div><span class="t">14:41:55</span><span class="INF">INF</span><span class="h">api-07.internal</span><span>200 POST /cart/confirm 418ms</span></div>
+          <div class="sel"><span class="t">14:41:54</span><span class="ERR">ERR</span><span class="h">api-03.internal</span><span>pool exhausted 64/64 wait=37</span></div>
+          <div><span class="t">14:41:52</span><span class="INF">INF</span><span class="h">lb-1.internal</span><span>drain api-03 by t.lind</span></div>
+          <div><span class="t">14:41:51</span><span class="WRN">WRN</span><span class="h">db-ro-2.internal</span><span>slow query orders_by_cart 1.8s</span></div>
+          <div><span class="t">14:41:49</span><span class="INF">INF</span><span class="h">api-05.internal</span><span>200 POST /cart/confirm 377ms</span></div>
+          <div><span class="t">14:41:47</span><span class="ERR">ERR</span><span class="h">api-03.internal</span><span>502 POST /cart/confirm 3000ms</span></div>
+          <div><span class="t">14:41:46</span><span class="INF">INF</span><span class="h">ops-04.internal</span><span>rollback v5.11.4 · 9/12 ready</span></div>
+          <div><span class="t">14:41:44</span><span class="WRN">WRN</span><span class="h">cache-11.internal</span><span>evictions 2.1k/s &gt; baseline</span></div>
+        </div>
+      </section>
+
+      <section class="panel aff">
+        <div class="ph"><h2>Affected</h2><div class="r"><span class="lg">5 services</span></div></div>
+        <div class="big"><span class="caps">Failed checkouts</span><b>≈ 1,140</b><span>3.2% of attempts since 14:18</span></div>
+        <div class="svc">
+          <a href="#"><i class="sq bad"></i>checkout<span class="r c-bad">5xx 1.4%</span></a>
+          <a href="#"><i class="sq warn"></i>pay-adapter<span class="r c-warn">t/o 0.9%</span></a>
+          <a href="#"><i class="sq warn"></i>cart<span class="r">upstream</span></a>
+          <a href="#"><i class="sq ok"></i>notify<span class="r">queued 1.2k</span></a>
+          <a href="#"><i class="sq ok"></i>ledger<span class="r">healthy</span></a>
+        </div>
+      </section>
+
+      <section class="panel rb">
+        <div class="ph"><h2>Runbook · RB-014</h2><div class="r"><a class="ib" href="#" title="Open runbook" style="width:24px;height:24px"><svg class="i" aria-hidden="true"><use href="icons.svg#book"></use></svg></a></div></div>
+        <div class="prog"><span>4 / 7</span><span class="bar"><i></i></span></div>
+        <div class="steps">
+          <a class="done" href="#"><span class="box"><svg class="i" aria-hidden="true"><use href="icons.svg#check"></use></svg></span><span><b>Rule out a false alarm</b></span></a>
+          <a class="done" href="#"><span class="box"><svg class="i" aria-hidden="true"><use href="icons.svg#check"></use></svg></span><span><b>Check pay-adapter &amp; ledger</b></span></a>
+          <a class="done" href="#"><span class="box"><svg class="i" aria-hidden="true"><use href="icons.svg#check"></use></svg></span><span><b>Diff against last deploy</b></span></a>
+          <a class="done" href="#"><span class="box"><svg class="i" aria-hidden="true"><use href="icons.svg#check"></use></svg></span><span><b>Roll back to v5.11.4</b></span></a>
+          <a class="cur" href="#"><span class="box"></span><span><b>Drain api-03.internal</b><span>in progress · Tomás</span></span></a>
+          <a href="#"><span class="box"></span><span><b>Hold 5xx &lt; 0.5% for 10 min</b></span></a>
+          <a href="#"><span class="box"></span><span><b>Post update, open postmortem</b></span></a>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="status">
+    <span class="live"><i></i>Connected · stream lag 0.8s</span>
+    <span>INC-2291 · 6 responders · 3 runbook steps left</span>
+    <div class="r"><span>Synced 14:42:07 UTC</span><span>Strobewatch 3.9.2</span></div>
+  </footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="desktop windows">
+<title>Overview · Strobewatch</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app.css">
+<style>
+.ov { height: 100%; display: grid; grid-template-columns: minmax(0, 1fr) 400px; grid-template-rows: 44px 84px 282px minmax(0, 1fr); gap: 12px; padding: 16px 20px; }
+.head { grid-column: 1 / -1; display: flex; align-items: center; gap: 12px; }
+.head .sub { margin-top: 4px; font: var(--fs-sm)/1 var(--mono); color: var(--muted); white-space: nowrap; }
+.head .spacer { flex: 1; }
+.btn .pip { width: 6px; height: 6px; background: var(--ok); box-shadow: 0 0 6px var(--ok); }
+
+.kpis { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.kpi { padding: 12px 14px; display: grid; grid-template-columns: minmax(0, 1fr) 72px; grid-template-rows: auto auto auto; column-gap: 8px; }
+.kpi .caps { grid-column: 1 / -1; }
+.kpi .v { margin-top: 6px; font: 700 var(--fs-kpi)/1 var(--mono); letter-spacing: -.01em; white-space: nowrap; }
+.kpi .v small { font-size: var(--fs-md); font-weight: 400; color: var(--muted); margin-left: 4px; letter-spacing: 0; }
+.kpi .v.gc { color: var(--accent); text-shadow: var(--glow-c); }
+.kpi .v.gm { color: var(--primary); text-shadow: var(--glow-m); }
+.kpi .d { margin-top: 6px; font: var(--fs-xs)/1 var(--mono); color: var(--muted); white-space: nowrap; display: flex; align-items: center; gap: 4px; }
+.kpi .d svg.i { width: 12px; height: 12px; stroke-width: 2; }
+.kpi .sp { grid-column: 2; grid-row: 2; align-self: end; width: 72px; height: 26px; margin-bottom: 2px; overflow: visible; }
+.kpi .d { grid-column: 1 / -1; }
+
+.health { grid-column: 1; grid-row: 3; }
+.tiles { flex: 1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(5, minmax(0, 1fr)); gap: 6px 8px; padding: 10px 12px 12px; }
+.tile { position: relative; display: flex; flex-direction: column; justify-content: center; gap: 3px; padding: 0 10px 0 12px; background: var(--surface-2); border: 1px solid var(--line-soft); min-width: 0; }
+.tile::before { content: ""; position: absolute; left: -1px; top: -1px; bottom: -1px; width: 2px; background: var(--ok); opacity: .8; }
+.tile b { display: flex; align-items: center; justify-content: space-between; gap: 6px; font: 600 var(--fs-sm)/1.1 var(--mono); white-space: nowrap; }
+.tile span { display: flex; justify-content: space-between; gap: 6px; font: var(--fs-xs)/1.1 var(--mono); color: var(--muted); white-space: nowrap; }
+.tile em { font-style: normal; }
+.tile.warn { border-color: rgba(255, 197, 61, .45); background: linear-gradient(90deg, var(--warn-soft), var(--surface-2) 70%); }
+.tile.warn::before { background: var(--warn); }
+.tile.warn span em { color: var(--warn); font-style: normal; }
+.tile.bad { border-color: var(--primary); background: linear-gradient(90deg, rgba(255, 46, 136, .2), var(--surface-2) 80%); }
+.tile.bad::before { background: var(--primary); }
+.tile.bad span em { color: var(--primary); font-style: normal; }
+.tile:hover { border-color: var(--accent); }
+
+.regions { grid-column: 2; grid-row: 3; }
+.mapbox { position: relative; flex: 1; margin: 8px 12px 0; }
+.mapbox svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.rlist { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 12px; padding: 4px 12px 10px; }
+.rlist a { display: flex; align-items: center; gap: 8px; height: 26px; font: var(--fs-sm)/1 var(--mono); white-space: nowrap; border-bottom: 1px solid var(--line-soft); }
+.rlist a .ms { margin-left: auto; color: var(--muted); }
+.rlist a .ms.c-bad, .rlist a .ms.c-warn { color: inherit; }
+
+.charts { grid-column: 1; grid-row: 4; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; min-height: 0; }
+.plot { position: relative; flex: 1; margin: 10px 12px 26px 46px; }
+.plot svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.plot .yl { position: absolute; left: -40px; width: 34px; text-align: right; transform: translateY(-50%); font: var(--fs-xs)/1 var(--mono); color: var(--muted); white-space: nowrap; }
+.plot .xl { position: absolute; bottom: -20px; transform: translateX(-50%); font: var(--fs-xs)/1 var(--mono); color: var(--muted); white-space: nowrap; }
+.plot .xl.first { transform: none; }
+.plot .xl.last { transform: translateX(-100%); }
+.plot .tagm { position: absolute; top: -2px; transform: translateX(4px); font: var(--fs-xs)/1 var(--mono); color: var(--warn); white-space: nowrap; }
+.plot .nowv { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--accent); box-shadow: var(--glow-c); }
+
+.feed { grid-column: 2; grid-row: 4; }
+.ev { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 10px; align-items: center; height: 42px; padding: 0 12px; border-bottom: 1px solid var(--line-soft); }
+.ev:last-child { border-bottom: 0; }
+.ev:hover { background: var(--hover); }
+.ev .t { font: var(--fs-sm)/1 var(--mono); color: var(--muted); }
+.ev .m { min-width: 0; }
+.ev .m b { display: block; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ev .m span { display: flex; align-items: center; gap: 6px; font: var(--fs-xs)/1.3 var(--mono); color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ev.hot { background: linear-gradient(90deg, rgba(255, 46, 136, .12), transparent 70%); box-shadow: inset 2px 0 0 var(--primary); }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="title">
+    <div class="brand"><svg class="i" aria-hidden="true"><use href="icons.svg#logo"></use></svg><b>STROBEWATCH</b></div>
+    <a class="env" href="#"><i></i>prod-global<svg class="i" aria-hidden="true"><use href="icons.svg#chev-d"></use></svg></a>
+    <div class="cmd"><svg class="i" aria-hidden="true"><use href="icons.svg#search"></use></svg><span>Search services, hosts, incidents…</span><kbd>Ctrl K</kbd></div>
+    <div class="tb-r">
+      <a class="ib" href="#" title="Notifications"><svg class="i" aria-hidden="true"><use href="icons.svg#bell"></use></svg><i class="badge"></i></a>
+      <span class="av" title="Rina Okafor">RO</span>
+    </div>
+  </header>
+
+  <aside class="side" aria-label="Navigation">
+    <nav class="nav">
+      <a href="overview.html" class="on"><svg class="i" aria-hidden="true"><use href="icons.svg#overview"></use></svg>Overview</a>
+      <a href="#"><svg class="i" aria-hidden="true"><use href="icons.svg#services"></use></svg>Services<span class="n">48</span></a>
+      <a href="incident.html"><svg class="i" aria-hidden="true"><use href="icons.svg#incident"></use></svg>Incidents<span class="n hot">2</span></a>
+      <a href="#"><svg class="i" aria-hidden="true"><use href="icons.svg#hosts"></use></svg>Hosts<span class="n">312</span></a>
+      <a href="#"><svg class="i" aria-hidden="true"><use href="icons.svg#logs"></use></svg>Logs</a>
+      <a href="#"><svg class="i" aria-hidden="true"><use href="icons.svg#traces"></use></svg>Traces</a>
+      <a href="#"><svg class="i" aria-hidden="true"><use href="icons.svg#bell"></use></svg>Alert rules<span class="n">17</span></a>
+      <a href="#"><svg class="i" aria-hidden="true"><use href="icons.svg#globe"></use></svg>Status page</a>
+    </nav>
+    <h4 class="caps">Pinned</h4>
+    <div class="pins">
+      <a href="incident.html"><i class="sq bad"></i>checkout<span class="n">612ms</span></a>
+      <a href="#"><i class="sq warn"></i>pay-adapter<span class="n">340ms</span></a>
+      <a href="#"><i class="sq ok"></i>api-gateway<span class="n">88ms</span></a>
+      <a href="#"><i class="sq ok"></i>auth<span class="n">41ms</span></a>
+    </div>
+    <div class="oncall">
+      <div class="caps">On call now</div>
+      <div class="who"><span class="av">RO</span><div><b>Rina Okafor</b><span>Primary · until 18:00</span></div></div>
+      <div class="who"><span class="av v">DK</span><div><b>Dev Kim</b><span>Secondary · payments</span></div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="ov">
+      <div class="head">
+        <div>
+          <h1 class="h1">Overview</h1>
+          <div class="sub">prod-global · Sun 08 Nov 2026 · 14:42 UTC</div>
+        </div>
+        <span class="spacer"></span>
+        <div class="seg"><a href="#">15m</a><a href="#" class="on">1h</a><a href="#">6h</a><a href="#">24h</a><a href="#">7d</a></div>
+        <a class="btn" href="#"><i class="pip"></i>Live · 15s</a>
+        <a class="btn primary" href="incident.html"><svg class="i" aria-hidden="true"><use href="icons.svg#incident"></use></svg>Declare incident</a>
+      </div>
+
+      <section class="kpis">
+        <div class="panel kpi"><div class="caps">Uptime · 30d</div><div class="v gc">99.982<small>%</small></div><div class="d">SLO 99.95% · budget 64% left</div><svg class="sp" viewBox="0 0 96 28" preserveAspectRatio="none" aria-hidden="true"><path d="M0.0 4.6 L4.2 4.3 L8.3 3.8 L12.5 2.8 L16.7 4.4 L20.9 2.7 L25.0 4.1 L29.2 4.0 L33.4 4.0 L37.6 5.8 L41.7 4.3 L45.9 5.2 L50.1 5.8 L54.3 3.1 L58.4 5.2 L62.6 4.2 L66.8 3.4 L71.0 3.9 L75.1 4.7 L79.3 4.1 L83.5 16.8 L87.7 25.3 L91.8 21.1 L96.0 12.6" fill="none" stroke="#22E1FF" stroke-width="1.5"/></svg></div>
+        <div class="panel kpi"><div class="caps">p95 latency</div><div class="v">235<small>ms</small></div><div class="d c-warn"><svg class="i" aria-hidden="true"><use href="icons.svg#arrow-up"></use></svg>38% vs 1h ago</div><svg class="sp" viewBox="0 0 96 28" preserveAspectRatio="none" aria-hidden="true"><path d="M0.0 25.3 L4.2 25.2 L8.3 24.5 L12.5 24.9 L16.7 24.8 L20.9 24.5 L25.0 24.3 L29.2 25.0 L33.4 24.7 L37.6 24.9 L41.7 24.9 L45.9 24.6 L50.1 25.0 L54.3 24.8 L58.4 24.9 L62.6 24.2 L66.8 24.6 L71.0 24.3 L75.1 16.4 L79.3 4.7 L83.5 2.7 L87.7 8.6 L91.8 16.4 L96.0 20.6" fill="none" stroke="#FFC53D" stroke-width="1.5"/></svg></div>
+        <div class="panel kpi"><div class="caps">5xx error rate</div><div class="v gm">1.18<small>%</small></div><div class="d c-bad"><svg class="i" aria-hidden="true"><use href="icons.svg#arrow-dn"></use></svg>from 6.1% peak at 14:26</div><svg class="sp" viewBox="0 0 96 28" preserveAspectRatio="none" aria-hidden="true"><path d="M0.0 25.3 L4.2 25.1 L8.3 25.3 L12.5 25.2 L16.7 25.3 L20.9 24.9 L25.0 24.9 L29.2 24.8 L33.4 25.2 L37.6 24.9 L41.7 24.9 L45.9 25.2 L50.1 24.8 L54.3 24.7 L58.4 25.2 L62.6 24.7 L66.8 25.1 L71.0 25.0 L75.1 17.7 L79.3 7.7 L83.5 2.7 L87.7 5.4 L91.8 14.6 L96.0 21.9" fill="none" stroke="#FF2E88" stroke-width="1.5"/></svg></div>
+        <div class="panel kpi"><div class="caps">Throughput</div><div class="v">18.4k<small>req/s</small></div><div class="d c-ok"><svg class="i" aria-hidden="true"><use href="icons.svg#arrow-up"></use></svg>3.1% vs last Sun</div><svg class="sp" viewBox="0 0 96 28" preserveAspectRatio="none" aria-hidden="true"><path d="M0.0 24.6 L4.2 22.3 L8.3 16.2 L12.5 25.3 L16.7 17.4 L20.9 18.4 L25.0 23.6 L29.2 18.7 L33.4 14.1 L37.6 15.1 L41.7 20.7 L45.9 7.4 L50.1 9.6 L54.3 6.5 L58.4 17.8 L62.6 15.0 L66.8 17.6 L71.0 6.8 L75.1 13.2 L79.3 14.6 L83.5 10.0 L87.7 2.7 L91.8 3.4 L96.0 10.5" fill="none" stroke="#3CF0B4" stroke-width="1.5"/></svg></div>
+      </section>
+
+      <section class="panel health">
+        <div class="ph"><h2>Service health</h2><span class="lg"><i class="sq ok"></i>44 ok</span><span class="lg"><i class="sq warn"></i>3 degraded</span><span class="lg"><i class="sq bad"></i>1 critical</span><div class="r"><a class="more" href="#">All 48<svg class="i" aria-hidden="true"><use href="icons.svg#chev-r"></use></svg></a></div></div>
+        <div class="tiles">
+          <a class="tile" href="#"><b>api-gateway</b><span>p95 88ms<em>99.99%</em></span></a>
+          <a class="tile" href="#"><b>auth</b><span>p95 41ms<em>100%</em></span></a>
+          <a class="tile bad" href="incident.html"><b>checkout<i class="sq bad"></i></b><span>p95 612ms<em>5xx 1.2%</em></span></a>
+          <a class="tile warn" href="#"><b>pay-adapter<i class="sq warn"></i></b><span>p95 340ms<em>t/o 0.9%</em></span></a>
+          <a class="tile warn" href="#"><b>cart<i class="sq warn"></i></b><span>p95 210ms<em>99.6%</em></span></a>
+          <a class="tile" href="#"><b>billing</b><span>p95 132ms<em>99.98%</em></span></a>
+          <a class="tile" href="#"><b>search</b><span>p95 96ms<em>99.99%</em></span></a>
+          <a class="tile warn" href="#"><b>media-edge<i class="sq warn"></i></b><span>hit 76%<em>sw-1</em></span></a>
+          <a class="tile" href="#"><b>notify</b><span>p95 58ms<em>99.99%</em></span></a>
+          <a class="tile" href="#"><b>ledger</b><span>p95 74ms<em>100%</em></span></a>
+          <a class="tile" href="#"><b>profiles</b><span>p95 49ms<em>99.99%</em></span></a>
+          <a class="tile" href="#"><b>recommend</b><span>p95 143ms<em>99.97%</em></span></a>
+          <a class="tile" href="#"><b>queue</b><span>lag 0.4s<em>100%</em></span></a>
+          <a class="tile" href="#"><b>ws-relay</b><span>9.8k conn<em>99.99%</em></span></a>
+          <a class="tile" href="#"><b>geo-lookup</b><span>p95 22ms<em>100%</em></span></a>
+          <a class="tile" href="#"><b>inventory</b><span>p95 81ms<em>99.99%</em></span></a>
+          <a class="tile" href="#"><b>sessions</b><span>p95 19ms<em>100%</em></span></a>
+          <a class="tile" href="#"><b>img-resize</b><span>p95 205ms<em>99.95%</em></span></a>
+          <a class="tile" href="#"><b>export-jobs</b><span>queue 12<em>99.99%</em></span></a>
+          <a class="tile" href="#"><b>flags</b><span>p95 9ms<em>100%</em></span></a>
+        </div>
+      </section>
+
+      <section class="panel regions">
+        <div class="ph"><h2>Regions</h2><div class="r"><span class="lg">6 regions · 312 hosts</span></div></div>
+        <div class="mapbox">
+          <svg viewBox="0 0 376 150" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <defs>
+              <pattern id="dots" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.05" fill="#4A4680"/></pattern>
+              <radialGradient id="pm"><stop offset="0" stop-color="#FF2E88" stop-opacity=".55"/><stop offset="1" stop-color="#FF2E88" stop-opacity="0"/></radialGradient>
+              <radialGradient id="pw"><stop offset="0" stop-color="#FFC53D" stop-opacity=".4"/><stop offset="1" stop-color="#FFC53D" stop-opacity="0"/></radialGradient>
+            </defs>
+            <path fill="url(#dots)" d="M18 34c10-16 44-24 70-20 22 3 30 14 46 16 16 2 22 16 14 28-8 12-30 10-38 22-8 12-4 28-18 34-16 6-30-6-36-18-6-12-22-12-32-22-10-10-14-26-6-40Z"/>
+            <path fill="url(#dots)" d="M164 22c18-12 52-14 76-6 18 6 22 18 40 20 22 2 46-6 64 6 14 10 12 28-2 36-14 8-34 2-46 12-12 10-4 26-20 32-18 6-34-6-42-20-8-14-26-12-40-20-14-8-26-18-30-32-2-10 0-20 0-28Z"/>
+            <path fill="url(#dots)" d="M96 104c10-8 28-8 36 2 8 10 2 24-10 30-12 6-28 4-32-8-3-9-2-18 6-24Z"/>
+            <path fill="url(#dots)" d="M290 104c12-6 30-4 38 6 8 10 2 22-12 26-14 4-30-2-32-14-1-8 0-14 6-18Z"/>
+            <g fill="none" stroke="#22E1FF" stroke-width="1" stroke-dasharray="3 3" opacity=".55">
+              <path d="M66 44Q140 4 214 40"/><path d="M214 40Q262 20 318 58"/><path d="M66 44Q90 90 116 118"/><path d="M214 40Q250 96 306 118"/><path d="M116 118Q210 150 306 118"/>
+            </g>
+            <circle cx="214" cy="40" r="26" fill="url(#pm)"/>
+            <circle cx="116" cy="118" r="20" fill="url(#pw)"/>
+            <g stroke-width="1.5" fill="#0B0B16">
+              <circle cx="66" cy="44" r="5" stroke="#3CF0B4"/>
+              <circle cx="214" cy="40" r="5" stroke="#FF2E88"/>
+              <circle cx="214" cy="40" r="11" stroke="#FF2E88" fill="none" opacity=".6"/>
+              <circle cx="318" cy="58" r="5" stroke="#3CF0B4"/>
+              <circle cx="116" cy="118" r="5" stroke="#FFC53D"/>
+              <circle cx="306" cy="118" r="5" stroke="#3CF0B4"/>
+              <circle cx="168" cy="70" r="5" stroke="#3CF0B4"/>
+            </g>
+            <g fill="#3CF0B4"><circle cx="66" cy="44" r="2"/><circle cx="318" cy="58" r="2"/><circle cx="306" cy="118" r="2"/><circle cx="168" cy="70" r="2"/></g>
+            <circle cx="214" cy="40" r="2" fill="#FF2E88"/><circle cx="116" cy="118" r="2" fill="#FFC53D"/>
+            <g font-family="SF Mono, Menlo, Consolas, monospace" font-size="11" fill="#A09CC8" stroke="#151528" stroke-width="4" stroke-linejoin="round" paint-order="stroke"><text x="58" y="30">nw-1</text><text x="200" y="18" fill="#FF2E88">ne-2</text><text x="328" y="62">e-3</text><text x="178" y="80">c-1</text><text x="126" y="122" fill="#FFC53D">sw-1</text><text x="316" y="122">se-2</text></g>
+          </svg>
+        </div>
+        <div class="rlist">
+          <a href="#"><i class="sq ok"></i>nw-1<span class="ms">38ms</span></a>
+          <a href="#" class="c-bad"><i class="sq bad"></i>ne-2<span class="ms c-bad">612ms</span></a>
+          <a href="#"><i class="sq ok"></i>e-3<span class="ms">57ms</span></a>
+          <a href="#"><i class="sq ok"></i>c-1<span class="ms">41ms</span></a>
+          <a href="#" class="c-warn"><i class="sq warn"></i>sw-1<span class="ms c-warn">96ms</span></a>
+          <a href="#"><i class="sq ok"></i>se-2<span class="ms">63ms</span></a>
+        </div>
+      </section>
+
+      <div class="charts">
+        <section class="panel">
+          <div class="ph"><h2>Latency</h2><div class="r"><span class="lg"><i style="background:#6E6AA8"></i>p50 52</span><span class="lg"><i style="background:#22E1FF"></i>p95 235</span><span class="lg"><i style="background:#FF2E88"></i>p99 379</span></div></div>
+          <div class="plot">
+            <svg viewBox="0 0 600 200" preserveAspectRatio="none" aria-hidden="true">
+              <g stroke="#2E2B52" stroke-width="1" vector-effect="non-scaling-stroke"><path d="M0 0H600" vector-effect="non-scaling-stroke"/><path d="M0 50H600" vector-effect="non-scaling-stroke"/><path d="M0 100H600" vector-effect="non-scaling-stroke"/><path d="M0 150H600" vector-effect="non-scaling-stroke"/><path d="M0 200H600" vector-effect="non-scaling-stroke"/></g>
+              <path d="M330 0V200" stroke="#FFC53D" stroke-dasharray="3 3" vector-effect="non-scaling-stroke" fill="none"/>
+              <path d="M0.0 189.9 L10.0 190.1 L20.0 189.5 L30.0 190.1 L40.0 189.6 L50.0 189.7 L60.0 190.2 L70.0 189.7 L80.0 190.2 L90.0 189.8 L100.0 190.2 L110.0 190.3 L120.0 189.9 L130.0 189.2 L140.0 189.9 L150.0 190.0 L160.0 189.5 L170.0 188.9 L180.0 189.2 L190.0 189.5 L200.0 188.9 L210.0 189.9 L220.0 189.2 L230.0 189.7 L240.0 190.0 L250.0 190.2 L260.0 190.0 L270.0 189.3 L280.0 189.8 L290.0 189.5 L300.0 189.3 L310.0 189.6 L320.0 189.5 L330.0 190.1 L340.0 190.8 L350.0 189.9 L360.0 187.4 L370.0 186.4 L380.0 185.4 L390.0 183.5 L400.0 182.3 L410.0 182.3 L420.0 181.0 L430.0 180.8 L440.0 181.9 L450.0 181.5 L460.0 181.4 L470.0 180.5 L480.0 180.6 L490.0 182.0 L500.0 182.1 L510.0 183.8 L520.0 184.5 L530.0 184.8 L540.0 186.2 L550.0 186.8 L560.0 187.9 L570.0 187.4 L580.0 187.1 L590.0 187.3 L600.0 186.9" fill="none" stroke="#6E6AA8" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+              <path d="M0.0 158.3 L10.0 156.6 L20.0 156.4 L30.0 156.4 L40.0 157.0 L50.0 155.5 L60.0 154.4 L70.0 156.2 L80.0 156.0 L90.0 158.6 L100.0 156.7 L110.0 156.2 L120.0 154.5 L130.0 154.7 L140.0 157.2 L150.0 157.6 L160.0 156.4 L170.0 159.0 L180.0 157.9 L190.0 158.8 L200.0 159.4 L210.0 159.8 L220.0 156.8 L230.0 158.6 L240.0 158.7 L250.0 158.1 L260.0 155.7 L270.0 158.5 L280.0 157.7 L290.0 157.0 L300.0 155.3 L310.0 154.9 L320.0 154.6 L330.0 157.2 L340.0 157.8 L350.0 149.4 L360.0 132.4 L370.0 116.6 L380.0 109.2 L390.0 97.2 L400.0 83.3 L410.0 78.4 L420.0 74.4 L430.0 72.0 L440.0 74.2 L450.0 77.3 L460.0 74.6 L470.0 74.1 L480.0 72.1 L490.0 76.0 L500.0 84.5 L510.0 94.2 L520.0 103.2 L530.0 112.0 L540.0 123.9 L550.0 130.2 L560.0 136.0 L570.0 137.5 L580.0 138.4 L590.0 140.6 L600.0 141.3" fill="none" stroke="#22E1FF" stroke-width="1.75" vector-effect="non-scaling-stroke"/>
+              <path d="M0.0 125.7 L10.0 121.2 L20.0 124.4 L30.0 125.5 L40.0 124.7 L50.0 124.8 L60.0 123.4 L70.0 125.3 L80.0 126.4 L90.0 125.5 L100.0 125.6 L110.0 123.4 L120.0 125.5 L130.0 119.1 L140.0 119.0 L150.0 123.0 L160.0 123.5 L170.0 122.8 L180.0 122.5 L190.0 124.4 L200.0 118.9 L210.0 115.8 L220.0 119.1 L230.0 120.2 L240.0 123.9 L250.0 125.0 L260.0 123.4 L270.0 123.5 L280.0 118.8 L290.0 122.8 L300.0 125.3 L310.0 118.4 L320.0 119.5 L330.0 123.1 L340.0 120.7 L350.0 116.3 L360.0 94.1 L370.0 66.4 L380.0 46.5 L390.0 30.1 L400.0 19.4 L410.0 13.9 L420.0 15.4 L430.0 5.7 L440.0 6.3 L450.0 2.4 L460.0 8.6 L470.0 12.6 L480.0 4.0 L490.0 10.4 L500.0 21.9 L510.0 34.5 L520.0 47.0 L530.0 60.3 L540.0 77.4 L550.0 89.2 L560.0 98.7 L570.0 104.8 L580.0 107.0 L590.0 105.6 L600.0 105.3" fill="none" stroke="#FF2E88" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+            </svg>
+            <span class="yl" style="top:0">800</span><span class="yl" style="top:25%">600</span><span class="yl" style="top:50%">400</span><span class="yl" style="top:75%">200</span><span class="yl" style="top:100%">0ms</span>
+            <span class="tagm" style="left:55%;transform:translateX(calc(-100% - 4px))">deploy v5.12.0</span>
+            <span class="xl first" style="left:0">13:42</span><span class="xl" style="left:30%">14:00</span><span class="xl" style="left:55%">14:15</span><span class="xl last" style="left:100%">14:42</span>
+          </div>
+        </section>
+        <section class="panel">
+          <div class="ph"><h2>5xx rate</h2><div class="r"><span class="lg"><i style="background:#FF2E88"></i>all services</span><span class="lg"><i style="background:#FFC53D"></i>alert 2%</span></div></div>
+          <div class="plot">
+            <svg viewBox="0 0 600 200" preserveAspectRatio="none" aria-hidden="true">
+              <defs><linearGradient id="ea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF2E88" stop-opacity=".45"/><stop offset="1" stop-color="#FF2E88" stop-opacity="0"/></linearGradient></defs>
+              <g stroke="#2E2B52" stroke-width="1"><path d="M0 0H600" vector-effect="non-scaling-stroke"/><path d="M0 50H600" vector-effect="non-scaling-stroke"/><path d="M0 100H600" vector-effect="non-scaling-stroke"/><path d="M0 150H600" vector-effect="non-scaling-stroke"/><path d="M0 200H600" vector-effect="non-scaling-stroke"/></g>
+              <path d="M0.0 191.4 L10.0 190.6 L20.0 191.9 L30.0 190.8 L40.0 190.3 L50.0 190.2 L60.0 192.1 L70.0 193.1 L80.0 193.4 L90.0 193.5 L100.0 193.6 L110.0 192.3 L120.0 191.0 L130.0 190.8 L140.0 191.9 L150.0 191.7 L160.0 191.1 L170.0 193.2 L180.0 192.0 L190.0 190.9 L200.0 191.0 L210.0 191.1 L220.0 192.0 L230.0 193.2 L240.0 191.6 L250.0 192.6 L260.0 191.4 L270.0 190.5 L280.0 192.1 L290.0 192.5 L300.0 190.9 L310.0 191.1 L320.0 193.0 L330.0 193.6 L340.0 195.3 L350.0 185.4 L360.0 175.7 L370.0 168.7 L380.0 152.2 L390.0 135.8 L400.0 122.2 L410.0 108.6 L420.0 91.0 L430.0 76.1 L440.0 47.5 L450.0 53.3 L460.0 55.9 L470.0 58.4 L480.0 53.4 L490.0 59.0 L500.0 66.5 L510.0 77.7 L520.0 93.1 L530.0 106.2 L540.0 118.7 L550.0 131.5 L560.0 142.2 L570.0 155.9 L580.0 168.0 L590.0 173.1 L600.0 170.5 L600 200 L0 200 Z" fill="url(#ea)"/>
+              <path d="M0 150H600" stroke="#FFC53D" stroke-dasharray="4 3" vector-effect="non-scaling-stroke" fill="none"/>
+              <path d="M0.0 191.4 L10.0 190.6 L20.0 191.9 L30.0 190.8 L40.0 190.3 L50.0 190.2 L60.0 192.1 L70.0 193.1 L80.0 193.4 L90.0 193.5 L100.0 193.6 L110.0 192.3 L120.0 191.0 L130.0 190.8 L140.0 191.9 L150.0 191.7 L160.0 191.1 L170.0 193.2 L180.0 192.0 L190.0 190.9 L200.0 191.0 L210.0 191.1 L220.0 192.0 L230.0 193.2 L240.0 191.6 L250.0 192.6 L260.0 191.4 L270.0 190.5 L280.0 192.1 L290.0 192.5 L300.0 190.9 L310.0 191.1 L320.0 193.0 L330.0 193.6 L340.0 195.3 L350.0 185.4 L360.0 175.7 L370.0 168.7 L380.0 152.2 L390.0 135.8 L400.0 122.2 L410.0 108.6 L420.0 91.0 L430.0 76.1 L440.0 47.5 L450.0 53.3 L460.0 55.9 L470.0 58.4 L480.0 53.4 L490.0 59.0 L500.0 66.5 L510.0 77.7 L520.0 93.1 L530.0 106.2 L540.0 118.7 L550.0 131.5 L560.0 142.2 L570.0 155.9 L580.0 168.0 L590.0 173.1 L600.0 170.5" fill="none" stroke="#FF2E88" stroke-width="1.75" vector-effect="non-scaling-stroke"/>
+            </svg>
+            <span class="yl" style="top:0">8%</span><span class="yl" style="top:25%">6%</span><span class="yl" style="top:50%">4%</span><span class="yl" style="top:75%">2%</span><span class="yl" style="top:100%">0</span>
+            <span class="xl first" style="left:0">13:42</span><span class="xl" style="left:30%">14:00</span><span class="xl" style="left:55%">14:15</span><span class="xl last" style="left:100%">14:42</span>
+          </div>
+        </section>
+      </div>
+
+      <section class="panel feed">
+        <div class="ph"><h2>Incident feed</h2><div class="r"><a class="more" href="incident.html">Open INC-2291<svg class="i" aria-hidden="true"><use href="icons.svg#chev-r"></use></svg></a></div></div>
+        <a class="ev hot" href="incident.html"><span class="t">14:24</span><div class="m"><b>Elevated 5xx on checkout</b><span><em class="chip bad">sev-2</em>INC-2291 · monitoring · 24m</span></div><span class="av">RO</span></a>
+        <a class="ev" href="#"><span class="t">14:09</span><div class="m"><b>Cache hit ratio below 80% in sw-1</b><span><em class="chip warn">sev-3</em>INC-2290 · media-edge · 33m</span></div><span class="av g">MA</span></a>
+        <a class="ev" href="#"><span class="t">13:58</span><div class="m"><b>Deploy api-gateway v2.38.1</b><span><em class="chip acc">deploy</em>12/12 pods · canary passed</span></div><span class="av v">TL</span></a>
+        <a class="ev" href="#"><span class="t">13:31</span><div class="m"><b>Token refresh latency on auth</b><span><em class="chip ok">resolved</em>INC-2288 · lasted 18m</span></div><span class="av m">SP</span></a>
+        <a class="ev" href="#"><span class="t">12:50</span><div class="m"><b>Muted: export-jobs queue depth</b><span><em class="chip dim">muted</em>by Dev Kim · until 16:00</span></div><span class="av v">DK</span></a>
+      </section>
+    </div>
+  </main>
+
+  <footer class="status">
+    <span class="live"><i></i>Connected · stream lag 0.8s</span>
+    <span>312 hosts · 48 services · 6 regions</span>
+    <span>2 open incidents</span>
+    <div class="r"><span>Synced 14:42:07 UTC</span><span>Strobewatch 3.9.2</span></div>
+  </footer>
+</div>
+</body>
+</html>
