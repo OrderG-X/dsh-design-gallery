@@ -1,0 +1,58 @@
+/* 慢行 · 设计变量（柔光毛玻璃） */
+:root {
+  --color-bg: #EAF0F6;
+  --color-surface: #F7F9FC;
+  --color-text: #10151C;
+  --color-muted: #4F5B69;
+  --color-faint: #6A7684;
+  --color-line: #D5DEE8;
+  --color-primary: #CC4520;
+  --color-primary-deep: #A8381A;
+  --color-primary-soft: #FCE4D9;
+  --color-on-primary: #FFFFFF;
+  --color-accent: #2B6CB0;
+  --color-accent-deep: #22568D;
+  --color-accent-soft: #DCEAF8;
+  --color-ok: #2D7351;
+  --color-ok-soft: #DDF0E4;
+  --color-link: #2B6CB0;
+
+  --blob-peach: #FFD3BE;
+  --blob-sky: #BFDBFF;
+  --blob-sand: #FFE6B5;
+
+  --glass: rgba(255, 255, 255, .56);
+  --glass-strong: rgba(255, 255, 255, .74);
+  --glass-edge: rgba(255, 255, 255, .88);
+  --glass-blur: blur(22px) saturate(165%);
+
+  --p-he: #FFD3BE;
+  --p-man: #C9E2FF;
+  --p-an: #FFE6B5;
+
+  --font-sans: -apple-system, "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-num: -apple-system, "SF Pro Display", "Helvetica Neue", var(--font-sans);
+
+  --text-xs: 10px;
+  --text-sm: 12px;
+  --text-md: 13px;
+  --text-body: 15px;
+  --text-lg: 17px;
+  --text-xl: 20px;
+  --text-hero: 24px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+
+  --radius-sm: 10px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-full: 999px;
+
+  --shadow: 0 10px 30px rgba(16, 21, 28, .10);
+  --shadow-sm: 0 4px 14px rgba(16, 21, 28, .08);
+}
