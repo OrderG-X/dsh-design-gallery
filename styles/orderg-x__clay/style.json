@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#F6EFE9",
+    "surface": "#FFFFFF",
+    "text": "#2B2233",
+    "muted": "#5F5468",
+    "line": "#E8DDD4",
+    "primary": "#C2410C",
+    "accent": "#2F8F7A",
+    "on": "#FFFFFF",
+    "link": "#1F6F8B"
+  },
+  "head": "ROUND",
+  "w": 800,
+  "radius": 28,
+  "shadow": "inset -4px -6px 10px rgba(0,0,0,.06), 8px 12px 24px rgba(120,80,60,.16)",
+  "dzh": "鼓鼓的大圆角块、糖果色、捏出来的手感",
+  "den": "Puffy rounded blocks, candy colors, a hand-squeezed feel",
+  "nzh": "大圆角、鼓起来的块，像用黏土捏出来的；每块带内高光和内阴影，再加一层柔和外投影；低饱和糖果色，一块一个颜色，别太花；圆体粗字，按钮像软软的可以按下去",
+  "nen": "Big radii and puffy blocks, as if squeezed out of clay; every block gets an inner highlight, an inner shadow and a soft drop shadow; muted candy colors, one per block, not too many; heavy rounded type, buttons look soft and pressable"
+}
