@@ -1,0 +1,20 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": { "zh": "云栖民宿", "en": "Yunqi Guesthouse" },
+  "description": {
+    "zh": "山间民宿的预订确认邮件：浅绿底白卡片、山野插画头图，带确认号与入住退房日期、房型卡、费用明细、入住四步与手绘路线图、取消政策时间条和管家联系方式",
+    "en": "A guesthouse booking confirmation email on pale green: hillside hero, confirmation number and dates, room card, price breakdown, check-in steps with a drawn map, cancellation timeline and contacts"
+  },
+  "kind": "email",
+  "screens": [
+    { "file": "email.html", "title": { "zh": "预订确认", "en": "Booking confirmation" } }
+  ],
+  "style": "fresh",
+  "categories": ["travel"],
+  "tags": ["booking", "detail", "map", "illustration"],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": { "login": "orderg-x", "id": 271418316 },
+  "ai": { "generated": true, "tool": "claude-opus-5-5" }
+}
