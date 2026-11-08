@@ -1,0 +1,50 @@
+:root {
+  --color-bg: #FFEF5C;
+  --color-surface: #FFFFFF;
+  --color-text: #000000;
+  --color-muted: #3B3B3B;
+  --color-line: #000000;
+  --color-primary: #000000;
+  --color-on: #FFEF5C;
+  --color-accent: #FF5C39;
+  --color-link: #1F3FD1;
+  --color-pink: #FFA6D9;
+  --color-mint: #7DE2B8;
+  --color-blue: #1F3FD1;
+  --color-ink-soft: #E6E6E6;
+
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+
+  --text-xs: 13px;
+  --text-sm: 15px;
+  --text-md: 17px;
+  --text-lg: 22px;
+  --text-xl: 44px;
+  --text-2xl: 64px;
+  --text-3xl: 104px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  --bw: 3px;
+  --radius: 0;
+  --shadow-sm: 3px 3px 0 #000000;
+  --shadow: 5px 5px 0 #000000;
+  --shadow-lg: 8px 8px 0 #000000;
+  --shadow-xl: 12px 12px 0 #000000;
+
+  --dur: 120ms;
+  --ease: cubic-bezier(.3, .7, .3, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur: 0ms; }
+}

@@ -1,0 +1,51 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": {
+    "zh": "粗体工作室 作品集",
+    "en": "Studio Cuti Portfolio"
+  },
+  "description": {
+    "zh": "独立设计师的新粗野主义作品集：大字首页（名片、精选作品、服务报价、联系表单）和一个包装案例详情页（问题、四步过程、前后对比、结果数字）",
+    "en": "Neo-brutalist portfolio for an independent designer: big-type home with work grid, services and contact form, plus a packaging case study with process and outcome numbers"
+  },
+  "kind": "web",
+  "screens": [
+    {
+      "file": "home.html",
+      "title": {
+        "zh": "首页",
+        "en": "Home"
+      }
+    },
+    {
+      "file": "case.html",
+      "title": {
+        "zh": "项目详情",
+        "en": "Case study"
+      }
+    }
+  ],
+  "style": "brutal",
+  "categories": [
+    "portfolio"
+  ],
+  "tags": [
+    "landing",
+    "gallery",
+    "article",
+    "detail",
+    "illustration",
+    "form"
+  ],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "claude-opus-5-5"
+  }
+}
