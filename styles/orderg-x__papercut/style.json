@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#FFF6E9",
+    "surface": "#FFFFFF",
+    "text": "#1E2A3A",
+    "muted": "#4E5B6B",
+    "line": "#F0DCC2",
+    "primary": "#1D4ED8",
+    "accent": "#E4572E",
+    "on": "#FFFFFF",
+    "link": "#1D4ED8"
+  },
+  "head": "GROTESK",
+  "w": 800,
+  "radius": 0,
+  "shadow": "0 6px 0 rgba(30,42,58,.14)",
+  "dzh": "圆、拱、三角拼成的剪纸插画，纯色叠层",
+  "den": "Paper-cut illustrations of circles, arches and triangles in flat layers",
+  "nzh": "用圆、半圆、三角、拱形拼插画，像剪纸一层叠一层；每层纯色，下层露一条深色边当阴影，不用渐变；4–5 个饱和色，留大块米白底；粗黑体标题，可以压在色块上",
+  "nen": "Build illustrations from circles, half-circles, triangles and arches, layered like cut paper; flat colors only, each layer shows a darker edge below as its shadow, no gradients; 4-5 saturated colors on plenty of cream; heavy grotesk headings that may sit on the shapes"
+}
