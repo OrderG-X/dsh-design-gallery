@@ -1,0 +1,22 @@
+{
+  "c": {
+    "bg": "#F7F2F7",
+    "surface": "#FFFFFF",
+    "text": "#2A2235",
+    "muted": "#5E5470",
+    "line": "#E9DDEB",
+    "primary": "#A23B72",
+    "accent": "#4F7CAC",
+    "on": "#FFFFFF",
+    "link": "#5B4FA8"
+  },
+  "head": "SERIF",
+  "w": 400,
+  "radius": 24,
+  "shadow": "0 0 40px rgba(214,160,214,.35)",
+  "dzh": "粉雾光晕、留白很多、轻得像在云里",
+  "den": "Hazy pink glows, lots of air, light as a cloud",
+  "nzh": "底上几团糊开的光：粉、雾紫、天蓝，边缘看不清；元素少而轻，留白很多，像在云里；标题用细衬线，可以加一点柔光；不用硬边框、深阴影和纯黑",
+  "nen": "A few blurred glows on the background in pink, misty lilac and sky blue; few, light elements and lots of air, like floating in clouds; thin serif headings with a slight glow; no hard borders, heavy shadows or pure black",
+  "bgImage": "radial-gradient(circle at 25% 18%, #FFDDEB 0, transparent 48%), radial-gradient(circle at 78% 78%, #DCE6FF 0, transparent 52%)"
+}
