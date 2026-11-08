@@ -824,6 +824,75 @@ test('维护者命令：解析、改规矩文件', () => {
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(root, 'policy/trust-overrides.json')))['alice-1'], { tier: 'T2', id: 42, at: '2026-11-06T00:00:00.000Z' })
 })
 
+/** 工作流里某一步的 run: | 脚本（去掉缩进） */
+function stepScript(file, name) {
+  const lines = fs.readFileSync(path.join(REAL, '.github/workflows', file), 'utf8').split('\n')
+  const at = lines.findIndex((l) => l.trim() === `- name: ${name}`)
+  const r = lines.findIndex((l, i) => i > at && /^\s*run: \|\s*$/.test(l))
+  assert.ok(at >= 0 && r > at, `${file} 里没找到「${name}」的 run`)
+  const ind = lines[r].search(/\S/)
+  const body = []
+  for (const l of lines.slice(r + 1)) { if (l.trim() && l.search(/\S/) <= ind) break; body.push(l) }
+  const cut = Math.min(...body.filter((l) => l.trim()).map((l) => l.search(/\S/)))
+  return body.map((l) => l.slice(cut)).join('\n')
+}
+const HAS_JQ = (() => { try { execFileSync('jq', ['--version'], { stdio: 'ignore' }); return true } catch { return false } })()
+
+test('维护者命令：下架 / 撤销不另外派发 publish（App 没有 Actions 写权限），推到 main 就靠 push 触发', () => {
+  // 机器人（App token）推 policy/** 到 main → publish 的 push 触发器自己跑
+  const pub = fs.readFileSync(path.join(REAL, '.github/workflows/publish.yml'), 'utf8')
+  assert.match(pub, /push:\s*\n\s*branches: \[main\]\s*\n\s*paths: \[[^\]]*'policy\/\*\*'/)
+  // 哪个工作流都不调 gh workflow run（App 没这个权限，403 会让后面的回复、打标签全跳过）
+  for (const f of fs.readdirSync(path.join(REAL, '.github/workflows'))) {
+    const code = fs.readFileSync(path.join(REAL, '.github/workflows', f), 'utf8').split('\n').filter((l) => !l.trim().startsWith('#')).join('\n')
+    assert.doesNotMatch(code, /gh workflow run/, f)
+  }
+  // 自动隐藏：推上去了就记 hidden=true（后面那步才会告诉举报人「已隐藏」）
+  assert.match(stepScript('reports.yml', '数有效举报，够了就先隐藏'), /if git push -q origin HEAD:main; then\s*\n\s*echo "hidden=true"/)
+})
+
+test('维护者命令：/takedown 真跑「照做」那步——推上 main、回「✓ 已处理」；推不上回 ⚠', { skip: (process.platform === 'win32' || !HAS_JQ) && '要 bash + jq' }, () => {
+  const script = stepScript('chatops.yml', '照做')
+  const w = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-chatops-'))
+  const sh = (args, cwd) => execFileSync('git', args, { cwd, stdio: 'pipe', encoding: 'utf8' }).trim()
+  const remote = path.join(w, 'remote.git')
+  const work = path.join(w, 'work')
+  sh(['init', '-q', '--bare', remote], w)
+  fs.mkdirSync(path.join(work, 'policy'), { recursive: true })
+  sh(['init', '-q'], work)
+  fs.writeFileSync(path.join(work, 'policy/denylist.json'), '[]\n')
+  sh(['-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '--allow-empty', '-m', 'init'], work)
+  sh(['add', 'policy'], work)
+  sh(['-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '-m', 'policy'], work)
+  sh(['remote', 'add', 'origin', remote], work)
+  sh(['push', '-q', 'origin', 'HEAD:main'], work)
+  // 假 gh：记下调用和回复内容；gh workflow run 像真的一样 403
+  const bin = path.join(w, 'bin')
+  fs.mkdirSync(bin)
+  fs.writeFileSync(path.join(bin, 'gh'), '#!/bin/bash\necho "gh $*" >> "$GH_LOG"\nprev=""; for a in "$@"; do [ "$prev" = "--body-file" ] && { echo "REPLY: $(cat "$a")" >> "$GH_LOG"; }; prev="$a"; done\n[ "$1" = "workflow" ] && { echo "HTTP 403: Resource not accessible by integration" >&2; exit 1; }\nexit 0\n', { mode: 0o755 })
+  const run = () => {
+    const log = path.join(w, `gh-${Date.now()}-${Math.random()}.log`)
+    fs.writeFileSync(path.join(work, 'action.json'), JSON.stringify({ action: 'takedown', id: 'a__bcd', reason: 'policy', changed: 'policy/denylist.json' }))
+    fs.writeFileSync(path.join(work, 'policy/denylist.json'), JSON.stringify([{ id: 'a__bcd', at: new Date().toISOString(), reason: 'policy' }]) + '\n')
+    let code = 0
+    try {
+      execFileSync('bash', ['--noprofile', '--norc', '-eo', 'pipefail', '-c', script], { cwd: work, stdio: 'pipe', env: { ...process.env, PATH: `${bin}${path.delimiter}${process.env.PATH}`, GH_LOG: log, GH_TOKEN: 'x', N: '3', ACTOR: 'OrderG-X', GITHUB_REPOSITORY: 'o/r' } })
+    } catch (e) { code = e.status }
+    return { code, log: fs.existsSync(log) ? fs.readFileSync(log, 'utf8') : '' }
+  }
+  const ok = run()
+  assert.equal(ok.code, 0, ok.log)
+  assert.match(ok.log, /REPLY: ✓ 已处理：takedown/)
+  assert.doesNotMatch(ok.log, /gh workflow/)
+  assert.equal(sh(['--git-dir', remote, 'log', '-1', '--format=%s', 'main'], w), 'takedown by OrderG-X (#3)')
+  // 推不上（远端没了 / main 被别人先改了）：不说「已处理」，回 ⚠ 让维护者再发一次，这一步算失败
+  sh(['remote', 'set-url', 'origin', path.join(w, 'gone.git')], work)
+  const bad = run()
+  assert.equal(bad.code, 1, bad.log)
+  assert.match(bad.log, /REPLY: ⚠ 推不上 main/)
+  assert.doesNotMatch(bad.log, /已处理/)
+})
+
 test('治理：违规两次不收、手动信任按 id、待审和每天上限、模板更新也给人看', () => {
   const strikes = [{ login: 'alice-1', id: 42, why: 'x' }, { login: 'Alice-1', id: 42, why: 'y' }, { login: 'alice-1', id: 999, why: 'old owner of the name' }, { login: 'bob', why: 'no id' }]
   assert.deepEqual(standing({ login: 'Alice-1', id: 42, strikes }), { strikes: 2, override: '' })

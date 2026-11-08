@@ -65,8 +65,8 @@ jobs:
             f=$(jq -r '.changed // ""' action.json)
             if [ -z "$f" ] || git diff --quiet -- "$f"; then break; fi
             git -c user.name=dsh-design-gallery-bot -c user.email=bot@users.noreply.github.com commit -q -m "auto-hide $ID (3 reports)" -- "$f"
+            # 推到 main 后 publish 靠 push 触发器自己跑（改的是 policy/**）；不另外派发：App 没有 Actions 写权限，会 403
             if git push -q origin HEAD:main; then
-              gh workflow run publish.yml --ref main >/dev/null
               echo "hidden=true" >> "$GITHUB_OUTPUT"
               break
             fi

@@ -88,7 +88,8 @@ jobs:
               f=$(jq -r .changed action.json)
               if [ -z "$f" ] || [ "$f" = "null" ] || git diff --quiet -- "$f"; then say "没有要改的。 / Nothing to change."; exit 0; fi
               git -c user.name=dsh-design-gallery-bot -c user.email=bot@users.noreply.github.com commit -q -m "$a by $ACTOR (#$N)" -- "$f"
-              git push -q origin HEAD:main
-              if [ "$a" = "takedown" ] || [ "$a" = "restore" ]; then gh workflow run publish.yml --ref main >/dev/null; fi
+              # 不用另外派发 publish：机器人（App token）推到 main、改的是 policy/** → publish 的 push 触发器自己会跑
+              # （App 也没有 Actions 写权限，gh workflow run 会 403）。别把 checkout 换成 GITHUB_TOKEN：它推的不触发工作流
+              if ! git push -q origin HEAD:main; then say "⚠ 推不上 main（可能刚有别的改动），请再发一次命令。 / Could not push to main, please send the command again."; exit 1; fi
               say "✓ 已处理：$a / Done: $a" ;;
           esac
