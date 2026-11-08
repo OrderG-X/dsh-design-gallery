@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="slides">
+<title>标志与色彩 · 山野茶品牌提案</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="deck.css">
+<style>
+  .title { position: absolute; top: 120px; left: var(--margin); font-size: var(--text-title); }
+  .board {
+    position: absolute;
+    top: 212px;
+    left: var(--margin);
+    width: 540px;
+    height: 448px;
+    background: var(--color-surface);
+    border-top: var(--rule) solid var(--color-line);
+  }
+  .cons { position: absolute; top: 24px; left: 20px; width: 240px; height: 240px; }
+  .cons .g { fill: none; stroke: #8C8C8C; stroke-width: 1; stroke-dasharray: 3 3; }
+  .cons text { font-family: var(--font-sans); font-size: 10px; fill: var(--color-muted); }
+  .lock { position: absolute; top: 32px; left: 288px; width: 228px; }
+  .lu { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+  .lu svg { width: 46px; height: 46px; }
+  .lu b { display: block; font-size: 34px; font-weight: var(--weight-head); line-height: 1; letter-spacing: .06em; }
+  .lu i { display: block; margin-top: 6px; font-family: var(--font-sans); font-style: normal; font-size: 10px; letter-spacing: .26em; }
+  .lock .d { margin-top: 20px; font-size: 14px; line-height: 1.75; }
+  .vars {
+    position: absolute;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 16px;
+  }
+  .tile { height: 112px; display: grid; place-items: center; border: var(--hair) solid #D9D5CC; }
+  .tile svg { width: 56px; height: 56px; }
+  .tile.paper { background: var(--brand-paper); }
+  .tile.ink { background: var(--brand-ink); border-color: var(--brand-ink); }
+  .tile.white svg { width: 32px; height: 32px; }
+  .vars p { margin-top: 8px; font-family: var(--font-sans); font-size: 12px; line-height: 16px; color: var(--color-muted); }
+  .vars p b { color: var(--color-text); font-weight: 600; margin-right: 6px; }
+
+  .col { position: absolute; top: 212px; left: 652px; width: 564px; height: 448px; border-top: var(--rule) solid var(--color-line); padding-top: 14px; }
+  .ratio { display: grid; grid-template-columns: 55fr 30fr 10fr 5fr; margin-top: 12px; }
+  .ratio span { display: block; height: 30px; }
+  .ratio .bg-paper { box-shadow: inset 0 0 0 1px rgba(17, 17, 17, .25); }
+  .ratio i { display: block; margin-top: 6px; font-family: var(--font-sans); font-style: normal; font-size: 11px; color: var(--color-muted); font-variant-numeric: tabular-nums; }
+  .sw { margin-top: 18px; }
+  .sw li {
+    display: grid;
+    grid-template-columns: 46px 112px 96px 1fr;
+    column-gap: 16px;
+    align-items: center;
+    padding: 6px 0;
+    border-top: var(--hair) solid var(--color-line);
+  }
+  .sw .chip { width: 46px; height: 46px; border: var(--hair) solid rgba(17, 17, 17, .2); }
+  .sw b { font-size: 19px; font-weight: 700; line-height: 1.2; }
+  .sw b small { display: block; margin-top: 3px; font-family: var(--font-sans); font-size: 11px; font-weight: 400; letter-spacing: .08em; color: var(--color-muted); }
+  .sw code { font-family: var(--font-sans); font-size: 14px; font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+  .sw span:last-child { font-family: var(--font-sans); font-size: 13px; line-height: 1.5; color: var(--color-muted); }
+  .bg-paper { background: var(--brand-paper); }
+  .bg-ink { background: var(--brand-ink); }
+  .bg-mist { background: var(--brand-mist); }
+  .bg-seal { background: var(--brand-seal); }
+  .type {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 24px;
+    border-top: var(--rule) solid var(--color-line);
+    padding-top: 10px;
+  }
+  .type .l { font-family: var(--font-sans); font-size: 11px; letter-spacing: .06em; color: var(--color-muted); line-height: 16px; }
+  .type .a { font-size: 34px; font-weight: var(--weight-head); line-height: 1.2; margin-top: 4px; }
+  .type .b { font-size: 17px; line-height: 1.4; margin-top: 8px; }
+  .type .b span { font-family: var(--font-sans); font-size: 13px; color: var(--color-muted); }
+</style>
+</head>
+<body>
+<main class="slide">
+  <header class="run grid">
+    <span class="b">山野茶 · 品牌识别提案</span>
+    <span class="s">03　标志与色彩</span>
+    <a class="p" href="05-applications.html">04 / 06</a>
+  </header>
+
+  <h1 class="title head">一枚印，四种颜色。</h1>
+
+  <section class="board">
+    <svg class="cons" viewBox="0 0 240 240" role="img" aria-label="标志结构图：方印 1:1，碗口与山峰的辅助线">
+      <path class="g" d="M30 4 V236 M210 4 V236 M4 30 H236 M4 210 H236 M4 138 H236 M4 73 H236"/>
+      <circle class="g" cx="120" cy="138" r="55.8"/>
+      <use href="art.svg#mark" x="30" y="30" width="180" height="180"/>
+      <text x="214" y="70">峰</text>
+      <text x="214" y="134">碗口</text>
+      <text x="36" y="232">1 : 1 · 最小 16 px</text>
+    </svg>
+    <div class="lock">
+      <p class="kicker">标准组合</p>
+      <div class="lu">
+        <svg viewBox="0 0 100 100" aria-hidden="true"><use href="art.svg#mark"/></svg>
+        <div><b>山野茶</b><i>SHANYE TEA</i></div>
+      </div>
+      <p class="d">标志是一只茶碗，碗里盛着一座山，山腰一道云。方印取自老茶罐上的封签，红色只留给它。</p>
+    </div>
+    <div class="vars">
+      <div><div class="tile paper"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="art.svg#mark"/></svg></div><p><b>主标</b>浅底使用</p></div>
+      <div><div class="tile ink"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="art.svg#mark"/></svg></div><p><b>反白</b>深底、茶罐</p></div>
+      <div><div class="tile white"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="art.svg#mark-line"/></svg></div><p><b>线稿</b>单色、小于 24 px</p></div>
+    </div>
+  </section>
+
+  <section class="col">
+    <p class="kicker">色彩 · COLOR　用量比例</p>
+    <div class="ratio">
+      <div><span class="bg-paper"></span><i>55%</i></div>
+      <div><span class="bg-ink"></span><i>30%</i></div>
+      <div><span class="bg-mist"></span><i>10%</i></div>
+      <div><span class="bg-seal"></span><i>5%</i></div>
+    </div>
+    <ul class="sw">
+      <li><span class="chip bg-paper"></span><b>宣白<small>PAPER</small></b><code>#F4F1EA</code><span>底色、纸张、大片留白</span></li>
+      <li><span class="chip bg-ink"></span><b>墨黑<small>INK</small></b><code>#161513</code><span>文字、线条、茶罐</span></li>
+      <li><span class="chip bg-mist"></span><b>岚青<small>MIST</small></b><code>#66705F</code><span>门头雨棚、辅助图形</span></li>
+      <li><span class="chip bg-seal"></span><b>印红<small>SEAL</small></b><code>#C8231B</code><span>只给标志，一处点题</span></li>
+    </ul>
+    <div class="type">
+      <div><p class="l">标题 · 宋体 Black</p><p class="a">山高水长</p></div>
+      <div><p class="l">正文 · 宋体 Regular　标签 · 苹方</p><p class="b">海拔 1,150 m 的云雾绿<br><span>2026.04.12 采 · 50 g</span></p></div>
+    </div>
+  </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+<symbol id="mark" viewBox="0 0 100 100">
+  <rect width="100" height="100" fill="#C8231B"/>
+  <path d="M19 60 H81 A31 31 0 0 1 19 60 Z" fill="#F4F1EA"/>
+  <path d="M24 55 L45.5 25.5 Q48 22 50.5 25.5 L61 40 L66 33.5 Q68 31 70 33.5 L82 55 Z" fill="#F4F1EA" stroke="#F4F1EA" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M37 44 H57" stroke="#C8231B" stroke-width="3.2" stroke-linecap="round"/>
+</symbol>
+<symbol id="mark-ink" viewBox="0 0 100 100">
+  <rect width="100" height="100" fill="#161513"/>
+  <path d="M19 60 H81 A31 31 0 0 1 19 60 Z" fill="#F4F1EA"/>
+  <path d="M24 55 L45.5 25.5 Q48 22 50.5 25.5 L61 40 L66 33.5 Q68 31 70 33.5 L82 55 Z" fill="#F4F1EA" stroke="#F4F1EA" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M37 44 H57" stroke="#161513" stroke-width="3.2" stroke-linecap="round"/>
+</symbol>
+<symbol id="mark-line" viewBox="0 0 100 100">
+  <rect x="2" y="2" width="96" height="96" fill="none" stroke="#161513" stroke-width="4"/>
+  <path d="M19 60 H81 A31 31 0 0 1 19 60 Z" fill="#161513"/>
+  <path d="M24 55 L45.5 25.5 Q48 22 50.5 25.5 L61 40 L66 33.5 Q68 31 70 33.5 L82 55 Z" fill="#161513" stroke="#161513" stroke-width="2" stroke-linejoin="round"/>
+</symbol>
+<symbol id="ridge" viewBox="0 0 740 132">
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="612" cy="22" r="13" stroke="#555555" stroke-width="1.2"/>
+    <path d="M0 96 C30 92 52 80 76 66 C96 54 108 40 122 40 C138 40 150 62 170 70 C196 80 214 60 238 42 C258 26 270 12 286 12 C304 12 318 40 338 56 C360 74 384 70 408 60 C430 50 446 36 462 36 C480 36 494 54 516 64 C544 76 572 66 600 58 C624 52 640 50 660 54 C690 60 712 74 740 80" stroke="#555555" stroke-width="1.2"/>
+    <path d="M0 124 C40 120 70 108 104 98 C134 90 150 84 170 84 C196 84 210 100 236 106 C262 112 290 104 318 92 C340 82 356 74 376 74 C400 74 418 96 446 104 C476 112 510 106 540 96 C566 88 582 80 604 80 C630 80 650 100 680 108 C704 114 722 116 740 116" stroke="#111111" stroke-width="2"/>
+    <path d="M20 112 H70 M262 76 H330 M520 84 H560" stroke="#555555" stroke-width="1"/>
+    <path d="M0 130 H740" stroke="#111111" stroke-width="2"/>
+  </g>
+</symbol>
+<symbol id="store" viewBox="0 0 520 330">
+  <g font-family="Songti SC, Noto Serif SC, serif">
+    <path d="M30 22 V12 M490 22 V12 M30 17 H226 M294 17 H490" stroke="#555555" stroke-width="1" fill="none"/>
+    <text x="260" y="21" text-anchor="middle" font-family="PingFang SC, Helvetica Neue, sans-serif" font-size="12" fill="#555555">4.2 m</text>
+    <rect x="30" y="32" width="460" height="286" fill="#F4F1EA" stroke="#161513" stroke-width="2"/>
+    <rect x="30" y="32" width="460" height="62" fill="#161513"/>
+    <text x="60" y="76" font-size="34" font-weight="900" fill="#F4F1EA" letter-spacing="6">山野茶</text>
+    <text x="214" y="72" font-family="PingFang SC, Helvetica Neue, sans-serif" font-size="11" letter-spacing="3" fill="#F4F1EA">SHANYE TEA · 高山原叶</text>
+    <use href="#mark" x="440" y="44" width="38" height="38"/>
+    <path d="M30 94 H490 V108 Q478 120 466 108 Q454 120 442 108 Q430 120 418 108 Q406 120 394 108 Q382 120 370 108 Q358 120 346 108 Q334 120 322 108 Q310 120 298 108 Q286 120 274 108 Q262 120 250 108 Q238 120 226 108 Q214 120 202 108 Q190 120 178 108 Q166 120 154 108 Q142 120 130 108 Q118 120 106 108 Q94 120 82 108 Q70 120 58 108 Q46 120 34 108 L30 108 Z" fill="#66705F"/>
+    <rect x="56" y="140" width="252" height="150" fill="#FFFFFF" stroke="#161513" stroke-width="2"/>
+    <path d="M182 140 V290" stroke="#161513" stroke-width="1.5"/>
+    <path d="M72 186 H168 M196 186 H292 M72 232 H168 M196 232 H292" stroke="#161513" stroke-width="1.5"/>
+    <g fill="#161513">
+      <rect x="80" y="162" width="16" height="24"/><rect x="102" y="166" width="16" height="20"/><rect x="124" y="162" width="16" height="24"/>
+      <rect x="204" y="166" width="16" height="20"/><rect x="226" y="162" width="16" height="24"/>
+      <rect x="84" y="210" width="22" height="22"/><rect x="112" y="214" width="22" height="18"/>
+      <rect x="210" y="208" width="14" height="24"/><rect x="230" y="208" width="14" height="24"/><rect x="250" y="208" width="14" height="24"/>
+    </g>
+    <rect x="248" y="162" width="16" height="24" fill="#C8231B"/>
+    <path d="M60 266 H304" stroke="#161513" stroke-width="1.5"/>
+    <path d="M100 252 h28 v14 h-28 Z M232 248 a10 10 0 0 1 20 0 v18 h-20 Z" fill="none" stroke="#161513" stroke-width="1.5"/>
+    <rect x="336" y="140" width="126" height="178" fill="#FFFFFF" stroke="#161513" stroke-width="2"/>
+    <rect x="352" y="156" width="94" height="96" fill="none" stroke="#161513" stroke-width="1.5"/>
+    <path d="M440 268 v26" stroke="#161513" stroke-width="3" stroke-linecap="round"/>
+    <text x="399" y="214" text-anchor="middle" font-size="16" font-weight="700" fill="#161513">营业中</text>
+    <text x="399" y="234" text-anchor="middle" font-family="PingFang SC, Helvetica Neue, sans-serif" font-size="10" fill="#555555">10:00 – 21:00</text>
+    <path d="M254 318 L268 254 H316 L330 318 M262 292 H322" fill="none" stroke="#161513" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="268" y="256" width="48" height="34" fill="#161513"/>
+    <text x="292" y="270" text-anchor="middle" font-size="10" fill="#F4F1EA">今日</text>
+    <text x="292" y="284" text-anchor="middle" font-size="11" font-weight="700" fill="#F4F1EA">¥18</text>
+    <path d="M10 318 H510" stroke="#161513" stroke-width="2"/>
+  </g>
+</symbol>
+<symbol id="tin" viewBox="0 0 240 300">
+  <g font-family="Songti SC, Noto Serif SC, serif">
+    <rect x="148" y="112" width="74" height="166" fill="#161513"/>
+    <path d="M148 112 L156 98 H214 L222 112" fill="#161513"/>
+    <path d="M150 104 H220" stroke="#F4F1EA" stroke-width="1"/>
+    <rect x="160" y="140" width="50" height="86" fill="#F4F1EA"/>
+    <use href="#mark" x="172" y="150" width="26" height="26"/>
+    <text x="185" y="200" text-anchor="middle" font-size="12" font-weight="900" fill="#161513">山野茶</text>
+    <text x="185" y="216" text-anchor="middle" font-family="PingFang SC, Helvetica Neue, sans-serif" font-size="8" fill="#555555">50 g</text>
+    <rect x="22" y="58" width="128" height="40" fill="#161513"/>
+    <ellipse cx="86" cy="58" rx="64" ry="12" fill="#2A2926" stroke="#161513" stroke-width="2"/>
+    <path d="M26 98 H146 V266 A60 12 0 0 1 26 266 Z" fill="#FFFFFF" stroke="#161513" stroke-width="2"/>
+    <path d="M26 104 H146" stroke="#161513" stroke-width="1"/>
+    <text x="86" y="150" text-anchor="middle" font-size="30" font-weight="900" fill="#161513">山</text>
+    <text x="86" y="184" text-anchor="middle" font-size="30" font-weight="900" fill="#161513">野</text>
+    <text x="86" y="218" text-anchor="middle" font-size="30" font-weight="900" fill="#161513">茶</text>
+    <use href="#mark" x="112" y="118" width="22" height="22"/>
+    <path d="M40 236 H132" stroke="#161513" stroke-width="1"/>
+    <text x="86" y="254" text-anchor="middle" font-family="PingFang SC, Helvetica Neue, sans-serif" font-size="10" fill="#555555">云雾绿 · 海拔 1,150 m</text>
+    <path d="M8 280 H232" stroke="#161513" stroke-width="2"/>
+  </g>
+</symbol>
+<symbol id="cup" viewBox="0 0 200 300">
+  <g font-family="Songti SC, Noto Serif SC, serif">
+    <path d="M58 34 Q100 22 142 34 L146 46 H54 Z" fill="#FFFFFF" stroke="#161513" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="46" y="46" width="108" height="14" rx="2" fill="#FFFFFF" stroke="#161513" stroke-width="2"/>
+    <path d="M52 60 H148 L134 270 H66 Z" fill="#FFFFFF" stroke="#161513" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M56 116 H144 L139 196 H61 Z" fill="#161513"/>
+    <use href="#mark" x="86" y="128" width="28" height="28"/>
+    <text x="100" y="180" text-anchor="middle" font-size="13" font-weight="900" fill="#F4F1EA" letter-spacing="2">山野茶</text>
+    <text x="100" y="230" text-anchor="middle" font-size="11" fill="#555555">慢一点</text>
+    <text x="100" y="246" text-anchor="middle" font-size="11" fill="#555555">山就近一点</text>
+    <path d="M8 271 H192" stroke="#161513" stroke-width="2"/>
+  </g>
+</symbol>
+</svg>

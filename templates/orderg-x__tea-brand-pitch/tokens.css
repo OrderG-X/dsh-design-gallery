@@ -1,0 +1,33 @@
+:root {
+  --color-bg: #F4F1EA;
+  --color-surface: #FFFFFF;
+  --color-text: #111111;
+  --color-muted: #555555;
+  --color-line: #111111;
+  --color-primary: #C8231B;
+  --color-on-primary: #FFFFFF;
+  --color-link: #C8231B;
+
+  --brand-ink: #161513;
+  --brand-paper: #F4F1EA;
+  --brand-seal: #C8231B;
+  --brand-mist: #66705F;
+
+  --font-serif: "Songti SC", "Noto Serif SC", "Source Han Serif SC", "STSong", "SimSun", serif;
+  --font-sans: "PingFang SC", "Helvetica Neue", "HarmonyOS Sans SC", "Microsoft YaHei", sans-serif;
+  --weight-head: 900;
+
+  --text-label: 13px;
+  --text-small: 16px;
+  --text-body: 19px;
+  --text-sub: 28px;
+  --text-title: 56px;
+
+  --margin: 64px;
+  --col: 74px;
+  --gutter: 24px;
+  --rule-thick: 6px;
+  --rule: 2px;
+  --hair: 1px;
+  --radius: 2px;
+}

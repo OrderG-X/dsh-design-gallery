@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="slides">
+<title>品牌概念 · 山野茶品牌提案</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="deck.css">
+<style>
+  .glyph {
+    position: absolute;
+    top: 108px;
+    left: 40px;
+    font-size: 500px;
+    font-weight: var(--weight-head);
+    line-height: 1;
+  }
+  .gloss {
+    position: absolute;
+    top: 620px;
+    left: var(--margin);
+    width: 520px;
+    padding-top: 10px;
+    border-top: var(--hair) solid var(--color-line);
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    line-height: 16px;
+    letter-spacing: .04em;
+    color: var(--color-muted);
+  }
+  .side {
+    position: absolute;
+    top: 118px;
+    left: 652px;
+    width: 564px;
+    height: 552px;
+  }
+  .side::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -24px;
+    border-left: var(--hair) solid var(--color-line);
+  }
+  .side h1 { margin-top: 14px; font-size: 60px; }
+  .side .p { margin-top: 22px; width: 520px; font-size: 18px; line-height: 1.75; }
+  .alt { margin-top: 22px; display: flex; align-items: baseline; gap: 16px; font-size: 16px; }
+  .alt .kicker { color: var(--color-muted); font-weight: 400; letter-spacing: .1em; font-size: 12px; }
+  .alt span + span::before { content: "/"; margin-right: 16px; color: var(--color-muted); }
+  .pr {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 564px;
+    grid-template-columns: repeat(3, 1fr);
+    column-gap: 24px;
+  }
+  .pr li { border-top: var(--rule) solid var(--color-line); padding-top: 12px; }
+  .pr .c { font-size: 44px; font-weight: var(--weight-head); line-height: 1; }
+  .pr .c span { font-family: var(--font-sans); font-size: 12px; font-weight: 400; color: var(--color-muted); letter-spacing: .1em; margin-left: 8px; vertical-align: middle; }
+  .pr h3 { margin-top: 14px; font-size: 19px; font-weight: 700; line-height: 1.4; }
+  .pr .t { margin-top: 6px; font-family: var(--font-sans); font-size: 13px; line-height: 1.7; color: var(--color-muted); }
+</style>
+</head>
+<body>
+<main class="slide">
+  <header class="run grid">
+    <span class="b">山野茶 · 品牌识别提案</span>
+    <span class="s">02　品牌概念</span>
+    <a class="p" href="04-identity.html">03 / 06</a>
+  </header>
+
+  <p class="glyph" aria-hidden="true">野</p>
+  <p class="gloss"><span>野 · yě</span><span>山里本来的样子，不修饰，也不将就</span></p>
+
+  <section class="side">
+    <p class="kicker">品牌概念 · BRAND IDEA</p>
+    <h1 class="head">慢一点，<br>山就近一点。</h1>
+    <p class="p">山野茶只卖高山原叶茶。每一罐写明山头、海拔和采摘日；不讲茶道，也不讲礼数，只做一杯天天能喝、喝得出山味的茶。</p>
+    <p class="alt"><span class="kicker">备选口号</span><span>一口山味</span><span>山在杯里</span><span>从山里来的茶</span></p>
+    <ol class="pr grid">
+      <li><p class="c">真<span>I</span></p><h3>来路看得见</h3><p class="t">每罐标出山头、海拔、采摘日，背面一张手绘茶园图</p></li>
+      <li><p class="c">简<span>II</span></p><h3>两色一枚印</h3><p class="t">只用墨色和纸色，红色留给标志，其他一律克制</p></li>
+      <li><p class="c red">野<span>III</span></p><h3>不修边幅</h3><p class="t">手绘山线、粗纸质感、大片留白，像山里寄来的信</p></li>
+    </ol>
+  </section>
+</main>
+</body>
+</html>

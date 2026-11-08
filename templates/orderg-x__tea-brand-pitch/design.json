@@ -1,0 +1,25 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": { "zh": "山野茶品牌提案", "en": "Shanye Tea Brand Pitch" },
+  "description": {
+    "zh": "虚构高山茶品牌的六页识别提案：调研洞察、品牌概念、手绘标志与色彩、茶罐外带杯门头示意、时间线与下一步，黑线栅格杂志风",
+    "en": "A six-slide brand identity pitch for a fictional mountain tea: insight, brand idea, drawn logo and colors, packaging, cup and storefront mock-ups, and a timeline, in an editorial style"
+  },
+  "kind": "slides",
+  "screens": [
+    { "file": "01-cover.html", "title": { "zh": "封面", "en": "Cover" } },
+    { "file": "02-insight.html", "title": { "zh": "背景与洞察", "en": "Insight" } },
+    { "file": "03-idea.html", "title": { "zh": "品牌概念", "en": "Brand idea" } },
+    { "file": "04-identity.html", "title": { "zh": "标志与色彩", "en": "Logo & color" } },
+    { "file": "05-applications.html", "title": { "zh": "应用延展", "en": "Applications" } },
+    { "file": "06-next.html", "title": { "zh": "时间与下一步", "en": "Timeline & next steps" } }
+  ],
+  "style": "editorial",
+  "categories": ["business", "portfolio"],
+  "tags": ["cover", "report", "illustration", "chart"],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": { "login": "orderg-x", "id": 271418316 },
+  "ai": { "generated": true, "tool": "claude-opus-5-5" }
+}
