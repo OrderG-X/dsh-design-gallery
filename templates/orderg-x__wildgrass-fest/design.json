@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": { "zh": "野草音乐节", "en": "Wildgrass Music Fest" },
+  "description": {
+    "zh": "冬日户外小型音乐节的 9:16 拼贴竖版海报：剪报和红纸拼的大标题、胶带、狗尾巴草标本，附两天演出阵容、票根票价和时间地点",
+    "en": "A 9:16 scrapbook poster for a small winter outdoor music fest: cut-out paper title, tape, a pressed foxtail, two-day line-up, ticket stub, date and venue"
+  },
+  "kind": "poster",
+  "size": "1080x1920",
+  "screens": [
+    { "file": "poster.html", "title": { "zh": "海报", "en": "Poster" } }
+  ],
+  "style": "custom",
+  "categories": ["event"],
+  "tags": ["cover", "illustration"],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": { "login": "orderg-x", "id": 271418316 },
+  "ai": { "generated": true, "tool": "claude-opus-5-5" }
+}

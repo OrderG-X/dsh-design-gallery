@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080">
+<meta name="dsh-design" content="poster 1080x1920">
+<title>海报 · 野草音乐节</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; }
+  body { background: var(--color-bg); color: var(--color-text); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  p, h1, h2 { margin: 0; }
+  .poster { position: relative; width: 1080px; height: 1920px; overflow: hidden; background: repeating-linear-gradient(0deg, transparent 0 31px, var(--color-rule) 31px 32px), var(--color-bg); }
+  .abs { position: absolute; }
+  .sh { filter: var(--shadow); }
+  .lift { filter: var(--shadow-lift); }
+  .type { font-family: var(--font-type); font-weight: 400; letter-spacing: .14em; }
+  .grain { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply; }
+
+  .tape { position: absolute; width: 168px; height: 46px; background: var(--color-tape); clip-path: polygon(0px 0px, 168px 0px, 167px 5px, 167px 10px, 166px 15px, 167px 20px, 168px 26px, 166px 31px, 162px 36px, 163px 41px, 168px 46px, 0px 46px, 5px 41px, 1px 36px, 3px 31px, 2px 26px, 1px 20px, 1px 15px, 1px 10px, 6px 5px); }
+  .tape.s { width: 120px; height: 40px; clip-path: polygon(0px 0px, 120px 0px, 119px 5px, 115px 10px, 119px 15px, 116px 20px, 120px 25px, 119px 30px, 115px 35px, 120px 40px, 0px 40px, 1px 35px, 3px 30px, 2px 25px, 2px 20px, 2px 15px, 1px 10px, 4px 5px); }
+  .washi { background: radial-gradient(rgba(255, 253, 247, .85) 3px, transparent 3.6px) 0 0 / 18px 18px, rgba(47, 110, 142, .62); }
+
+  .label { padding: 12px 30px 13px 34px; background: var(--color-kraft); font-family: var(--font-head); font-weight: 700; font-size: var(--text-md); letter-spacing: .12em; clip-path: polygon(0 4px, 100% 0, calc(100% - 3px) 100%, 3px calc(100% - 2px)); }
+  .vol { right: var(--safe); top: 72px; font-size: var(--text-sm); color: var(--color-text); }
+
+  .scrap { position: relative; box-sizing: border-box; }
+  .hero-char { position: absolute; font-family: var(--font-head); font-weight: var(--weight-head); font-size: var(--text-hero); line-height: 1; }
+  .news { background: repeating-linear-gradient(90deg, transparent 0 140px, var(--color-news) 140px 154px), repeating-linear-gradient(0deg, transparent 0 7px, rgba(42, 38, 34, .075) 7px 9px), var(--color-news); }
+  .news::before { content: ""; position: absolute; left: 22px; right: 22px; top: 16px; height: 9px; border-top: 4px solid var(--color-text); border-bottom: 1.5px solid var(--color-text); }
+  .red { background: radial-gradient(rgba(60, 10, 18, .18) 1.7px, transparent 2.3px) 0 0 / 11px 11px, var(--color-primary); color: var(--color-on); }
+  .dict { display: block; padding: 6px 16px 7px 14px; font-size: var(--text-sm); line-height: 1.4; color: var(--color-muted); background: var(--color-surface); clip-path: polygon(0 1px, 100% 0, calc(100% - 2px) 100%, 1px calc(100% - 2px)); }
+  .dict .type { margin-right: 10px; font-size: var(--text-md); color: var(--color-primary); letter-spacing: 0; }
+  .dict b { margin-right: 10px; font-family: var(--font-head); font-weight: 900; color: var(--color-text); }
+
+  .tiles { display: flex; gap: 14px; }
+  .tile { display: grid; place-items: center; width: 148px; height: 156px; font-family: var(--font-head); font-weight: 900; font-size: var(--text-tile); line-height: 1; clip-path: polygon(3px 0, 100% 4px, calc(100% - 2px) 100%, 0 calc(100% - 3px)); }
+  .t-blue { background: var(--color-accent); color: var(--color-on); }
+  .t-kraft { background: var(--color-kraft); color: var(--color-text); }
+  .t-ink { background: var(--color-text); color: var(--color-mustard); }
+
+  .strip { padding: 9px 20px 8px; background: var(--color-surface); font-size: var(--text-sm); color: var(--color-text); clip-path: polygon(0 2px, 100% 0, 100% 100%, 2px calc(100% - 1px)); }
+  .hand { font-family: var(--font-hand); color: var(--color-primary); }
+  .scribble { left: 742px; top: 978px; font-size: var(--text-md); transform: rotate(-4deg); }
+  .scribble svg { position: absolute; left: -4px; bottom: -12px; }
+
+  .page { position: relative; box-sizing: border-box; padding: 54px 40px 28px 116px; background: linear-gradient(90deg, transparent 0 86px, rgba(178, 58, 72, .42) 86px 88px, transparent 88px), repeating-linear-gradient(180deg, transparent 0 51px, rgba(47, 110, 142, .17) 51px 53px), var(--color-surface); }
+  .page h2 { display: flex; align-items: baseline; gap: 16px; font-family: var(--font-head); font-weight: 700; font-size: var(--text-md); letter-spacing: .1em; }
+  .page h2 .type { font-size: var(--text-sm); color: var(--color-accent); letter-spacing: .24em; }
+  .day { margin-top: 22px; }
+  .day + .day { margin-top: 26px; }
+  .dayhead { display: flex; align-items: center; gap: 14px; font-size: var(--text-sm); color: var(--color-muted); }
+  .chip { padding: 4px 12px 3px; font-family: var(--font-type); font-size: var(--text-sm); letter-spacing: .12em; color: var(--color-on); clip-path: polygon(0 2px, 100% 0, calc(100% - 2px) 100%, 1px calc(100% - 1px)); }
+  .c-blue { background: var(--color-accent); }
+  .c-red { background: var(--color-primary); }
+  .act { margin-top: 10px; display: flex; align-items: center; gap: 18px; font-family: var(--font-head); font-weight: 900; font-size: var(--text-act); line-height: 1.12; letter-spacing: .04em; }
+  .act span { background: linear-gradient(transparent 60%, rgba(224, 165, 60, .55) 60% 92%, transparent 92%); }
+  .act i { font-style: normal; font-family: var(--font-hand); font-weight: 400; font-size: var(--text-md); color: var(--color-primary); letter-spacing: 0; transform: rotate(-8deg); }
+  .others { margin-top: 6px; font-family: var(--font-head); font-weight: 700; font-size: var(--text-md); line-height: 1.45; }
+  .more { margin-top: 20px; font-size: var(--text-md); }
+
+  .clip-ico { left: 584px; top: 1016px; transform: rotate(6deg); }
+  .tag { left: 14px; top: 470px; padding: 8px 16px 10px; background: var(--color-surface); font-family: var(--font-hand); font-size: var(--text-md); line-height: 1.3; color: var(--color-text); transform: rotate(-6deg); }
+  .tag small { display: block; font-size: var(--text-sm); color: var(--color-muted); }
+
+  .ticket { position: relative; display: grid; grid-template-columns: 392px 1fr; width: 540px; height: 228px; background: var(--color-accent); color: var(--color-on); -webkit-mask: radial-gradient(circle at 392px 0, transparent 15px, #000 16px) top / 100% 51% no-repeat, radial-gradient(circle at 392px 100%, transparent 15px, #000 16px) bottom / 100% 51% no-repeat; mask: radial-gradient(circle at 392px 0, transparent 15px, #000 16px) top / 100% 51% no-repeat, radial-gradient(circle at 392px 100%, transparent 15px, #000 16px) bottom / 100% 51% no-repeat; }
+  .tk-main { padding: 20px 28px 0 32px; font-size: var(--text-sm); line-height: 1.5; }
+  .tk-h { font-size: var(--text-sm); letter-spacing: .2em; }
+  .tk-price { display: flex; align-items: baseline; gap: 14px; margin: 0 0 2px; font-family: var(--font-head); font-weight: 700; font-size: var(--text-md); }
+  .tk-price b { font-family: var(--font-num); font-weight: 900; font-size: var(--text-act); line-height: 1; letter-spacing: -.01em; }
+  .tk-early { display: inline-block; margin-top: 6px; padding: 2px 12px; background: var(--color-mustard); color: var(--color-text); font-weight: 600; }
+  .tk-stub { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; border-left: 3px dashed rgba(255, 246, 232, .55); }
+  .tk-stub b { writing-mode: vertical-rl; font-family: var(--font-head); font-weight: 900; font-size: 40px; letter-spacing: .2em; }
+  .tk-stub span { font-size: var(--text-sm); letter-spacing: .06em; }
+
+  .when { left: 628px; top: 1604px; width: 396px; }
+  .date { font-family: var(--font-num); font-weight: 900; font-size: 86px; line-height: 1; letter-spacing: -.02em; white-space: nowrap; }
+  .date span { color: var(--color-primary); padding: 0 2px; }
+  .days { margin-top: 12px; font-size: var(--text-md); font-weight: 600; }
+  .venue { display: flex; align-items: center; gap: 8px; margin-top: 14px; font-size: var(--text-sm); line-height: 1.4; }
+  .venue svg { flex-shrink: 0; }
+  .tip { margin-top: 6px; font-family: var(--font-hand); font-size: var(--text-md); color: var(--color-primary); }
+
+  .foot { left: var(--safe); right: var(--safe); bottom: 30px; display: flex; justify-content: space-between; font-size: var(--text-sm); color: var(--color-muted); letter-spacing: .04em; }
+</style>
+</head>
+<body>
+<main class="poster">
+  <div class="abs sh" style="left:56px;top:56px;transform:rotate(-2deg)"><p class="label">第三届 · 冬日草地场</p></div>
+  <span class="tape s" style="left:356px;top:62px;transform:rotate(76deg)"></span>
+  <p class="abs vol type">VOL.03 — 2026.12</p>
+
+  <svg class="abs sh" style="left:700px;top:118px" width="340" height="340" viewBox="0 0 340 340" aria-hidden="true"><defs><pattern id="dots" width="12" height="12" patternUnits="userSpaceOnUse"><circle cx="6" cy="6" r="2" fill="#B97F22" fill-opacity=".38"/></pattern></defs><path d="M334 170 L335 186 L327 201 L330 219 L319 232 L314 247 L309 263 L295 273 L288 288 L273 296 L263 309 L249 317 L232 321 L216 321 L202 333 L186 335 L170 330 L155 326 L139 328 L123 326 L110 314 L91 318 L82 301 L66 297 L52 288 L41 276 L33 261 L30 245 L17 233 L16 217 L13 201 L7 186 L9 170 L4 154 L6 137 L12 122 L22 109 L26 93 L33 79 L46 68 L55 55 L66 43 L82 38 L95 29 L107 17 L123 16 L138 11 L155 13 L170 11 L186 6 L200 17 L218 11 L232 19 L245 30 L262 32 L273 45 L288 52 L294 69 L302 82 L312 94 L316 110 L327 122 L327 139 L330 154Z" fill="#E0A53C"/><path d="M334 170 L335 186 L327 201 L330 219 L319 232 L314 247 L309 263 L295 273 L288 288 L273 296 L263 309 L249 317 L232 321 L216 321 L202 333 L186 335 L170 330 L155 326 L139 328 L123 326 L110 314 L91 318 L82 301 L66 297 L52 288 L41 276 L33 261 L30 245 L17 233 L16 217 L13 201 L7 186 L9 170 L4 154 L6 137 L12 122 L22 109 L26 93 L33 79 L46 68 L55 55 L66 43 L82 38 L95 29 L107 17 L123 16 L138 11 L155 13 L170 11 L186 6 L200 17 L218 11 L232 19 L245 30 L262 32 L273 45 L288 52 L294 69 L302 82 L312 94 L316 110 L327 122 L327 139 L330 154Z" fill="url(#dots)"/></svg>
+
+  <div class="abs sh" style="left:52px;top:168px;transform:rotate(-4deg)">
+    <div class="scrap news" style="width:470px;height:520px;clip-path:polygon(0px 0px, 470px 0px, 467px 13px, 466px 26px, 464px 39px, 467px 52px, 466px 65px, 466px 78px, 469px 91px, 466px 104px, 466px 117px, 464px 130px, 469px 143px, 468px 156px, 469px 169px, 464px 182px, 465px 195px, 470px 208px, 463px 221px, 463px 234px, 465px 247px, 466px 260px, 469px 273px, 470px 286px, 466px 299px, 470px 312px, 469px 325px, 468px 338px, 470px 351px, 467px 364px, 467px 377px, 464px 390px, 466px 403px, 466px 416px, 467px 429px, 465px 442px, 467px 455px, 468px 468px, 463px 481px, 463px 494px, 464px 507px, 470px 520px, 457px 515px, 444px 518px, 431px 518px, 418px 518px, 405px 520px, 392px 515px, 379px 517px, 366px 514px, 352px 517px, 339px 513px, 326px 514px, 313px 520px, 300px 519px, 287px 514px, 274px 517px, 261px 513px, 248px 517px, 235px 519px, 222px 516px, 209px 515px, 196px 518px, 183px 519px, 170px 518px, 157px 513px, 144px 515px, 131px 519px, 118px 518px, 104px 519px, 91px 520px, 78px 514px, 65px 519px, 52px 516px, 39px 517px, 26px 519px, 13px 515px, 0px 520px)">
+      <span class="hero-char" style="left:34px;top:30px">野</span>
+    </div>
+  </div>
+  <span class="tape" style="left:6px;top:166px;transform:rotate(-40deg)"></span>
+
+  <div class="abs lift" style="left:486px;top:388px;transform:rotate(3.5deg)">
+    <div class="scrap red" style="width:520px;height:548px;clip-path:polygon(0px 0px, 12px 8px, 24px 9px, 36px 8px, 48px 1px, 60px 5px, 73px 4px, 85px 5px, 97px 1px, 109px 2px, 121px 4px, 133px 2px, 145px 4px, 157px 0px, 169px 1px, 181px 6px, 193px 4px, 206px 5px, 218px 7px, 230px 3px, 242px 1px, 254px 7px, 266px 5px, 278px 6px, 290px 6px, 302px 9px, 314px 3px, 327px 7px, 339px 3px, 351px 5px, 363px 6px, 375px 3px, 387px 1px, 399px 4px, 411px 6px, 423px 5px, 435px 4px, 447px 6px, 460px 2px, 472px 2px, 484px 3px, 496px 7px, 508px 2px, 520px 0px, 520px 548px, 0px 548px, 1px 536px, 1px 524px, 0px 511px, 2px 499px, 5px 487px, 7px 475px, 3px 463px, 3px 451px, 3px 438px, 3px 426px, 7px 414px, 5px 402px, 2px 390px, 1px 378px, 7px 365px, 6px 353px, 7px 341px, 2px 329px, 5px 317px, 8px 304px, 5px 292px, 9px 280px, 2px 268px, 9px 256px, 1px 244px, 4px 231px, 0px 219px, 7px 207px, 6px 195px, 9px 183px, 7px 170px, 9px 158px, 5px 146px, 9px 134px, 7px 122px, 3px 110px, 9px 97px, 3px 85px, 2px 73px, 1px 61px, 4px 49px, 2px 37px, 8px 24px, 9px 12px)">
+      <span class="hero-char" style="left:58px;top:26px">草</span>
+    </div>
+  </div>
+  <span class="tape" style="left:404px;top:456px;transform:rotate(62deg)"></span>
+  <span class="tape s" style="left:900px;top:382px;transform:rotate(34deg)"></span>
+
+  <p class="abs sh" style="left:94px;top:690px;transform:rotate(-2.5deg)"><span class="dict"><span class="type">yě</span><b>野</b>不被安排，自顾自地长</span></p>
+  <p class="abs sh" style="left:668px;top:906px;transform:rotate(2deg)"><span class="dict"><span class="type">cǎo</span><b>草</b>冬天也不肯全枯</span></p>
+
+  <h1 class="abs tiles" style="left:60px;top:764px" aria-label="野草音乐节">
+    <span class="sh" style="transform:rotate(-5deg)"><span class="tile t-blue">音</span></span>
+    <span class="sh" style="transform:translateY(12px) rotate(3deg)"><span class="tile t-kraft">乐</span></span>
+    <span class="sh" style="transform:translateY(-2px) rotate(-2.5deg)"><span class="tile t-ink">节</span></span>
+  </h1>
+
+  <p class="abs sh" style="left:66px;top:962px;transform:rotate(-1.5deg)"><span class="strip type" style="display:block">WILDGRASS MUSIC FESTIVAL</span></p>
+
+  <p class="abs hand scribble">躺在草地上听歌！
+    <svg width="236" height="18" viewBox="0 0 380 22" preserveAspectRatio="none" fill="none" stroke="#B23A48" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M4 14C80 6 170 8 250 10S350 12 376 6"/><path d="M60 19C140 13 230 14 300 16"/></svg>
+  </p>
+
+  <div class="abs lift" style="left:46px;top:1052px;transform:rotate(-1deg)">
+    <section class="page" style="width:700px;height:528px;clip-path:polygon(0px 0px, 10px 6px, 20px 7px, 30px 7px, 40px 8px, 50px 7px, 60px 8px, 70px 0px, 80px 4px, 90px 8px, 100px 6px, 110px 8px, 120px 1px, 130px 4px, 140px 2px, 150px 5px, 160px 5px, 170px 0px, 180px 2px, 190px 3px, 200px 8px, 210px 7px, 220px 1px, 230px 7px, 240px 1px, 250px 6px, 260px 1px, 270px 0px, 280px 8px, 290px 2px, 300px 2px, 310px 9px, 320px 8px, 330px 3px, 340px 9px, 350px 5px, 360px 6px, 370px 2px, 380px 8px, 390px 6px, 400px 9px, 410px 8px, 420px 3px, 430px 3px, 440px 1px, 450px 1px, 460px 1px, 470px 3px, 480px 5px, 490px 0px, 500px 6px, 510px 3px, 520px 3px, 530px 7px, 540px 4px, 550px 3px, 560px 4px, 570px 6px, 580px 1px, 590px 9px, 600px 0px, 610px 7px, 620px 8px, 630px 0px, 640px 7px, 650px 3px, 660px 5px, 670px 0px, 680px 0px, 690px 2px, 700px 0px, 700px 528px, 0px 528px)">
+      <h2><span class="type">LINE-UP</span>演出阵容</h2>
+      <div class="day">
+        <p class="dayhead"><span class="chip c-blue">DAY 1</span>12.19 周六 · 14:00 开唱</p>
+        <p class="act"><span>晚风收割机</span><i>压轴！</i></p>
+        <p class="others">浅水鱼 · 蒲公英邮差 · 鹅卵石合唱团</p>
+      </div>
+      <div class="day">
+        <p class="dayhead"><span class="chip c-red">DAY 2</span>12.20 周日 · 13:30 开唱</p>
+        <p class="act"><span>冬眠熊</span><i>会返场</i></p>
+        <p class="others">苔藓 · 南方信号 · 小卖部乐队 · 纸船</p>
+      </div>
+      <p class="more hand">＋ 还有 4 组神秘嘉宾，12 月 1 日揭晓</p>
+    </section>
+  </div>
+  <span class="tape washi" style="left:250px;top:1030px;transform:rotate(-4deg)"></span>
+  <svg class="abs clip-ico" width="40" height="110" viewBox="0 0 40 110" fill="none" stroke="#8A857C" stroke-width="4" stroke-linecap="round" aria-hidden="true"><path d="M28 30V88C28 100 12 100 12 88V18C12 6 32 6 32 18V80"/></svg>
+
+  <div class="abs" style="left:752px;top:1010px;width:280px;height:560px;transform:rotate(4deg)">
+    <svg width="280" height="560" viewBox="0 0 280 560" role="img" aria-label="几枝压干的狗尾巴草标本">
+      <path d="M138 548C118 474 82 424 34 388C88 424 124 470 148 540Z" fill="#9A8750"/>
+      <path d="M150 530C182 466 222 424 262 388C230 434 194 478 160 538Z" fill="#A8955A"/>
+      <g fill="none" stroke-linecap="round">
+        <path d="M120 556Q100 450 66 352" stroke="#7F6E3E" stroke-width="3"/>
+        <path d="M144 556Q168 380 150 200" stroke="#7F6E3E" stroke-width="4.5"/>
+        <path d="M178 556Q214 430 236 300" stroke="#7F6E3E" stroke-width="3.5"/>
+        <path d="M66 352l9 -6M66 352l-14 -6M64 346l12 -5M64 346l-10 -1M62 340l15 -10M62 340l-16 3M60 334l11 -13M60 334l-17 -4M59 328l9 -10M59 328l-15 -8M57 321l15 -17M57 321l-19 1M56 315l15 -16M56 315l-12 -8M56 309l13 -11M56 309l-22 -15M55 303l13 -1M55 303l-18 -10M55 297l13 -1M55 297l-17 -15M55 291l19 -12M55 291l-14 -3M55 285l12 -9M55 285l-13 -8M56 279l10 -2M56 279l-12 -5M56 272l16 -5M56 272l-10 -6M57 266l13 -8M57 266l-12 -3M59 260l9 1M59 260l-5 -5M60 254l5 -1M60 254l-3 -1M62 248l0 0M62 248l-0 -0" stroke="#9E7B35" stroke-width="2"/>
+        <path d="M66 352Q46 300 62 248" stroke="#C49A4A" stroke-width="12"/>
+        <path d="M150 200l17 -2M150 200l-15 -14M151 196l24 -13M151 196l-11 -14M152 191l20 -9M152 191l-25 -17M153 187l29 -7M153 187l-22 -8M154 183l25 1M154 183l-21 -20M154 179l28 -19M154 179l-26 -19M155 175l23 -17M155 175l-29 -17M155 171l28 -1M155 171l-25 -27M156 167l25 -3M156 167l-23 -24M156 162l33 -26M156 162l-21 -5M156 158l37 -17M156 158l-30 -9M156 154l29 -16M156 154l-26 -14M156 150l29 -3M156 150l-31 -26M156 146l33 -2M156 146l-32 -4M156 142l33 -4M156 142l-38 -16M156 138l31 -27M156 138l-38 -15M155 135l22 -25M155 135l-37 -28M155 131l21 -7M155 131l-28 0M154 127l25 -10M154 127l-34 4M153 123l24 -33M153 123l-35 -3M152 119l33 -9M152 119l-33 -20M151 115l19 -28M151 115l-29 6M150 112l20 -19M150 112l-30 4M149 108l19 -9M149 108l-30 -14M148 104l27 -31M148 104l-31 -3M147 100l25 -21M147 100l-33 -5M145 97l27 -28M145 97l-31 -6M144 93l15 -22M144 93l-39 -1M142 90l13 -32M142 90l-29 -1M141 86l14 -14M141 86l-24 10M139 82l18 -24M139 82l-29 5M137 79l20 -19M137 79l-15 7M135 75l20 -13M135 75l-21 3M133 72l12 -24M133 72l-20 6M130 68l12 -16M130 68l-19 5M128 65l6 -28M128 65l-24 0M126 61l6 -18M126 61l-20 8M123 58l7 -14M123 58l-15 9M121 55l5 -15M121 55l-18 6M118 51l4 -19M118 51l-14 2M115 48l6 -14M115 48l-7 5M112 45l2 -11M112 45l-12 1M109 41l1 -5M109 41l-8 2M106 38l0 -0M106 38l-0 0" stroke="#9E7B35" stroke-width="2.2"/>
+        <path d="M150 200l11 -0M150 200l-10 -14M152 194l13 -5M152 194l-10 -5M153 187l19 -10M153 187l-14 -6M154 181l15 -5M154 181l-17 -14M155 175l13 -6M155 175l-11 -12M156 169l21 -2M156 169l-19 -16M156 163l23 -3M156 163l-14 -13M156 157l19 -4M156 157l-20 -8M156 151l18 -10M156 151l-16 -2M156 145l23 -6M156 145l-26 -15M156 139l20 -7M156 139l-16 -8M155 133l17 -17M155 133l-18 -6M154 128l16 -11M154 128l-23 -4M153 122l14 -10M153 122l-17 -0M152 116l14 -13M152 116l-17 -5M150 111l20 -20M150 111l-25 -12M148 105l9 -15M148 105l-26 -9M147 100l13 -21M147 100l-21 -7M144 94l19 -12M144 94l-18 -5M142 89l13 -11M142 89l-17 -6M139 84l14 -12M139 84l-16 -1M137 78l12 -14M137 78l-17 -1M133 73l7 -14M133 73l-14 -0M130 68l5 -12M130 68l-12 1M127 63l7 -12M127 63l-10 2M123 58l3 -12M123 58l-10 -1M119 53l3 -8M119 53l-9 2M115 48l2 -6M115 48l-8 0M111 43l1 -4M111 43l-6 -0M106 38l0 -0M106 38l-0 0" stroke="#D9B66A" stroke-width="2"/>
+        <path d="M150 200Q174 108 106 38" stroke="#C49A4A" stroke-width="22"/>
+        <path d="M236 300l14 -4M236 300l-8 -9M237 294l11 -2M237 294l-16 -5M238 288l17 -2M238 288l-10 -6M240 282l20 -5M240 282l-17 -6M241 277l16 -9M241 277l-13 -18M242 271l20 -0M242 271l-14 -15M243 265l16 -6M243 265l-18 -18M244 259l20 -12M244 259l-16 -7M245 253l17 0M245 253l-13 -16M247 248l27 -16M247 248l-17 -12M248 242l16 -5M248 242l-23 -7M249 236l23 -12M249 236l-16 -20M250 231l17 -11M250 231l-13 -10M251 225l15 -9M251 225l-15 -19M252 219l19 -6M252 219l-18 -6M253 214l20 -10M253 214l-14 -19M255 208l13 -2M255 208l-16 -6M256 203l12 2M256 203l-18 -6M257 197l15 2M257 197l-10 -9M258 192l10 -3M258 192l-12 -10M259 186l13 -8M259 186l-8 -9M260 181l10 -3M260 181l-6 -8M261 175l6 -4M261 175l-6 -3M262 170l0 -0M262 170l-0 -0" stroke="#9E7B35" stroke-width="2"/>
+        <path d="M236 300Q250 232 262 170" stroke="#C49A4A" stroke-width="14"/>
+      </g>
+      <path d="M176 548C196 512 220 490 252 474C226 496 204 520 186 552Z" fill="#B3A266"/>
+    </svg>
+    <span class="tape s" style="left:104px;top:404px;transform:rotate(-12deg)"></span>
+    <p class="abs tag">狗尾巴草<small>河滩 · 11 月 22 日</small></p>
+  </div>
+
+  <div class="abs sh" style="left:52px;top:1610px;transform:rotate(1.5deg)">
+    <div class="ticket">
+      <div class="tk-main">
+        <p class="type tk-h">TICKETS · 购票</p>
+        <p class="tk-price"><span>两日通票</span><b>¥260</b></p>
+        <p>单日票 ¥160 · 学生票 ¥120</p>
+        <p class="tk-early">早鸟 8 折 · 11.30 截止</p>
+      </div>
+      <div class="tk-stub"><b>入场券</b><span class="type">No.0317</span></div>
+    </div>
+  </div>
+
+  <div class="abs when">
+    <p class="date">12.19<span>–</span>20</p>
+    <p class="days">周六 + 周日 · 14:00 入场</p>
+    <p class="venue"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B23A48" stroke-width="2.2" stroke-linejoin="round" aria-hidden="true"><path d="M12 22C12 22 4.5 14.6 4.5 9.4A7.5 7.5 0 0 1 19.5 9.4C19.5 14.6 12 22 12 22Z"/><circle cx="12" cy="9.5" r="2.6"/></svg>青坡河滩营地 · 南岸草地</p>
+    <p class="tip">夜里 3℃，带上毯子和保温杯</p>
+  </div>
+
+  <p class="abs foot"><span>主办 河滩野草社</span><span>咨询 138 0000 0000</span><span>hello@example.com</span></p>
+
+  <svg class="grain" width="1080" height="1920" aria-hidden="true">
+    <filter id="paper"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 .35  0 0 0 0 .27  0 0 0 0 .18  0 0 0 .16 0"/></filter>
+    <rect width="1080" height="1920" filter="url(#paper)"/>
+  </svg>
+</main>
+</body>
+</html>
