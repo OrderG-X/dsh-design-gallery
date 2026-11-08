@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="web">
+<title>领养申请 · 门口有猫</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<svg class="sprite" aria-hidden="true" focusable="false">
+  <defs>
+    <clipPath id="hc"><circle cx="120" cy="100" r="62"/></clipPath>
+    <clipPath id="mini"><circle cx="120" cy="110" r="90"/></clipPath>
+    <clipPath id="av"><circle cx="24" cy="24" r="24"/></clipPath>
+    <symbol id="cat" viewBox="0 0 240 210">
+      <path d="M44 210C44 162 76 138 120 138S196 162 196 210Z" style="fill:var(--f)"/>
+      <path d="M92 210C92 174 104 158 120 158S148 174 148 210Z" style="fill:var(--b,var(--f))"/>
+      <path d="M64 158Q120 186 176 158V172Q120 200 64 172Z" style="fill:var(--col,none)"/>
+      <path d="M64 96 70 28 114 62Z" style="fill:var(--el,var(--f))"/>
+      <path d="M176 96 170 28 126 62Z" style="fill:var(--er,var(--f))"/>
+      <path d="M78 82 81 46 104 64ZM162 82 159 46 136 64Z" style="fill:var(--in)"/>
+      <circle cx="120" cy="106" r="62" style="fill:var(--e)"/>
+      <circle cx="120" cy="100" r="62" style="fill:var(--f)"/>
+      <g clip-path="url(#hc)">
+        <path d="M50 30H124C118 66 102 92 50 118Z" style="fill:var(--p1,var(--f))"/>
+        <circle cx="180" cy="70" r="46" style="fill:var(--p2,var(--f))"/>
+        <path d="M112 38H128L120 66ZM92 44 104 40 101 62ZM136 40 148 44 139 62Z" style="fill:var(--st,var(--f))"/>
+      </g>
+      <path d="M90 128C90 110 106 104 120 114C134 104 150 110 150 128C150 146 132 152 120 146C108 152 90 146 90 128Z" style="fill:var(--m,var(--f))"/>
+      <circle cx="97" cy="98" r="11" style="fill:var(--eye)"/>
+      <circle cx="143" cy="98" r="11" style="fill:var(--eye2,var(--eye))"/>
+      <ellipse cx="97" cy="98" rx="4" ry="8.5" fill="#1E2A3A"/>
+      <ellipse cx="143" cy="98" rx="4" ry="8.5" fill="#1E2A3A"/>
+      <circle cx="100" cy="94" r="3" fill="#fff"/>
+      <circle cx="146" cy="94" r="3" fill="#fff"/>
+      <path d="M86 98A11 11 0 0 1 108 98ZM132 98A11 11 0 0 1 154 98Z" style="fill:var(--lid,none)"/>
+      <path d="M112 120H128L120 129Z" style="fill:var(--n,#F08FA0)"/>
+      <path d="M120 129V134M108 136Q114 142 120 134Q126 142 132 136" fill="none" style="stroke:var(--mo,var(--ln,#1E2A3A))" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M86 124 54 118M86 132 56 134M154 124 186 118M154 132 184 134" fill="none" style="stroke:var(--ln,#1E2A3A)" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="120" cy="190" r="9" style="fill:var(--tag,none)"/>
+    </symbol>
+    <symbol id="logo" viewBox="0 0 40 44">
+      <path d="M0 44V20a20 20 0 0 1 40 0v24Z" fill="#1D4ED8"/>
+      <path d="M9.5 33 11 17 20.5 25ZM30.5 33 29 17 19.5 25Z" fill="#E4572E"/>
+      <circle cx="20" cy="33" r="11" fill="#B13E1C"/>
+      <circle cx="20" cy="31" r="11" fill="#E4572E"/>
+      <circle cx="16" cy="30" r="1.8" fill="#1E2A3A"/>
+      <circle cx="24" cy="30" r="1.8" fill="#1E2A3A"/>
+      <path d="M18 34.5h4L20 37Z" fill="#FFF6E9"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="notice">
+  <div class="wrap">
+    <p><span class="tri"></span>11 月 15 日（周六）领养开放日 · 晴川里社区活动室 14:00–17:00，小麦也会在</p>
+    <a href="home.html#how">了解领养流程 →</a>
+  </div>
+</div>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="home.html" aria-label="门口有猫 首页">
+      <svg viewBox="0 0 40 44" aria-hidden="true"><use href="#logo"/></svg>
+      <span><b>门口有猫</b><small>城东流浪猫救助小组</small></span>
+    </a>
+    <nav class="nav" aria-label="主导航">
+      <a href="home.html#cats" aria-current="page">等家的猫</a>
+      <a href="home.html#how">领养流程</a>
+      <a href="home.html#help">一起帮忙</a>
+      <a href="home.html#stories">回家故事</a>
+    </nav>
+    <div class="end">
+      <span class="phone num">138 0000 0000</span>
+      <a class="btn sm" href="apply.html">申请领养</a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <nav class="crumbs" aria-label="位置">
+      <a href="home.html">首页</a><i>/</i><a href="home.html#cats">等家的猫</a><i>/</i><a href="home.html#cats">小麦</a><i>/</i><b>领养申请</b>
+    </nav>
+
+    <div class="apply">
+      <div class="side">
+      <aside class="profile" aria-label="小麦的档案">
+        <div class="art">
+          <svg viewBox="0 0 400 380" role="img" aria-label="小麦的剪纸画像：三花猫，旁边有太阳和毛线球">
+            <path d="M0 380V200a200 200 0 0 1 400 0v180Z" fill="#1538A3"/>
+            <path d="M0 380V200a200 200 0 0 1 400 0v180Z" fill="#1D4ED8" transform="translate(0 10)"/>
+            <circle cx="316" cy="104" r="30" fill="#F4B740"/>
+            <path d="M58 150 74 122 90 150Z" fill="#9CC3FF"/>
+            <circle cx="30" cy="250" r="6" fill="#FFF6E9"/>
+            <use href="#cat" x="40" y="100" width="320" height="280" style="--f:#FFFFFF;--e:#D5DCE6;--el:#E4572E;--p1:#E4572E;--er:#2B3A50;--p2:#2B3A50;--in:#F7A8B8;--eye:#2E9C6A"/>
+            <circle cx="350" cy="352" r="30" fill="#B13E1C"/>
+            <circle cx="350" cy="348" r="30" fill="#E4572E"/>
+            <path d="M326 334Q350 340 370 326M322 352Q350 358 378 346M330 370Q352 370 372 362" fill="none" stroke="#FFF6E9" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="body">
+          <div class="who"><h1>小麦</h1><span class="days">等家第 46 天</span></div>
+          <p class="meta">三花 · 母 · 约 1 岁 2 个月 · 编号 DC-2609</p>
+          <dl class="facts-grid">
+            <div><dt>体重</dt><dd>3.4 kg</dd></div>
+            <div><dt>绝育</dt><dd>已做</dd></div>
+            <div><dt>疫苗</dt><dd>3 针</dd></div>
+            <div><dt>到站</dt><dd>9/23</dd></div>
+          </dl>
+
+          <h2>她的故事</h2>
+          <p class="story-p">9 月下旬在菜场后巷的纸箱里被发现，当时只有 2.1 kg，左眼有点发炎。在临时家庭住了六周，现在胖了、眼睛也好了。最爱趴在人腿上打呼噜，听见开罐头的声音会一路小跑过来。</p>
+
+          <h2>性格</h2>
+          <ul class="meter">
+            <li><span>亲人</span><span class="dots"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i></span><em>会主动蹭人</em></li>
+            <li><span>爱说话</span><span class="dots"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i></i></span><em>会到门口接你</em></li>
+            <li><span>活泼</span><span class="dots"><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i></span><em>晚上比较疯</em></li>
+            <li><span>和别的猫相处</span><span class="dots"><i class="f"></i><i class="f"></i><i></i><i></i><i></i></span><em>要慢慢介绍</em></li>
+          </ul>
+
+          <h2>健康</h2>
+          <ul class="health">
+            <li><span class="tick"></span>已绝育</li>
+            <li><span class="tick"></span>疫苗三针齐全</li>
+            <li><span class="tick"></span>体内外驱虫</li>
+            <li><span class="tick"></span>猫瘟、猫艾滋阴性</li>
+          </ul>
+
+          <div class="carer">
+            <svg viewBox="0 0 48 48" aria-hidden="true"><g clip-path="url(#av)"><circle cx="24" cy="24" r="24" fill="#FFE6B0"/><path d="M6 50a18 16 0 0 1 36 0Z" fill="#2E9C6A"/><circle cx="24" cy="21" r="9" fill="#E8B48A"/><path d="M15 21a9 9 0 0 1 18 0c-4-2-9-3-13-1Z" fill="#1E2A3A"/></g></svg>
+            <p><b>临时家庭 阿青</b> 照顾她 6 周<br><span>现在每天两顿干粮加一顿湿粮，用豆腐猫砂。</span></p>
+          </div>
+        </div>
+      </aside>
+
+      <section class="side-card" aria-labelledby="also-h">
+        <h2 id="also-h">也在等家的猫</h2>
+        <ul class="mini-list">
+          <li><a href="home.html#cats">
+            <svg viewBox="30 20 180 180" aria-hidden="true"><g clip-path="url(#mini)"><circle cx="120" cy="110" r="90" fill="#F4B740"/><use href="#cat" width="240" height="210" style="--f:#1E2A3A;--e:#0E151F;--in:#9C5468;--eye:#F4B740;--lid:#1E2A3A;--ln:#FFF6E9"/></g></svg>
+            <span><b>煤球</b><small>黑猫 · 公 · 2 岁 · 等家 73 天</small></span><i>→</i></a></li>
+          <li><a href="home.html#cats">
+            <svg viewBox="30 20 180 180" aria-hidden="true"><g clip-path="url(#mini)"><circle cx="120" cy="110" r="90" fill="#F7A8B8"/><use href="#cat" width="240" height="210" style="--f:#1E2A3A;--e:#0E151F;--b:#FFFFFF;--m:#FFFFFF;--in:#9C5468;--eye:#2E9C6A;--ln:#FFF6E9;--mo:#1E2A3A"/></g></svg>
+            <span><b>豆花</b><small>奶牛 · 母 · 3 岁 · 等家 31 天</small></span><i>→</i></a></li>
+          <li><a href="home.html#cats">
+            <svg viewBox="30 20 180 180" aria-hidden="true"><g clip-path="url(#mini)"><circle cx="120" cy="110" r="90" fill="#2E9C6A"/><use href="#cat" width="240" height="210" style="--f:#FFFFFF;--e:#D5DCE6;--p1:#9AA5B4;--el:#9AA5B4;--in:#F7A8B8;--eye:#1D4ED8;--eye2:#F4B740"/></g></svg>
+            <span><b>年糕</b><small>白猫 · 母 · 7 岁 · 等家 104 天</small></span><i>→</i></a></li>
+        </ul>
+      </section>
+
+      <section class="ask" aria-labelledby="ask-h">
+        <svg viewBox="0 0 64 56" aria-hidden="true"><path d="M4 4h56v36H28L14 54V40H4Z" fill="#C98A17" transform="translate(0 4)"/><path d="M4 4h56v36H28L14 54V40H4Z" fill="#FFF6E9"/><circle cx="20" cy="22" r="4" fill="#1E2A3A"/><circle cx="32" cy="22" r="4" fill="#1E2A3A"/><circle cx="44" cy="22" r="4" fill="#1E2A3A"/></svg>
+        <div>
+          <h2 id="ask-h">填表时拿不准？</h2>
+          <p>直接问照顾小麦的志愿者：<b class="num">138 0000 0000</b>，或写信到 hello@example.com。周一到周五晚上都会回。</p>
+        </div>
+      </section>
+      </div>
+
+      <form class="form-card" aria-label="小麦的领养申请表">
+        <div class="form-head">
+          <span class="eyebrow">领养申请 · 约 10 分钟</span>
+          <h2>想带小麦回家？先认识一下你</h2>
+          <p>信息只用于这次领养评估，不公开、不外传。带 <em class="req">*</em> 的必填，其余可以见面时再聊。</p>
+          <ol class="progress">
+            <li class="done"><b>1</b>关于你</li>
+            <li class="done"><b>2</b>你的家</li>
+            <li class="done"><b>3</b>养猫经验</li>
+            <li class="now"><b>4</b>约个时间</li>
+          </ol>
+        </div>
+
+        <div class="form-body">
+          <fieldset class="group">
+            <legend><i>1</i>关于你</legend>
+            <div class="fields">
+              <label class="field"><span>怎么称呼你<em>*</em></span><input class="input filled" type="text" value="陈小满"></label>
+              <label class="field"><span>手机号<em>*</em></span><input class="input filled" type="tel" value="138 0000 0000"></label>
+              <label class="field"><span>邮箱</span><input class="input filled" type="email" value="hello@example.com"></label>
+              <label class="field"><span>住在哪一片<em>*</em></span><span class="select"><select class="input filled"><option>城东 · 晴川里附近</option><option>城东 · 其他小区</option><option>城西</option><option>城南</option><option>城北</option></select></span></label>
+              <div class="field full">
+                <span>平时在家的时间</span>
+                <div class="opts">
+                  <label class="opt"><input type="radio" name="time"><span class="mark"></span>大部分时间在家</label>
+                  <label class="opt on"><input type="radio" name="time" checked><span class="mark"></span>朝九晚六，周末在家</label>
+                  <label class="opt"><input type="radio" name="time"><span class="mark"></span>经常出差</label>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="group">
+            <legend><i>2</i>你的家</legend>
+            <div class="fields">
+              <div class="field full">
+                <span>住房情况<em>*</em></span>
+                <div class="opts">
+                  <label class="opt on"><input type="radio" name="house" checked><span class="mark"></span>自有住房</label>
+                  <label class="opt"><input type="radio" name="house"><span class="mark"></span>长期租房（房东同意养猫）</label>
+                  <label class="opt"><input type="radio" name="house"><span class="mark"></span>和家人同住</label>
+                </div>
+              </div>
+              <div class="field full">
+                <span>窗户和阳台<em>*</em></span>
+                <div class="opts">
+                  <label class="opt"><input type="radio" name="win"><span class="mark"></span>已经全部封好</label>
+                  <label class="opt on"><input type="radio" name="win" checked><span class="mark"></span>接猫前会封好</label>
+                  <label class="opt"><input type="radio" name="win"><span class="mark"></span>暂时不打算封</label>
+                </div>
+                <small>每年都有领养的猫从窗户、阳台掉下去，封窗是我们唯一不能商量的条件。</small>
+              </div>
+              <div class="field full">
+                <span>家里还有谁（可多选）</span>
+                <div class="opts">
+                  <label class="opt"><input type="checkbox"><span class="mark sq"></span>只有我</label>
+                  <label class="opt on"><input type="checkbox" checked><span class="mark sq"></span>伴侣</label>
+                  <label class="opt"><input type="checkbox"><span class="mark sq"></span>小孩</label>
+                  <label class="opt"><input type="checkbox"><span class="mark sq"></span>老人</label>
+                  <label class="opt"><input type="checkbox"><span class="mark sq"></span>别的猫狗</label>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="group">
+            <legend><i>3</i>养猫经验</legend>
+            <div class="fields">
+              <div class="field full">
+                <span>养过猫吗</span>
+                <div class="opts">
+                  <label class="opt"><input type="radio" name="exp"><span class="mark"></span>第一次养</label>
+                  <label class="opt on"><input type="radio" name="exp" checked><span class="mark"></span>以前养过</label>
+                  <label class="opt"><input type="radio" name="exp"><span class="mark"></span>现在家里就有</label>
+                </div>
+              </div>
+              <label class="field full"><span>为什么想带小麦回家？</span><textarea class="input filled" placeholder="说说你是怎么认识她的，写几句就好。">上个月开放日见过小麦，她一直跟着我叫，最后趴在我腿上睡着了。我和伴侣住两室一厅，书房可以给她当小屋。小时候在老家养过一只橘猫，陪了我们家 15 年。</textarea><small>96 / 500 字</small></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="group">
+            <legend><i>4</i>约个时间见见她</legend>
+            <div class="fields">
+              <div class="field full">
+                <span>选一个见面时间</span>
+                <div class="slots">
+                  <label class="slot on"><input type="radio" name="slot" checked><b>11/15 周六</b><span>14:00 · 开放日</span></label>
+                  <label class="slot"><input type="radio" name="slot"><b>11/15 周六</b><span>15:30 · 开放日</span></label>
+                  <label class="slot"><input type="radio" name="slot"><b>11/16 周日</b><span>10:00 · 临时家庭</span></label>
+                  <label class="slot full-up" aria-disabled="true"><input type="radio" name="slot" disabled><b>11/16 周日</b><span>15:00 · 已约满</span></label>
+                </div>
+              </div>
+            </div>
+            <div class="agree">
+              <label class="check on"><input type="checkbox" checked><span class="box"></span><span>我同意领养后的 3 次回访（第 1 周、第 1 个月、第 3 个月），可以视频。</span></label>
+              <label class="check on"><input type="checkbox" checked><span class="box"></span><span>我知道领养不收费，也不会转送、遗弃或让她繁育。</span></label>
+              <label class="check"><input type="checkbox"><span class="box"></span><span>以后搬家、结婚、有宝宝时，我会提前想好她的安排。</span></label>
+            </div>
+          </fieldset>
+
+          <div class="submit">
+            <p>前 3 部分已填好 · 草稿已自动保存</p>
+            <div class="acts">
+              <button class="btn ghost" type="button">先存草稿</button>
+              <button class="btn" type="button">提交申请 <span class="arr">→</span></button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <section class="next band" aria-labelledby="next-h">
+    <div class="wrap">
+      <span class="eyebrow">接下来会怎样</span>
+      <div class="sec-head">
+        <h2 id="next-h">提交以后，小麦大约 3 周能到家</h2>
+        <p>每一步都可以停下来，不合适就说，没关系。</p>
+      </div>
+      <ol class="timeline">
+        <li><span class="pin">1</span><p class="when">2 天内</p><h3>志愿者联系你</h3><p>先打个 15 分钟的电话，了解你和家里的情况，也回答你的问题。</p></li>
+        <li><span class="pin">2</span><p class="when">第 1 周</p><h3>见面，看看家</h3><p>开放日见见小麦；再约一次视频或上门，看看窗户和阳台。</p></li>
+        <li><span class="pin">3</span><p class="when">第 2–3 周</p><h3>试养 14 天</h3><p>带上她的猫窝和吃惯的粮回家。有问题随时问阿青。</p></li>
+        <li><span class="pin">4</span><p class="when">满 14 天</p><h3>签约，正式回家</h3><p>签一份领养协议。之后第 1 周、1 个月、3 个月各回访一次。</p></li>
+      </ol>
+      <dl class="faq">
+        <div><dt>领养要花钱吗？</dt><dd>不收领养费。你只需要准备猫砂盆、猫粮和每年体检的预算，平时每月大约 300–500 元。</dd></div>
+        <div><dt>试养不合适怎么办？</dt><dd>直接告诉我们。小麦会回到临时家庭，不会有任何责备，合适比快更重要。</dd></div>
+        <div><dt>能先来看看再决定吗？</dt><dd>当然。开放日不用申请也能来，只是填了申请，我们能提前把小麦带到现场。</dd></div>
+      </dl>
+    </div>
+  </section>
+</main>
+
+<footer class="foot-wrap">
+  <div class="wrap">
+    <div class="foot">
+      <div>
+        <a class="brand" href="home.html" aria-label="门口有猫 首页">
+          <svg viewBox="0 0 40 44" aria-hidden="true"><use href="#logo"/></svg>
+          <span><b>门口有猫</b><small>城东流浪猫救助小组</small></span>
+        </a>
+        <p class="about">2021 年起由城东几个小区的邻居自发组成。没有猫舍，靠临时家庭接力照顾每一只猫。</p>
+      </div>
+      <div>
+        <h4>领养</h4>
+        <ul>
+          <li><a href="home.html#cats">等家的猫</a></li>
+          <li><a href="home.html#how">领养流程</a></li>
+          <li><a href="apply.html">填写申请</a></li>
+          <li><a href="home.html#stories">回家故事</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>帮忙</h4>
+        <ul>
+          <li><a href="home.html#help">做临时家庭</a></li>
+          <li><a href="home.html#help">捐物资</a></li>
+          <li><a href="home.html#help">做志愿者</a></li>
+          <li><a href="home.html#help">每月账目公示</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>找到我们</h4>
+        <ul class="contact">
+          <li><span>电话</span>138 0000 0000</li>
+          <li><span>邮箱</span>hello@example.com</li>
+          <li><span>开放</span>每周六 14:00–17:00</li>
+          <li><span>地点</span>城东晴川里社区（预约后告知）</li>
+        </ul>
+      </div>
+    </div>
+    <div class="legal">
+      <span>© 2026 门口有猫 · 志愿者自发组织，不以营利为目的</span>
+      <span>发现需要帮助的流浪猫？请先拍照记下位置，再联系我们</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

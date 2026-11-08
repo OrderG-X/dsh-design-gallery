@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": { "zh": "门口有猫", "en": "Doorstep Cats" },
+  "description": {
+    "zh": "志愿者流浪猫领养小站的几何剪纸风官网：首页（剪纸猫主图、等家的猫、三步领养流程、临时家庭/捐物资/志愿者、回家故事）和一只猫的领养申请页（档案、申请表、提交后流程）",
+    "en": "Paper-cut site for a volunteer cat adoption group: home page with a paper-cut hero, cats waiting for homes, adoption steps and ways to help, plus one cat's profile with an application form"
+  },
+  "kind": "web",
+  "screens": [
+    { "file": "home.html", "title": { "zh": "首页", "en": "Home" } },
+    { "file": "apply.html", "title": { "zh": "领养申请", "en": "Adoption application" } }
+  ],
+  "style": "custom",
+  "categories": ["nonprofit", "pets"],
+  "tags": ["landing", "form", "list", "detail", "illustration"],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": { "login": "orderg-x", "id": 271418316 },
+  "ai": { "generated": true, "tool": "claude-opus-5-5" }
+}
