@@ -1,0 +1,52 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": {
+    "zh": "焙间 收银台",
+    "en": "Beijian Roastery POS"
+  },
+  "description": {
+    "zh": "小型咖啡烘焙馆的横屏平板点单收银：按分类点单（手绘杯子、冰热糖度豆子选项、右侧当前订单和合计）和结账页（订单明细、手机号查会员、支付方式按钮、小票预览）",
+    "en": "A landscape tablet POS for a small coffee roastery: menu with drawn drinks, ice/sweetness/bean options and live order panel, plus checkout with member lookup, payment buttons and receipt preview"
+  },
+  "kind": "tablet",
+  "size": "1180x820",
+  "screens": [
+    {
+      "file": "order.html",
+      "title": {
+        "zh": "点单",
+        "en": "Order"
+      }
+    },
+    {
+      "file": "checkout.html",
+      "title": {
+        "zh": "结账",
+        "en": "Checkout"
+      }
+    }
+  ],
+  "style": "custom",
+  "categories": [
+    "food",
+    "retail"
+  ],
+  "tags": [
+    "menu",
+    "cart",
+    "checkout",
+    "form",
+    "data-dense"
+  ],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "claude-opus-5-5"
+  }
+}
