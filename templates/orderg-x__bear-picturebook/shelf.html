@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="tablet">
+<title>书架 · 小熊绘本</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="ui.css">
+</head>
+<body>
+  <svg class="defs" aria-hidden="true" focusable="false">
+    <defs>
+      <radialGradient id="g-bear" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#CC946A"/><stop offset="1" stop-color="#8E5B3B"/></radialGradient>
+      <radialGradient id="g-muz" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="#FCE6CC"/><stop offset="1" stop-color="#E3B88E"/></radialGradient>
+      <radialGradient id="g-moon" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FFF6D2"/><stop offset="1" stop-color="#F2C24A"/></radialGradient>
+      <radialGradient id="g-leaf" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#AFE2B6"/><stop offset="1" stop-color="#4C9C6C"/></radialGradient>
+      <radialGradient id="g-red" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FFA493"/><stop offset="1" stop-color="#D95343"/></radialGradient>
+      <radialGradient id="g-orange" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FFBA8C"/><stop offset="1" stop-color="#E06C2C"/></radialGradient>
+      <radialGradient id="g-pink" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FFD3D9"/><stop offset="1" stop-color="#E98595"/></radialGradient>
+      <radialGradient id="g-blue" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#C4E2F8"/><stop offset="1" stop-color="#6AA4D6"/></radialGradient>
+      <radialGradient id="g-yellow" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FFEBA6"/><stop offset="1" stop-color="#EFB02C"/></radialGradient>
+      <radialGradient id="g-green" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#C6EAAE"/><stop offset="1" stop-color="#5FAA60"/></radialGradient>
+      <radialGradient id="g-white" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E9DDD3"/></radialGradient>
+      <radialGradient id="g-soil" cx=".4" cy=".2" r=".9"><stop offset="0" stop-color="#C79C76"/><stop offset="1" stop-color="#8B6042"/></radialGradient>
+      <radialGradient id="g-gray" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#B8ACA6"/><stop offset="1" stop-color="#76685F"/></radialGradient>
+      <radialGradient id="g-plum" cx=".4" cy=".2" r=".9"><stop offset="0" stop-color="#6D62AA"/><stop offset="1" stop-color="#4E4488"/></radialGradient>
+      <path id="star5" d="M12 2.8l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.6 6.6 19.5l1.1-6.1-4.5-4.2 6.1-.8z"/>
+      <path id="spark" d="M0-6Q1.2-1.2 6 0Q1.2 1.2 0 6Q-1.2 1.2-6 0Q-1.2-1.2 0-6z"/>
+      <symbol id="bobo" viewBox="0 0 100 100">
+        <circle cx="22" cy="26" r="14" fill="url(#g-bear)"/><circle cx="22" cy="26" r="7" fill="#E7AE86"/>
+        <circle cx="78" cy="26" r="14" fill="url(#g-bear)"/><circle cx="78" cy="26" r="7" fill="#E7AE86"/>
+        <ellipse cx="50" cy="56" rx="38" ry="34" fill="url(#g-bear)"/>
+        <ellipse cx="38" cy="34" rx="11" ry="5" fill="#fff" opacity=".22" transform="rotate(-18 38 34)"/>
+        <ellipse cx="50" cy="68" rx="17" ry="13" fill="url(#g-muz)"/>
+        <ellipse cx="50" cy="62.5" rx="6.5" ry="4.6" fill="#3A2620"/>
+        <path d="M45 70.5q5 4 10 0" fill="none" stroke="#3A2620" stroke-width="2.4" stroke-linecap="round"/>
+        <circle cx="35" cy="51" r="4.2" fill="#2B1C17"/><circle cx="65" cy="51" r="4.2" fill="#2B1C17"/>
+        <circle cx="36.4" cy="49.6" r="1.4" fill="#fff"/><circle cx="66.4" cy="49.6" r="1.4" fill="#fff"/>
+        <ellipse cx="25" cy="64" rx="6" ry="4" fill="#F0907E" opacity=".55"/><ellipse cx="75" cy="64" rx="6" ry="4" fill="#F0907E" opacity=".55"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <div class="status" aria-hidden="true">
+    <span>9:41&nbsp;&nbsp;11月8日 周日</span>
+    <span class="status-r">
+      <svg viewBox="0 0 17 12"><path d="M8.5 11.2 6.4 9.1a3 3 0 0 1 4.2 0z" fill="currentColor"/><path d="M3.6 6.4a7 7 0 0 1 9.8 0M1 3.8a10.6 10.6 0 0 1 15 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      82%
+      <svg viewBox="0 0 27 12"><rect x=".7" y=".7" width="22.6" height="10.6" rx="3" fill="none" stroke="currentColor" stroke-opacity=".45" stroke-width="1.2"/><rect x="2.4" y="2.4" width="16" height="7.2" rx="1.6" fill="currentColor"/><path d="M25 4.2v3.6c.8-.3 1.3-1 1.3-1.8S25.8 4.5 25 4.2z" fill="currentColor" fill-opacity=".45"/></svg>
+    </span>
+  </div>
+
+  <div class="page">
+    <header class="hello">
+      <span class="logo" aria-hidden="true"><svg viewBox="0 0 100 100"><use href="#bobo"/></svg></span>
+      <div class="hello-t">
+        <p>小熊绘本 · Lv.2 小读者</p>
+        <h1>早上好，米粒！</h1>
+      </div>
+      <div class="hello-r">
+        <span class="score" aria-label="星星 128 颗"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#star5" fill="url(#g-yellow)" stroke="#EFB02C" stroke-width="1.6" stroke-linejoin="round"/></svg>128</span>
+        <a class="me" href="#" aria-label="切换小读者">
+          <svg viewBox="0 0 52 52" aria-hidden="true">
+            <rect width="52" height="52" fill="#D3E6F5"/>
+            <circle cx="26" cy="25" r="17" fill="#4A3426"/>
+            <circle cx="12" cy="15" r="6" fill="#4A3426"/><circle cx="40" cy="15" r="6" fill="#4A3426"/>
+            <path d="M8 56q2-13 18-13t18 13z" fill="#E8743B"/>
+            <ellipse cx="26" cy="28" rx="13" ry="13.5" fill="#F7D8BC"/>
+            <path d="M13 24q3-10 13-10t13 10q-6-3-13-3t-13 3z" fill="#4A3426"/>
+            <circle cx="21" cy="29" r="1.8" fill="#2B1C17"/><circle cx="31" cy="29" r="1.8" fill="#2B1C17"/>
+            <path d="M23 34q3 2.4 6 0" fill="none" stroke="#B5523A" stroke-width="1.6" stroke-linecap="round"/>
+            <ellipse cx="17.5" cy="33" rx="2.6" ry="1.7" fill="#F2A08C" opacity=".7"/><ellipse cx="34.5" cy="33" rx="2.6" ry="1.7" fill="#F2A08C" opacity=".7"/>
+          </svg>
+        </a>
+      </div>
+    </header>
+
+    <section class="today">
+      <div class="goal clay c-mint">
+        <p class="k"><svg class="ic ic-sm" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8" fill="currentColor"/></svg>今日目标 · 11月8日</p>
+        <h2>再读 1 本就完成啦</h2>
+        <div class="bars">
+          <div class="bar-row"><span>绘本</span><span class="track"><i style="width:50%"></i></span><b>1/2</b></div>
+          <div class="bar-row"><span>单词</span><span class="track"><i style="width:67%"></i></span><b>4/6</b></div>
+          <div class="bar-row"><span>时长</span><span class="track"><i style="width:60%"></i></span><b>12/20</b></div>
+        </div>
+        <svg class="goal-art" viewBox="0 0 160 160" aria-hidden="true">
+          <use href="#spark" transform="translate(18 34)" fill="#FFF3C4"/>
+          <use href="#spark" transform="translate(146 22) scale(.7)" fill="#FFF3C4"/>
+          <use href="#spark" transform="translate(136 70) scale(.5)" fill="#fff"/>
+          <ellipse cx="80" cy="150" rx="56" ry="40" fill="url(#g-bear)"/>
+          <ellipse cx="80" cy="146" rx="30" ry="22" fill="url(#g-muz)" opacity=".8"/>
+          <use href="#bobo" x="30" y="8" width="100" height="100"/>
+          <path d="M30 116q25-12 50 2q25-14 50-2v34q-25-10-50 3q-25-13-50-3z" fill="url(#g-orange)"/>
+          <path d="M35 115q22-8 45 3v31q-23-10-45-3z" fill="url(#g-white)"/>
+          <path d="M80 118q23-11 45-3v31q-22-7-45 3z" fill="url(#g-white)"/>
+          <path d="M43 123q14-4 29 1M43 131q14-4 29 1M88 124q14-5 29-1M88 132q14-5 29-1" fill="none" stroke="#E2D2C6" stroke-width="2.4" stroke-linecap="round"/>
+          <circle cx="36" cy="140" r="11" fill="url(#g-bear)"/><circle cx="124" cy="140" r="11" fill="url(#g-bear)"/>
+        </svg>
+      </div>
+
+      <div class="stickers clay c-pink">
+        <div class="k"><h2>贴纸册</h2><span>本周 5 / 8</span></div>
+        <div class="st-grid">
+          <span class="st" title="蜂蜜罐"><svg viewBox="0 0 34 34" aria-hidden="true"><rect x="8" y="11" width="18" height="17" rx="7" fill="url(#g-yellow)"/><rect x="9" y="7" width="16" height="6" rx="3" fill="url(#g-soil)"/><path d="M12 15q2 3 0 6" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none" opacity=".7"/></svg></span>
+          <span class="st" title="星星"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#star5" fill="url(#g-yellow)" stroke="#EFB02C" stroke-width="1.4" stroke-linejoin="round"/></svg></span>
+          <span class="st" title="月亮"><svg viewBox="0 0 34 34" aria-hidden="true"><path d="M21 6a11 11 0 1 0 8 16A9 9 0 0 1 21 6z" fill="url(#g-moon)"/></svg></span>
+          <span class="st" title="草莓"><svg viewBox="0 0 34 34" aria-hidden="true"><path d="M17 29c-6-3-10-9-10-14 0-3 3-5 10-5s10 2 10 5c0 5-4 11-10 14z" fill="url(#g-red)"/><path d="M11 10q6-6 12 0q-3 2-6 0q-3 2-6 0z" fill="#5FAA60"/><circle cx="13" cy="16" r="1" fill="#FFE6A0"/><circle cx="20" cy="16" r="1" fill="#FFE6A0"/><circle cx="16.5" cy="21" r="1" fill="#FFE6A0"/></svg></span>
+          <span class="st" title="小火箭"><svg viewBox="0 0 34 34" aria-hidden="true"><path d="M17 4c5 4 6 10 5 17h-10c-1-7 0-13 5-17z" fill="url(#g-white)"/><path d="M17 4c2.6 2 4 4.4 4.6 7h-9.2c.6-2.6 2-5 4.6-7z" fill="url(#g-red)"/><circle cx="17" cy="14" r="2.6" fill="url(#g-blue)"/><path d="M12 17l-4 6h5zM22 17l4 6h-5z" fill="url(#g-red)"/><path d="M15 23q2 6 4 0z" fill="#F2B630"/></svg></span>
+          <span class="st next" title="下一张：小蜜蜂"><svg viewBox="0 0 34 34" aria-hidden="true"><ellipse cx="11" cy="12" rx="5" ry="6" fill="#D3E6F5"/><ellipse cx="21" cy="12" rx="5" ry="6" fill="#D3E6F5"/><ellipse cx="17" cy="20" rx="10" ry="8" fill="url(#g-yellow)"/><path d="M15 12.5v15M20 13v14" stroke="#4A3426" stroke-width="2.6"/><circle cx="25" cy="18" r="1.5" fill="#2B1C17"/></svg></span>
+          <span class="st empty"></span>
+          <span class="st empty"></span>
+        </div>
+        <p class="st-tip">再读 1 本，就能贴上小蜜蜂</p>
+      </div>
+    </section>
+
+    <nav class="levels" aria-label="分级">
+      <a class="lv done" href="#"><span class="lv-n">1</span><span><b>启蒙</b><small>24 本全读完</small></span></a>
+      <a class="lv on" href="shelf.html" aria-current="page"><span class="lv-n">2</span><span><b>入门</b><small>已读 3 / 24</small></span></a>
+      <a class="lv lock" href="#"><span class="lv-n">3</span><span><b>进阶</b><small>读完 2 级开</small></span><svg class="ic ic-sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="3"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg></a>
+      <a class="lv lock" href="#"><span class="lv-n">4</span><span><b>小达人</b><small>还没开</small></span><svg class="ic ic-sm" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="3"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></svg></a>
+    </nav>
+
+    <section class="shelf clay c-white">
+      <div class="shelf-h">
+        <h2>入门书架<span>动物、天气和好朋友</span></h2>
+        <a class="more" href="#">看全部 24 本<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"/></svg></a>
+      </div>
+
+      <div class="row">
+        <div class="books">
+          <a class="book b-night" href="read.html">
+            <h3>Bobo and the Big Moon</h3>
+            <svg viewBox="0 0 160 110" aria-hidden="true">
+              <use href="#spark" transform="translate(24 12) scale(.8)" fill="#FFE6A0"/>
+              <use href="#spark" transform="translate(66 30) scale(.5)" fill="#FFE6A0"/>
+              <circle cx="122" cy="38" r="22" fill="url(#g-moon)"/>
+              <circle cx="114" cy="34" r="3.5" fill="#EBC05A" opacity=".5"/><circle cx="128" cy="46" r="2.5" fill="#EBC05A" opacity=".5"/>
+              <path d="M0 84Q50 64 100 78T160 74V110H0z" fill="url(#g-plum)"/>
+              <use href="#bobo" x="32" y="50" width="58" height="58"/>
+            </svg>
+            <span class="ribbon" aria-hidden="true"></span>
+          </a>
+          <a class="book b-sky" href="#">
+            <h3>Lulu’s Lost Kite</h3>
+            <svg viewBox="0 0 160 110" aria-hidden="true">
+              <g fill="#fff" opacity=".9"><circle cx="20" cy="44" r="8"/><circle cx="31" cy="40" r="10"/><circle cx="42" cy="45" r="7"/><rect x="14" y="44" width="34" height="8" rx="4"/></g>
+              <path d="M118 14 140 36 118 64 96 36z" fill="url(#g-red)"/>
+              <path d="M118 14v50M96 36h44" stroke="#fff" stroke-opacity=".55" stroke-width="2"/>
+              <path d="M118 64q-10 12 2 20t-2 22" fill="none" stroke="#7D6E92" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="M110 76l8 3-7 4zM116 94l8 2-6 5z" fill="#F2B630"/>
+              <path d="M0 94Q60 78 160 92V110H0z" fill="url(#g-green)"/>
+              <ellipse cx="32" cy="64" rx="3.6" ry="11" fill="url(#g-white)" transform="rotate(-10 32 64)"/>
+              <ellipse cx="42" cy="63" rx="3.6" ry="11" fill="url(#g-white)" transform="rotate(12 42 63)"/>
+              <ellipse cx="45" cy="96" rx="15" ry="11" fill="url(#g-white)"/>
+              <circle cx="38" cy="80" r="10" fill="url(#g-white)"/>
+              <circle cx="40" cy="78" r="1.6" fill="#2B1C17"/><ellipse cx="44" cy="82" rx="2" ry="1.3" fill="#F2A08C"/>
+            </svg>
+          </a>
+          <a class="book b-mint" href="#">
+            <h3>Ten Tiny Seeds</h3>
+            <svg viewBox="0 0 160 110" aria-hidden="true">
+              <circle cx="146" cy="20" r="22" fill="url(#g-yellow)"/>
+              <path d="M44 86V64M80 82V50M116 86V70" stroke="#4C9C6C" stroke-width="3.2" stroke-linecap="round"/>
+              <ellipse cx="36" cy="64" rx="9" ry="5" fill="url(#g-leaf)" transform="rotate(-25 36 64)"/>
+              <ellipse cx="52" cy="62" rx="9" ry="5" fill="url(#g-leaf)" transform="rotate(25 52 62)"/>
+              <ellipse cx="70" cy="50" rx="11" ry="6" fill="url(#g-leaf)" transform="rotate(-25 70 50)"/>
+              <ellipse cx="90" cy="48" rx="11" ry="6" fill="url(#g-leaf)" transform="rotate(25 90 48)"/>
+              <ellipse cx="110" cy="70" rx="7" ry="4" fill="url(#g-leaf)" transform="rotate(-25 110 70)"/>
+              <ellipse cx="122" cy="69" rx="7" ry="4" fill="url(#g-leaf)" transform="rotate(25 122 69)"/>
+              <path d="M0 86Q80 70 160 86V110H0z" fill="url(#g-soil)"/>
+              <g fill="#6E4A31"><ellipse cx="26" cy="98" rx="3" ry="2"/><ellipse cx="62" cy="102" rx="3" ry="2"/><ellipse cx="98" cy="97" rx="3" ry="2"/><ellipse cx="136" cy="101" rx="3" ry="2"/></g>
+            </svg>
+          </a>
+          <a class="book b-butter" href="#">
+            <h3>Hop, Frog, Hop!</h3>
+            <svg viewBox="0 0 160 110" aria-hidden="true">
+              <path d="M14 82q14-40 40-26" fill="none" stroke="#E2A93A" stroke-width="2.4" stroke-dasharray="2 6" stroke-linecap="round"/>
+              <path d="M0 88Q80 78 160 88V110H0z" fill="url(#g-blue)"/>
+              <path d="M34 94a40 10 0 1 0 80 0a40 10 0 0 0-30-9.6L74 94z" fill="url(#g-leaf)"/>
+              <ellipse cx="80" cy="74" rx="26" ry="18" fill="url(#g-green)"/>
+              <circle cx="67" cy="56" r="9" fill="url(#g-green)"/><circle cx="93" cy="56" r="9" fill="url(#g-green)"/>
+              <circle cx="67" cy="55" r="5" fill="#fff"/><circle cx="93" cy="55" r="5" fill="#fff"/>
+              <circle cx="68" cy="56" r="2.6" fill="#2B1C17"/><circle cx="92" cy="56" r="2.6" fill="#2B1C17"/>
+              <path d="M70 74q10 7 20 0" fill="none" stroke="#2F6B3A" stroke-width="2.4" stroke-linecap="round"/>
+              <ellipse cx="62" cy="76" rx="4" ry="2.6" fill="#F2A08C" opacity=".7"/><ellipse cx="98" cy="76" rx="4" ry="2.6" fill="#F2A08C" opacity=".7"/>
+            </svg>
+          </a>
+        </div>
+        <div class="labels">
+          <div class="label"><h4>波波和大月亮</h4><p class="go"><svg class="ic ic-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5z" fill="currentColor"/></svg>读到第 6 / 12 页</p></div>
+          <div class="label"><h4>露露的风筝</h4><p><span class="stars"><svg class="on" viewBox="0 0 24 24"><use href="#star5"/></svg><svg class="on" viewBox="0 0 24 24"><use href="#star5"/></svg><svg class="on" viewBox="0 0 24 24"><use href="#star5"/></svg></span>读完了</p></div>
+          <div class="label"><h4>十颗小种子</h4><p><span class="stars"><svg class="on" viewBox="0 0 24 24"><use href="#star5"/></svg><svg class="on" viewBox="0 0 24 24"><use href="#star5"/></svg><svg viewBox="0 0 24 24"><use href="#star5"/></svg></span>读完了</p></div>
+          <div class="label"><h4>跳吧，小青蛙</h4><p><span class="stars"><svg class="on" viewBox="0 0 24 24"><use href="#star5"/></svg><svg class="on" viewBox="0 0 24 24"><use href="#star5"/></svg><svg class="on" viewBox="0 0 24 24"><use href="#star5"/></svg></span>读完了</p></div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="books">
+          <a class="book b-pink" href="#">
+            <h3>A Cake for Mole</h3>
+            <svg viewBox="0 0 160 110" aria-hidden="true">
+              <path d="M0 96Q80 86 160 96V110H0z" fill="#E9A5B0"/>
+              <rect x="44" y="66" width="62" height="30" rx="10" fill="url(#g-white)"/>
+              <rect x="52" y="46" width="46" height="24" rx="9" fill="url(#g-pink)"/>
+              <path d="M52 56q0-10 9-10h28q9 0 9 10v2q-4 4-7 0t-7 0-7 0-7 0-7 0-7 0-5 0z" fill="#fff"/>
+              <circle cx="75" cy="40" r="6.5" fill="url(#g-red)"/>
+              <path d="M75 34q3-6 8-6" fill="none" stroke="#4C9C6C" stroke-width="2" stroke-linecap="round"/>
+              <path d="M112 110q4-26 22-26t22 26z" fill="url(#g-soil)"/>
+              <ellipse cx="134" cy="88" rx="15" ry="13" fill="url(#g-gray)"/>
+              <circle cx="128" cy="85" r="1.8" fill="#2B1C17"/><circle cx="140" cy="85" r="1.8" fill="#2B1C17"/>
+              <ellipse cx="134" cy="91" rx="4" ry="3" fill="#F09AA8"/>
+            </svg>
+          </a>
+          <a class="book b-peach" href="#">
+            <h3>The Sleepy Snail</h3>
+            <svg viewBox="0 0 160 110" aria-hidden="true">
+              <path d="M122 30h9l-9 10h9M138 18h6l-6 7h6" fill="none" stroke="#B5523A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M0 94Q80 84 160 96V110H0z" fill="url(#g-green)"/>
+              <path d="M34 96q0-10 12-10h62q8 0 12-9l6-12q4-5 8 0 3 9-1 19-6 14-21 14H44q-10 0-10-2z" fill="#F4D49B"/>
+              <path d="M126 66l-4-14M134 66l2-14" stroke="#D9B276" stroke-width="2.6" stroke-linecap="round"/>
+              <circle cx="122" cy="52" r="3" fill="#D9B276"/><circle cx="136" cy="52" r="3" fill="#D9B276"/>
+              <path d="M124 74q3 2 6 0" fill="none" stroke="#5A3A24" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="74" cy="64" r="27" fill="url(#g-orange)"/>
+              <path d="M74 64m-3 0a3 3 0 1 1 6 0a8 8 0 0 1-15 0a12 12 0 0 1 23-2a17 17 0 0 1-29 9" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </a>
+          <a class="book b-teal" href="#">
+            <h3>Duck’s Red Boots</h3>
+            <svg viewBox="0 0 160 110" aria-hidden="true">
+              <ellipse cx="80" cy="100" rx="56" ry="8" fill="#9FCBE8"/>
+              <ellipse cx="78" cy="72" rx="28" ry="20" fill="url(#g-yellow)"/>
+              <circle cx="98" cy="46" r="16" fill="url(#g-yellow)"/>
+              <path d="M112 46q12 0 14 5-6 4-15 2z" fill="url(#g-orange)"/>
+              <circle cx="102" cy="42" r="2.4" fill="#2B1C17"/>
+              <ellipse cx="72" cy="70" rx="12" ry="7" fill="#F2B630" transform="rotate(-15 72 70)"/>
+              <rect x="64" y="86" width="14" height="14" rx="5" fill="url(#g-red)"/>
+              <rect x="84" y="86" width="14" height="14" rx="5" fill="url(#g-red)"/>
+              <path d="M64 97h14M84 97h14" stroke="#A8382C" stroke-width="2"/>
+            </svg>
+          </a>
+          <a class="book b-gray" href="#">
+            <h3>Rain, Rain, Big Rain</h3>
+            <svg viewBox="0 0 160 110" aria-hidden="true">
+              <g fill="url(#g-white)"><circle cx="46" cy="18" r="13"/><circle cx="64" cy="12" r="16"/><circle cx="82" cy="20" r="11"/></g>
+              <rect x="34" y="18" width="58" height="13" rx="6.5" fill="#FAF5F0"/>
+              <g fill="url(#g-blue)"><path d="M44 44q4 6 0 9-4-3 0-9z"/><path d="M64 56q4 6 0 9-4-3 0-9z"/><path d="M84 42q4 6 0 9-4-3 0-9z"/><path d="M30 64q4 6 0 9-4-3 0-9z"/></g>
+              <path d="M96 66a26 22 0 0 1 52 0q-6-4-13 0-6-4-13 0-6-4-13 0-7-4-13 0z" fill="url(#g-red)"/>
+              <path d="M122 66v28q0 6-6 6t-6-5" fill="none" stroke="#5A3A24" stroke-width="3" stroke-linecap="round"/>
+              <ellipse cx="60" cy="102" rx="36" ry="6" fill="#B9D8EE"/>
+            </svg>
+          </a>
+        </div>
+        <div class="labels">
+          <div class="label"><h4>给鼹鼠的蛋糕</h4><p><span class="pill pill-new">新</span>10 页 · 5 个新词</p></div>
+          <div class="label"><h4>爱睡觉的蜗牛</h4><p>8 页 · 4 个新词</p></div>
+          <div class="label"><h4>鸭子的红靴子</h4><p>10 页 · 6 个新词</p></div>
+          <div class="label"><h4>下大雨啦</h4><p>12 页 · 5 个新词</p></div>
+        </div>
+      </div>
+    </section>
+
+    <nav class="dock" aria-label="主导航">
+      <a class="on" href="shelf.html" aria-current="page"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5.5h5v14h-5zM9.5 5.5h5v14h-5z"/><path d="m15.5 6.4 4.3-1.2 3 13.5-4.3 1.2z" transform="translate(-1.6 .2)"/></svg>书架</a>
+      <a href="words.html"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="3.5"/><path d="M7.5 15l2-6 2 6M8.2 13h2.6M14 9h2.2a1.5 1.5 0 0 1 0 3H14zm0 3h2.6a1.5 1.5 0 0 1 0 3H14z"/></svg>单词</a>
+      <a href="#"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-8-8h8z"/><path d="M20 4l-8 8"/></svg>贴纸</a>
+      <a href="#"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9.6" r="2.2"/><path d="M3.5 19.5c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><path d="M15.4 14.8c2.4-.3 4.4 1.1 5.1 4.2"/></svg>家长</a>
+    </nav>
+  </div>
+</body>
+</html>

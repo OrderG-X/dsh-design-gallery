@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="tablet">
+<title>学单词 · 小熊绘本</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="ui.css">
+</head>
+<body>
+  <svg class="defs" aria-hidden="true" focusable="false">
+    <defs>
+      <radialGradient id="g-bear" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#CC946A"/><stop offset="1" stop-color="#8E5B3B"/></radialGradient>
+      <radialGradient id="g-muz" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="#FCE6CC"/><stop offset="1" stop-color="#E3B88E"/></radialGradient>
+      <radialGradient id="g-moon" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FFF6D2"/><stop offset="1" stop-color="#F2C24A"/></radialGradient>
+      <radialGradient id="g-leaf" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#AFE2B6"/><stop offset="1" stop-color="#4C9C6C"/></radialGradient>
+      <radialGradient id="g-red" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FFA493"/><stop offset="1" stop-color="#D95343"/></radialGradient>
+      <radialGradient id="g-orange" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FFBA8C"/><stop offset="1" stop-color="#E06C2C"/></radialGradient>
+      <radialGradient id="g-pink" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FFD3D9"/><stop offset="1" stop-color="#E98595"/></radialGradient>
+      <radialGradient id="g-blue" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#C4E2F8"/><stop offset="1" stop-color="#6AA4D6"/></radialGradient>
+      <radialGradient id="g-yellow" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FFEBA6"/><stop offset="1" stop-color="#EFB02C"/></radialGradient>
+      <radialGradient id="g-green" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#C6EAAE"/><stop offset="1" stop-color="#5FAA60"/></radialGradient>
+      <radialGradient id="g-white" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E9DDD3"/></radialGradient>
+      <radialGradient id="g-soil" cx=".4" cy=".2" r=".9"><stop offset="0" stop-color="#C79C76"/><stop offset="1" stop-color="#8B6042"/></radialGradient>
+      <radialGradient id="g-gray" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#B8ACA6"/><stop offset="1" stop-color="#76685F"/></radialGradient>
+      <radialGradient id="g-plum" cx=".4" cy=".2" r=".9"><stop offset="0" stop-color="#6D62AA"/><stop offset="1" stop-color="#4E4488"/></radialGradient>
+      <path id="star5" d="M12 2.8l2.7 5.6 6.1.8-4.5 4.2 1.1 6.1L12 16.6 6.6 19.5l1.1-6.1-4.5-4.2 6.1-.8z"/>
+      <path id="spark" d="M0-6Q1.2-1.2 6 0Q1.2 1.2 0 6Q-1.2 1.2-6 0Q-1.2-1.2 0-6z"/>
+      <symbol id="bobo" viewBox="0 0 100 100">
+        <circle cx="22" cy="26" r="14" fill="url(#g-bear)"/><circle cx="22" cy="26" r="7" fill="#E7AE86"/>
+        <circle cx="78" cy="26" r="14" fill="url(#g-bear)"/><circle cx="78" cy="26" r="7" fill="#E7AE86"/>
+        <ellipse cx="50" cy="56" rx="38" ry="34" fill="url(#g-bear)"/>
+        <ellipse cx="38" cy="34" rx="11" ry="5" fill="#fff" opacity=".22" transform="rotate(-18 38 34)"/>
+        <ellipse cx="50" cy="68" rx="17" ry="13" fill="url(#g-muz)"/>
+        <ellipse cx="50" cy="62.5" rx="6.5" ry="4.6" fill="#3A2620"/>
+        <path d="M45 70.5q5 4 10 0" fill="none" stroke="#3A2620" stroke-width="2.4" stroke-linecap="round"/>
+        <circle cx="35" cy="51" r="4.2" fill="#2B1C17"/><circle cx="65" cy="51" r="4.2" fill="#2B1C17"/>
+        <circle cx="36.4" cy="49.6" r="1.4" fill="#fff"/><circle cx="66.4" cy="49.6" r="1.4" fill="#fff"/>
+        <ellipse cx="25" cy="64" rx="6" ry="4" fill="#F0907E" opacity=".55"/><ellipse cx="75" cy="64" rx="6" ry="4" fill="#F0907E" opacity=".55"/>
+      </symbol>
+    </defs>
+  </svg>
+  <svg class="defs" aria-hidden="true" focusable="false">
+    <defs>
+      <radialGradient id="g-tree" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#8ACB9F"/><stop offset="1" stop-color="#3C7C61"/></radialGradient>
+      <radialGradient id="g-trunk" cx=".3" cy=".3" r=".9"><stop offset="0" stop-color="#B98458"/><stop offset="1" stop-color="#7C5034"/></radialGradient>
+    </defs>
+  </svg>
+
+  <div class="status" aria-hidden="true">
+    <span>9:41&nbsp;&nbsp;11月8日 周日</span>
+    <span class="status-r">
+      <svg viewBox="0 0 17 12"><path d="M8.5 11.2 6.4 9.1a3 3 0 0 1 4.2 0z" fill="currentColor"/><path d="M3.6 6.4a7 7 0 0 1 9.8 0M1 3.8a10.6 10.6 0 0 1 15 0" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+      82%
+      <svg viewBox="0 0 27 12"><rect x=".7" y=".7" width="22.6" height="10.6" rx="3" fill="none" stroke="currentColor" stroke-opacity=".45" stroke-width="1.2"/><rect x="2.4" y="2.4" width="16" height="7.2" rx="1.6" fill="currentColor"/><path d="M25 4.2v3.6c.8-.3 1.3-1 1.3-1.8S25.8 4.5 25 4.2z" fill="currentColor" fill-opacity=".45"/></svg>
+    </span>
+  </div>
+
+  <div class="page">
+    <header class="topbar">
+      <a class="btn btn-soft btn-icon" href="read.html" aria-label="回到绘本"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"/></svg></a>
+      <div class="topbar-t">
+        <p>来自《波波和大月亮》</p>
+        <h1>学单词</h1>
+      </div>
+      <div class="topbar-r">
+        <span class="score" aria-label="星星 134 颗"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#star5" fill="url(#g-yellow)" stroke="#EFB02C" stroke-width="1.6" stroke-linejoin="round"/></svg>134</span>
+      </div>
+    </header>
+
+    <div class="qprog">
+      <span>第 <b>4</b> 题 / 共 8 题</span>
+      <div class="segs" aria-hidden="true"><i class="ok"></i><i class="ok"></i><i class="ok"></i><i class="now"></i><i></i><i></i><i></i><i></i></div>
+      <span>已得 <b>6</b> 颗星</span>
+    </div>
+
+    <section class="quiz clay c-sky">
+      <div class="q-head">
+        <button class="btn btn-teal say" type="button" aria-label="再听一遍"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></button>
+        <div class="q-word">
+          <p>听一听，哪张图是它？</p>
+          <h2>moon<small>/muːn/</small></h2>
+        </div>
+        <button class="btn btn-soft" type="button"><svg class="ic ic-sm" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16a8 8 0 1 1 16 0"/><path d="m12 16-3.5-4.5"/></svg>慢速再听</button>
+      </div>
+
+      <div class="opts">
+        <button class="opt right" type="button" aria-pressed="true">
+          <span class="plus"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#star5" fill="url(#g-yellow)" stroke="#EFB02C" stroke-width="1.6" stroke-linejoin="round"/></svg>+2</span>
+          <i class="ok"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></i>
+          <svg class="art" viewBox="0 0 132 110" aria-hidden="true">
+            <circle cx="62" cy="56" r="50" fill="#5E54A0" opacity=".12"/>
+            <path d="M72 14a40 40 0 1 0 30 58A33 33 0 0 1 72 14z" fill="url(#g-moon)"/>
+            <path d="M52 56q5-5 10 0" fill="none" stroke="#B9822A" stroke-width="3" stroke-linecap="round"/>
+            <path d="M48 72q8 7 16 0" fill="none" stroke="#B9822A" stroke-width="3" stroke-linecap="round"/>
+            <ellipse cx="42" cy="66" rx="6" ry="4" fill="#F4A07E" opacity=".55"/>
+            <use href="#spark" transform="translate(110 22)" fill="#F2C24A"/>
+            <use href="#spark" transform="translate(116 84) scale(.6)" fill="#F2C24A"/>
+          </svg>
+          <span class="lbl">moon</span>
+        </button>
+        <button class="opt" type="button">
+          <svg class="art" viewBox="0 0 132 110" aria-hidden="true">
+            <g stroke="#F2B630" stroke-width="7" stroke-linecap="round"><path d="M66 6v10M66 94v10M16 55h10M106 55h10M31 20l7 7M94 83l7 7M31 90l7-7M94 27l7-7"/></g>
+            <circle cx="66" cy="55" r="30" fill="url(#g-yellow)"/>
+            <circle cx="56" cy="52" r="3" fill="#7A5410"/><circle cx="76" cy="52" r="3" fill="#7A5410"/>
+            <path d="M58 64q8 7 16 0" fill="none" stroke="#7A5410" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+          <span class="lbl">sun</span>
+        </button>
+        <button class="opt" type="button">
+          <svg class="art" viewBox="0 0 132 110" aria-hidden="true">
+            <g transform="translate(22 8) scale(3.7)"><use href="#star5" fill="url(#g-yellow)" stroke="#EFB02C" stroke-width="1" stroke-linejoin="round"/></g>
+            <circle cx="58" cy="54" r="2.6" fill="#7A5410"/><circle cx="74" cy="54" r="2.6" fill="#7A5410"/>
+            <path d="M60 63q6 5 12 0" fill="none" stroke="#7A5410" stroke-width="2.6" stroke-linecap="round"/>
+          </svg>
+          <span class="lbl">star</span>
+        </button>
+        <button class="opt" type="button">
+          <svg class="art" viewBox="0 0 132 110" aria-hidden="true">
+            <g fill="url(#g-blue)"><circle cx="48" cy="56" r="22"/><circle cx="76" cy="44" r="28"/><circle cx="100" cy="62" r="18"/><rect x="26" y="56" width="92" height="28" rx="14"/></g>
+            <ellipse cx="64" cy="34" rx="12" ry="6" fill="#fff" opacity=".4" transform="rotate(-20 64 34)"/>
+            <circle cx="62" cy="64" r="2.6" fill="#2C5A85"/><circle cx="82" cy="64" r="2.6" fill="#2C5A85"/>
+            <path d="M66 72q6 4 12 0" fill="none" stroke="#2C5A85" stroke-width="2.6" stroke-linecap="round"/>
+          </svg>
+          <span class="lbl">cloud</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="cheer clay c-mint">
+      <span class="cheer-face" aria-hidden="true"><svg viewBox="0 0 100 100"><use href="#bobo"/></svg></span>
+      <div class="cheer-t">
+        <h2>答对啦！Great job!</h2>
+        <p>moon 就是天上的月亮，波波刚才就在跟它打招呼。</p>
+      </div>
+      <a class="btn btn-primary" href="#">下一题<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg></a>
+    </section>
+
+    <section class="wl">
+      <div class="wl-h"><h2>今天的 6 个词</h2><span>会了 2 个 · 还差 4 个</span></div>
+      <div class="wl-grid">
+        <a class="wcard now" href="#"><span class="pill tag">在学</span><span class="nw-pic" style="background:#5E54A0"><svg viewBox="0 0 34 34" aria-hidden="true"><path d="M21 6a11 11 0 1 0 8 16A9 9 0 0 1 21 6z" fill="url(#g-moon)"/></svg></span><b>moon</b><small>月亮</small><span class="stars"><svg class="on" viewBox="0 0 24 24"><use href="#star5"/></svg><svg class="on" viewBox="0 0 24 24"><use href="#star5"/></svg><svg viewBox="0 0 24 24"><use href="#star5"/></svg></span></a>
+        <a class="wcard" href="#"><span class="nw-pic" style="background:var(--mint)"><svg viewBox="0 0 34 34" aria-hidden="true"><rect x="14.5" y="18" width="5" height="12" rx="2" fill="url(#g-trunk)"/><circle cx="17" cy="14" r="10" fill="url(#g-tree)"/></svg></span><b>tree</b><small>树</small><span class="stars"><svg class="on" viewBox="0 0 24 24"><use href="#star5"/></svg><svg class="on" viewBox="0 0 24 24"><use href="#star5"/></svg><svg class="on" viewBox="0 0 24 24"><use href="#star5"/></svg></span></a>
+        <a class="wcard" href="#"><span class="nw-pic" style="background:var(--peach)"><svg viewBox="0 0 34 34" aria-hidden="true"><path d="M11 30V5M23 30V5M11 11h12M11 18h12M11 25h12" fill="none" stroke="#9A6440" stroke-width="2.8" stroke-linecap="round"/><path d="M28 14V4m-3.5 3.5L28 4l3.5 3.5" fill="none" stroke="#C2410C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><b>climb</b><small>爬</small><span class="stars"><svg class="on" viewBox="0 0 24 24"><use href="#star5"/></svg><svg class="on" viewBox="0 0 24 24"><use href="#star5"/></svg><svg class="on" viewBox="0 0 24 24"><use href="#star5"/></svg></span></a>
+        <a class="wcard" href="#"><span class="nw-pic" style="background:var(--sky)"><svg viewBox="0 0 34 34" aria-hidden="true"><rect x="7" y="4" width="10" height="26" rx="5" fill="url(#g-orange)"/><rect x="20" y="18" width="10" height="12" rx="5" fill="url(#g-blue)"/></svg></span><b>tall</b><small>高高的</small><span class="stars"><svg class="on" viewBox="0 0 24 24"><use href="#star5"/></svg><svg viewBox="0 0 24 24"><use href="#star5"/></svg><svg viewBox="0 0 24 24"><use href="#star5"/></svg></span></a>
+        <a class="wcard" href="#"><span class="nw-pic" style="background:var(--butter)"><svg viewBox="0 0 34 34" aria-hidden="true"><rect x="8" y="11" width="18" height="17" rx="7" fill="url(#g-yellow)"/><rect x="9" y="7" width="16" height="6" rx="3" fill="url(#g-soil)"/><path d="M12 15q2 3 0 6" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none" opacity=".7"/></svg></span><b>honey</b><small>蜂蜜</small><span class="stars"><svg viewBox="0 0 24 24"><use href="#star5"/></svg><svg viewBox="0 0 24 24"><use href="#star5"/></svg><svg viewBox="0 0 24 24"><use href="#star5"/></svg></span></a>
+        <a class="wcard" href="#"><span class="nw-pic" style="background:var(--lilac)"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#star5" fill="url(#g-yellow)" stroke="#EFB02C" stroke-width="1.4" stroke-linejoin="round"/></svg></span><b>star</b><small>星星</small><span class="stars"><svg viewBox="0 0 24 24"><use href="#star5"/></svg><svg viewBox="0 0 24 24"><use href="#star5"/></svg><svg viewBox="0 0 24 24"><use href="#star5"/></svg></span></a>
+      </div>
+    </section>
+
+    <nav class="dock" aria-label="主导航">
+      <a href="shelf.html"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 5.5h5v14h-5zM9.5 5.5h5v14h-5z"/><path d="m15.5 6.4 4.3-1.2 3 13.5-4.3 1.2z" transform="translate(-1.6 .2)"/></svg>书架</a>
+      <a class="on" href="words.html" aria-current="page"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="14" rx="3.5"/><path d="M7.5 15l2-6 2 6M8.2 13h2.6M14 9h2.2a1.5 1.5 0 0 1 0 3H14zm0 3h2.6a1.5 1.5 0 0 1 0 3H14z"/></svg>单词</a>
+      <a href="#"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-8-8h8z"/><path d="M20 4l-8 8"/></svg>贴纸</a>
+      <a href="#"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9.6" r="2.2"/><path d="M3.5 19.5c.6-3.2 2.8-5 5.5-5s4.9 1.8 5.5 5"/><path d="M15.4 14.8c2.4-.3 4.4 1.1 5.1 4.2"/></svg>家长</a>
+    </nav>
+  </div>
+</body>
+</html>
