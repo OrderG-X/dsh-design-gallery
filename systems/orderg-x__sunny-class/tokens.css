@@ -1,0 +1,184 @@
+/* 设计系统「晴天 Sunny」的设计变量：5–10 岁孩子的学习 App 和课堂小工具。
+   晴天三色（太阳黄、天空蓝、叶子绿）+ 墨蓝粗描边；圆体字、大点击区、对错不只靠颜色。
+   复制到设计目录，每屏 <link rel="stylesheet" href="tokens.css">，再 link components.css。
+   默认是「孩子模式」；家长、老师看的页面给外层加 data-view="grown"，同一套组件变安静。 */
+:root {
+  /* 蜡笔盒：原色，大人模式也不变（吉祥物、星星、徽章、科目色都从这里取） */
+  --sun: #FFC531;                   /* 太阳黄：主按钮、星星、当前关卡；上面放墨蓝字 8.9:1 */
+  --sky: #4AA8FF;                   /* 天空蓝：选中、读音、进度；上面放墨蓝字 5.6:1 */
+  --leaf: #4CC870;                  /* 叶子绿：答对、完成、继续；上面放墨蓝字 6.6:1 */
+  --coral: #FF6F61;                 /* 珊瑚红：答错、退出、提醒点；上面放墨蓝字 5.1:1 */
+  --orange: #FF9A3C;                /* 橘子橙：再试一次、时间快到；上面放墨蓝字 6.6:1 */
+  --ink: #1C2B4B;                   /* 墨蓝：正文、所有粗描边、亮色块上的字 */
+  --paper: #FFFFFF;
+
+  /* 颜色：按角色定义（孩子模式） */
+  --color-bg: #EDF6FF;              /* 页面背景：晴天的浅天空（正文对它 12.9:1） */
+  --color-surface: #FFFFFF;         /* 卡片、选项、弹窗、输入框 */
+  --color-surface-2: #F3F9FF;       /* 次一级表面：键盘托盘、图片框、槽 */
+  --color-text: var(--ink);         /* 正文（对白 14:1） */
+  --color-muted: #4A5B7C;           /* 次要文字（对 bg 6.3:1，对白 6.8:1，别再浅） */
+  --color-line: #C9DDF0;            /* 卡片里的分隔虚线、图表网格 */
+  --color-line-strong: #9DB2CC;     /* 不可用的描边、空星星、锁住的关卡 */
+  --color-outline: var(--ink);      /* 粗描边的颜色：孩子模式是墨蓝 */
+  --color-primary: var(--sun);      /* 主色：太阳黄，一屏最重要的那个按钮 */
+  --color-primary-hover: #FFB915;
+  --color-primary-soft: #FFF2C6;    /* 浅阳光：提示气泡、当前项底 */
+  --color-primary-ink: var(--ink);  /* 主色上的字 */
+  --color-primary-text: #835400;    /* 浅底、白底上的主色字（对 soft 5.8:1） */
+  --color-accent: var(--sky);       /* 点缀：天空蓝，选中、读音、链接 */
+  --color-accent-soft: #DCEEFF;
+  --color-accent-text: #0E5BA8;     /* 浅底、白底上的蓝字（对 soft 5.8:1） */
+  --color-success: #166B33;         /* 对：字；亮色块用 --leaf */
+  --color-success-fill: var(--leaf);
+  --color-success-soft: #DFF6E5;
+  --color-danger: #A72D25;          /* 错：字；亮色块用 --coral */
+  --color-danger-fill: var(--coral);
+  --color-danger-soft: #FFE4E0;
+  --color-warning: #8F4A00;         /* 再试一次、时间快到：字；亮色块用 --orange */
+  --color-warning-fill: var(--orange);
+  --color-warning-soft: #FFEBD3;
+  --color-info: #0E5BA8;
+  --color-info-fill: var(--sky);
+  --color-info-soft: #DCEEFF;
+  --color-link: #0E5BA8;
+  --color-inverse: var(--ink);      /* 反色：轻提示 */
+  --color-inverse-ink: #FFFFFF;
+  --color-inverse-accent: var(--sun);
+  --color-overlay: rgb(28 43 75 / 0.55);
+  --color-focus: rgb(74 168 255 / 0.5);
+  --color-shine: rgb(255 255 255 / 0.55); /* 按钮、进度条顶上的一道高光 */
+
+  /* 字体：圆体。正文、标题都用圆体；识字卡里的汉字用楷体（课本字），拼音用圆体 */
+  --font-sans: ui-rounded, "SF Pro Rounded", "Yuanti SC", "PingFang SC", "HarmonyOS Sans SC", "MiSans", "Microsoft YaHei", system-ui, sans-serif;
+  --font-display: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", "Yuanti SC", "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-hanzi: "Kaiti SC", "STKaiti", "KaiTi", "AR PL UKai CN", "Noto Serif SC", "Songti SC", serif;
+  --font-mono: "SF Mono", Menlo, Consolas, monospace;
+
+  /* 字号阶梯：孩子模式正文 18px */
+  --text-xs: 14px;
+  --text-sm: 16px;
+  --text-md: 18px;
+  --text-lg: 22px;
+  --text-xl: 26px;
+  --text-2xl: 32px;
+  --text-3xl: 40px;
+  --text-4xl: 56px;
+
+  /* 字重：圆体在孩子屏上要厚一点，正文用 500 */
+  --weight-regular: 500;
+  --weight-medium: 600;
+  --weight-bold: 700;
+  --weight-black: 800;
+  --weight-button: 800;
+
+  /* 行高 */
+  --leading-tight: 1.15;
+  --leading-snug: 1.3;
+  --leading-normal: 1.55;
+  --leading-relaxed: 1.75;
+
+  /* 间距：4 / 8 的倍数。能点的东西之间至少 12 */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* 控件高：孩子的手指，最小 48 */
+  --tap-min: 48px;
+  --control-sm: 48px;
+  --control-md: 60px;
+  --control-lg: 76px;
+
+  /* 圆角：按钮一律胶囊，卡片、选项 26 */
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 26px;
+  --radius-xl: 36px;
+  --radius-full: 999px;
+
+  /* 描边：粗、墨蓝，像蜡笔描过的贴画 */
+  --stroke: 3px;
+  --stroke-sm: 2px;
+
+  /* 立体感：在描边里面，顶上一道高光、底下一道内阴影（不在外面垫台阶） */
+  --shade: inset 0 3px 0 var(--color-shine), inset 0 -5px 0 rgb(28 43 75 / 0.14);
+  --shade-sm: inset 0 2px 0 var(--color-shine), inset 0 -3px 0 rgb(28 43 75 / 0.14);
+  --shade-press: inset 0 4px 0 rgb(28 43 75 / 0.16);
+
+  /* 阴影：柔和的天蓝色投影，只用来让卡片和浮层离开背景 */
+  --shadow-sm: 0 8px 18px -10px rgb(22 72 140 / 0.35);
+  --shadow-md: 0 16px 32px -16px rgb(22 72 140 / 0.42);
+  --shadow-lg: 0 28px 56px -18px rgb(16 40 80 / 0.5);
+  --ring: 0 0 0 5px var(--color-focus);
+
+  /* 动效：轻轻弹一下；庆祝动画最长 700ms */
+  --ease: cubic-bezier(.34, 1.45, .64, 1);
+  --dur: 200ms;
+  --dur-fast: 100ms;
+  --dur-party: 700ms;
+}
+
+/* 大人模式：家长中心、老师后台。<html data-view="grown">，或只给某一块加 data-view="grown"。
+   同一套类名，描边变细变浅、字变小、主色换成沉一点的蓝；蜡笔盒原色不变 */
+[data-view="grown"] {
+  --color-bg: #F5F8FC;
+  --color-surface-2: #EEF3F9;
+  --color-muted: #51617F;           /* 对 bg 5.9:1 */
+  --color-line: #DCE4EE;
+  --color-line-strong: #B4C2D3;
+  --color-outline: #D3DDE9;         /* 描边换成浅线 */
+  --color-primary: #1D66C2;         /* 沉稳的蓝，白字 5.6:1 */
+  --color-primary-hover: #1857A6;
+  --color-primary-soft: #E6F0FB;
+  --color-primary-ink: #FFFFFF;
+  --color-primary-text: #1D66C2;
+  --color-focus: rgb(29 102 194 / 0.28);
+
+  --font-sans: system-ui, "PingFang SC", "HarmonyOS Sans SC", "MiSans", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-md: 15px;
+  --text-lg: 17px;
+  --text-xl: 20px;
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+  --text-4xl: 40px;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-bold: 600;
+  --weight-black: 700;
+  --weight-button: 600;
+
+  --control-sm: 36px;
+  --control-md: 44px;
+  --control-lg: 52px;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+
+  --stroke: 1px;
+  --stroke-sm: 1px;
+
+  --shade: 0 0 0 transparent;
+  --shade-sm: 0 0 0 transparent;
+  --shade-press: 0 0 0 transparent;
+  --shadow-sm: 0 1px 2px rgb(20 40 70 / 0.06);
+  --shadow-md: 0 1px 2px rgb(20 40 70 / 0.05), 0 8px 20px -8px rgb(20 40 70 / 0.14);
+  --shadow-lg: 0 2px 6px rgb(20 40 70 / 0.06), 0 20px 44px -12px rgb(20 40 70 / 0.28);
+  --ring: 0 0 0 3px var(--color-focus);
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --dur: 160ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root, [data-view="grown"] { --dur: 0ms; --dur-fast: 0ms; --dur-party: 0ms; }
+}
