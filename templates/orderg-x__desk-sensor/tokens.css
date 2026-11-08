@@ -1,0 +1,56 @@
+:root {
+  --color-bg: #F4F7FB;
+  --color-surface: #FFFFFF;
+  --color-text: #0E1A2B;
+  --color-muted: #4A5A70;
+  --color-line: #B9C8DC;
+  --color-line-soft: #E4EBF4;
+  --color-line-strong: #7E93AE;
+  --color-primary: #1748C9;
+  --color-primary-hover: #1239A3;
+  --color-primary-soft: #E9EFFC;
+  --color-accent: #E8590C;
+  --color-accent-ink: #B4420A;
+  --color-accent-soft: #FDEDE3;
+  --color-on: #FFFFFF;
+  --color-on-muted: #D3DEF7;
+  --color-link: #1748C9;
+
+  --grid-paper: repeating-linear-gradient(0deg, #E4EBF4 0, #E4EBF4 1px, transparent 1px, transparent 24px), repeating-linear-gradient(90deg, #E4EBF4 0, #E4EBF4 1px, transparent 1px, transparent 24px);
+  --grid-fine: repeating-linear-gradient(0deg, #EFF3F9 0, #EFF3F9 1px, transparent 1px, transparent 8px), repeating-linear-gradient(90deg, #EFF3F9 0, #EFF3F9 1px, transparent 1px, transparent 8px);
+  --grid-major: repeating-linear-gradient(0deg, #E1E8F2 0, #E1E8F2 1px, transparent 1px, transparent 40px), repeating-linear-gradient(90deg, #E1E8F2 0, #E1E8F2 1px, transparent 1px, transparent 40px);
+  --grid-blue: repeating-linear-gradient(0deg, rgba(255, 255, 255, .11) 0, rgba(255, 255, 255, .11) 1px, transparent 1px, transparent 24px), repeating-linear-gradient(90deg, rgba(255, 255, 255, .11) 0, rgba(255, 255, 255, .11) 1px, transparent 1px, transparent 24px);
+
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, "DejaVu Sans Mono", "Liberation Mono", monospace;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+
+  --text-xs: 12px;
+  --text-sm: 14px;
+  --text-md: 16px;
+  --text-lg: 20px;
+  --text-xl: 28px;
+  --text-2xl: 40px;
+  --text-3xl: 60px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  --radius: 0;
+  --shadow: none;
+  --hair: 1px solid var(--color-line);
+  --hair-strong: 1px solid var(--color-line-strong);
+  --tracking-label: 0.08em;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --dur: 160ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur: 0ms; }
+}

@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": { "zh": "Datum 桌面空气监测仪", "en": "Datum desk air monitor" },
+  "description": {
+    "zh": "虚构桌面空气监测仪的英文官网，工程图纸风：首页（带尺寸标注的线稿主图、便当格功能区含小图表、使用步骤、预订价格条）和规格页（三视图与爆炸图、规格表、两款对比、常见问题）",
+    "en": "Blueprint-style site for a fictional desk air monitor: home with a dimensioned hero drawing, bento grid with a small chart, steps and preorder; specs with drawings, spec table, comparison, FAQ"
+  },
+  "kind": "web",
+  "screens": [
+    { "file": "home.html", "title": { "zh": "首页", "en": "Home" } },
+    { "file": "specs.html", "title": { "zh": "规格", "en": "Specs" } }
+  ],
+  "style": "custom",
+  "categories": ["business"],
+  "tags": ["landing", "pricing", "chart", "data-dense", "illustration", "detail"],
+  "lang": "en",
+  "license": "CC0-1.0",
+  "author": { "login": "orderg-x", "id": 271418316 },
+  "ai": { "generated": true, "tool": "claude-opus-5-5" }
+}
