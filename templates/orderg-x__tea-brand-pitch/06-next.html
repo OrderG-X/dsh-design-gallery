@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="slides">
+<title>时间与下一步 · 山野茶品牌提案</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="deck.css">
+<style>
+  .title { position: absolute; top: 120px; left: var(--margin); font-size: var(--text-title); }
+  .tl { position: absolute; top: 210px; left: var(--margin); width: 1152px; height: 260px; overflow: visible; }
+  .tl text { font-family: var(--font-sans); font-size: 12px; fill: var(--color-muted); }
+  .tl .m { font-size: 13px; fill: var(--color-text); font-weight: 600; letter-spacing: .04em; }
+  .tl .k { font-family: var(--font-serif); font-size: 17px; font-weight: 700; fill: var(--color-text); }
+  .tl .bar { fill: var(--color-line); }
+  .tl .brk { fill: var(--color-surface); stroke: var(--color-line); stroke-width: 1; stroke-dasharray: 3 2; }
+  .tl .hair { stroke: var(--color-line); stroke-width: 1; }
+  .tl .grid-v { stroke: #BDB9B0; stroke-width: 1; }
+  .tl .today { stroke: var(--color-line); stroke-width: 1.5; stroke-dasharray: 4 3; }
+  .tl .open { stroke: var(--color-primary); stroke-width: 2; }
+  .tl .red { fill: var(--color-primary); font-weight: 700; font-size: 13px; }
+  .tl .ink { fill: var(--color-text); font-weight: 600; }
+  .ask { position: absolute; top: 496px; left: var(--margin); width: 662px; }
+  .ask ol { margin-top: 10px; }
+  .ask li {
+    display: grid;
+    grid-template-columns: 30px 1fr auto;
+    align-items: baseline;
+    padding: 10px 0;
+    border-top: var(--hair) solid var(--color-line);
+  }
+  .ask li:first-child { border-top: var(--rule) solid var(--color-line); }
+  .box { width: 16px; height: 16px; border: var(--rule) solid var(--color-line); transform: translateY(2px); }
+  .ask b { font-size: 19px; font-weight: 700; line-height: 1.4; }
+  .ask span:last-child { font-family: var(--font-sans); font-size: 13px; color: var(--color-muted); }
+  .end {
+    position: absolute;
+    top: 496px;
+    left: 848px;
+    width: 368px;
+    height: 176px;
+  }
+  .end::before { content: ""; position: absolute; top: 0; bottom: 0; left: -24px; border-left: var(--hair) solid var(--color-line); }
+  .end h2 { font-size: 72px; font-weight: var(--weight-head); line-height: 1; letter-spacing: -.02em; }
+  .end dl { margin-top: 20px; display: grid; grid-template-columns: 64px 1fr; row-gap: 4px; font-family: var(--font-sans); font-size: 14px; line-height: 1.5; }
+  .end dt { color: var(--color-muted); }
+</style>
+</head>
+<body>
+<main class="slide">
+  <header class="run grid">
+    <span class="b">山野茶 · 品牌识别提案</span>
+    <span class="s">05　时间与下一步</span>
+    <a class="p" href="01-cover.html">06 / 06</a>
+  </header>
+
+  <h1 class="title head">十二周，赶在春茶上新前开门。</h1>
+
+  <svg class="tl" viewBox="0 0 1152 260" role="img" aria-label="时间线：11 月 23 日开始，四个阶段，春节停工，2027 年 3 月 6 日首店开门">
+    <g class="grid-v"><path d="M328 24 V238 M576 24 V238 M824 24 V238 M1048 24 V238"/></g>
+    <text class="m" x="214" y="16">2026 · 11</text>
+    <text class="m" x="334" y="16">12 月</text>
+    <text class="m" x="582" y="16">2027 · 1 月</text>
+    <text class="m" x="830" y="16">2 月</text>
+    <text class="m" x="1054" y="16">3 月</text>
+    <path class="hair" d="M0 28 H1152" stroke-width="2"/>
+    <path class="hair" d="M0 82 H1152 M0 134 H1152 M0 186 H1152 M0 238 H1152"/>
+
+    <text class="k" x="0" y="52">策略与概念确认</text><text x="0" y="72">11.23 – 12.04 · 2 周</text>
+    <rect class="bar" x="264" y="46" width="96" height="20"/>
+    <text class="k" x="0" y="104">标志与色彩定稿</text><text x="0" y="124">12.07 – 12.25 · 3 周</text>
+    <rect class="bar" x="376" y="98" width="152" height="20"/>
+    <text class="k" x="0" y="156">茶罐 · 杯 · 门头物料</text><text x="0" y="176">12.28 – 01.22 · 4 周</text>
+    <rect class="bar" x="544" y="150" width="208" height="20"/>
+    <text class="k" x="0" y="208">打样与门头施工</text><text x="0" y="228">01.25 – 02.19 · 3 周</text>
+    <rect class="bar" x="768" y="202" width="96" height="20"/>
+    <rect class="brk" x="864.5" y="202.5" width="71" height="19"/>
+    <text class="ink" x="900" y="216" text-anchor="middle">春节</text>
+    <rect class="bar" x="936" y="202" width="40" height="20"/>
+
+    <path class="today" d="M224 24 V238"/>
+    <text class="ink" x="224" y="256" text-anchor="middle">今天 11.18</text>
+    <path class="open" d="M1088 24 V238"/>
+    <rect x="1082" y="22" width="12" height="12" fill="#C8231B"/>
+    <text class="red" x="1088" y="256" text-anchor="middle">03.06 首店开门</text>
+  </svg>
+
+  <section class="ask">
+    <p class="kicker">本周请您确认 · 3 件</p>
+    <ol>
+      <li><span class="box"></span><b>品牌概念：慢一点，山就近一点</b><span>见第 3 页</span></li>
+      <li><span class="box"></span><b>标志方向：茶碗方印 + 四色色板</b><span>见第 4 页</span></li>
+      <li><span class="box"></span><b>首店门头尺寸与现场照片</b><span>11.25 前</span></li>
+    </ol>
+  </section>
+
+  <section class="end">
+    <h2>谢谢。</h2>
+    <dl>
+      <dt>提案人</dt><dd>沈一苇 · 两行设计事务所</dd>
+      <dt>邮箱</dt><dd>hello@example.com</dd>
+      <dt>电话</dt><dd>138 0000 0000</dd>
+    </dl>
+  </section>
+</main>
+</body>
+</html>

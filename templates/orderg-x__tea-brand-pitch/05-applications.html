@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="slides">
+<title>应用延展 · 山野茶品牌提案</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="deck.css">
+<style>
+  .title { position: absolute; top: 120px; left: var(--margin); font-size: var(--text-title); }
+  .note {
+    position: absolute;
+    top: 128px;
+    left: 864px;
+    width: 352px;
+    padding-left: 20px;
+    border-left: var(--hair) solid var(--color-line);
+    font-size: var(--text-small);
+    line-height: 1.7;
+  }
+  .note .kicker { margin-bottom: 8px; }
+  .apps {
+    position: absolute;
+    top: 212px;
+    left: var(--margin);
+    width: 1152px;
+    height: 448px;
+  }
+  .apps figure { position: relative; border-top: var(--rule) solid var(--color-line); }
+  .apps figure + figure::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -12px;
+    border-left: var(--hair) solid var(--color-line);
+  }
+  .f1 { grid-column: 1 / 7; }
+  .f2 { grid-column: 7 / 10; }
+  .f3 { grid-column: 10 / 13; }
+  .apps svg { position: absolute; top: 28px; left: 0; right: 0; margin: 0 auto; }
+  .f1 svg { width: 520px; height: 330px; }
+  .f2 svg { width: 240px; height: 300px; top: 58px; }
+  .f3 svg { width: 200px; height: 300px; top: 58px; }
+  .apps figcaption {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding-top: 10px;
+    border-top: var(--hair) solid var(--color-line);
+    display: grid;
+    grid-template-columns: 36px 1fr;
+  }
+  .f2 figcaption, .f3 figcaption { padding-left: 12px; }
+  .apps .no { font-size: var(--text-small); font-variant-numeric: tabular-nums; line-height: 1.5; }
+  .apps h3 { font-size: 19px; font-weight: 700; line-height: 1.5; }
+  .apps figcaption p { grid-column: 2; font-family: var(--font-sans); font-size: 13px; line-height: 1.6; color: var(--color-muted); }
+</style>
+</head>
+<body>
+<main class="slide">
+  <header class="run grid">
+    <span class="b">山野茶 · 品牌识别提案</span>
+    <span class="s">04　应用延展</span>
+    <a class="p" href="06-next.html">05 / 06</a>
+  </header>
+
+  <h1 class="title head">放在哪儿，都认得出。</h1>
+  <div class="note">
+    <p class="kicker">首批物料 · 3 件</p>
+    <p>先做首店开门必需的三件，打样后再扩展到礼盒、菜单和线上店。</p>
+  </div>
+
+  <section class="apps grid">
+    <figure class="f1">
+      <svg viewBox="0 0 520 330" role="img" aria-label="门头示意：黑色招牌写山野茶，右上角红印，岚青色雨棚，左边橱窗右边门"><use href="art.svg#store"/></svg>
+      <figcaption><span class="no">01</span><h3>首店门头</h3><p>宽 4.2 m 黑底招牌，印放右上角；橱窗只摆茶罐，不贴海报</p></figcaption>
+    </figure>
+    <figure class="f2">
+      <svg viewBox="0 0 240 300" role="img" aria-label="茶罐示意：白色圆罐竖写山野茶，旁边一只黑色小罐"><use href="art.svg#tin"/></svg>
+      <figcaption><span class="no">02</span><h3>茶罐 · 小罐</h3><p>100 g 白罐 / 50 g 黑罐，竖排品名</p></figcaption>
+    </figure>
+    <figure class="f3">
+      <svg viewBox="0 0 200 300" role="img" aria-label="外带杯示意：白杯黑色杯套，杯套上印标志"><use href="art.svg#cup"/></svg>
+      <figcaption><span class="no">03</span><h3>外带杯</h3><p>12 oz 纸杯，黑杯套印标志与口号</p></figcaption>
+    </figure>
+  </section>
+</main>
+</body>
+</html>
