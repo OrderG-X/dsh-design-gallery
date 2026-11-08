@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="slides">
+<title>第一站：蒸发 · 水的旅行</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="deck.css">
+<style>
+  .pic { position: absolute; top: 108px; left: var(--margin); width: 600px; height: 556px; overflow: hidden; }
+  .pic svg { width: 596px; height: 552px; }
+  .lab { position: absolute; z-index: 1; }
+  .l1 { top: 262px; left: 96px; }
+  .l2 { top: 150px; left: 420px; }
+  .l3 { top: 590px; left: 380px; }
+
+  .txt { position: absolute; top: 112px; left: 712px; width: 512px; }
+  .py { margin-top: 18px; font-size: 26px; font-weight: 800; color: var(--color-link); letter-spacing: .08em; }
+  .word { font-size: var(--text-word); line-height: 1.08; -webkit-text-stroke: 2px currentColor; }
+  .def { margin-top: 14px; font-size: 28px; line-height: 1.5; }
+  .def b { font-weight: 800; }
+  .key { margin-top: 16px; display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 800; }
+  .key svg { width: 26px; height: 44px; flex: none; }
+  .try { position: relative; margin-top: 30px; padding: 30px 22px 18px; transform: rotate(1.2deg); display: grid; grid-template-columns: 1fr 120px; column-gap: 12px; align-items: center; }
+  .try .pill { position: absolute; top: -20px; left: 18px; transform: rotate(-3deg); }
+  .try p { font-size: 20px; line-height: 1.55; }
+  .try svg { width: 120px; height: 80px; }
+</style>
+</head>
+<body>
+<main class="slide">
+  <header class="top">
+    <a class="brand" href="01-cover.html"><svg viewBox="0 0 100 120" aria-hidden="true"><use href="art.svg#drop"/></svg>水的旅行<span>科学 · 四年级上册</span></a>
+    <ol class="route">
+      <li class="on"><b>1</b>蒸发</li>
+      <li><b>2</b>凝结</li>
+      <li><b>3</b>降水</li>
+      <li><b>4</b>汇流</li>
+    </ol>
+    <a class="pg" href="04-condense.html">3 / 6</a>
+  </header>
+
+  <div class="pic card">
+    <svg viewBox="0 0 596 552" role="img" aria-label="插画：太阳晒着大海，水滴豆豆变成虚线的水蒸气往天上飘">
+      <use href="art.svg#sun" x="28" y="30" width="150" height="150"/>
+      <g fill="none" stroke="#1D1B3A" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 10">
+        <path d="M150 400 Q136 370 150 340 T150 280 T150 220"/>
+        <path d="M250 396 Q236 366 250 336 T250 276"/>
+        <path d="M520 400 Q506 370 520 340 T520 280 T520 220 T520 160"/>
+      </g>
+      <path d="M268 330 C300 300 320 290 350 286" fill="none" stroke="#FF6A3D" stroke-width="5" stroke-linecap="round" stroke-dasharray="1 12"/>
+      <path d="M342 276 L356 286 L340 296" fill="none" stroke="#FF6A3D" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <use href="art.svg#vapor" x="360" y="190" width="120" height="144"/>
+      <path d="M0 410 Q30 392 60 410 T120 410 T180 410 T240 410 T300 410 T360 410 T420 410 T480 410 T540 410 T600 410 V552 H0 Z" fill="#8ED6CC" stroke="#1D1B3A" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M40 470 Q60 458 80 470 T120 470 M420 500 Q440 488 460 500 T500 500" fill="none" stroke="#1D1B3A" stroke-width="3" stroke-linecap="round"/>
+      <use href="art.svg#drop" x="196" y="320" width="90" height="108"/>
+    </svg>
+  </div>
+  <span class="pill lab l1 tl">① 太阳晒，海水变热</span>
+  <span class="pill lab l2 or tr">② 变成水蒸气，往上飘</span>
+  <span class="pill lab l3 wt tl">大海</span>
+
+  <section class="txt">
+    <span class="pill or tl">第一站</span>
+    <p class="py">zhēng fā</p>
+    <h1 class="word head">蒸发</h1>
+    <p class="def">水受热后，变成看不见的<b class="teal">水蒸气</b>，<br>悄悄跑到空气里。</p>
+    <p class="key"><svg viewBox="0 0 26 44" aria-hidden="true"><rect x="7" y="2.5" width="12" height="28" rx="6" fill="#FFFFFF" stroke="#1D1B3A" stroke-width="2.5"/><circle cx="13" cy="34" r="8" fill="#FF6A3D" stroke="#1D1B3A" stroke-width="2.5"/><path d="M13 14 V30" stroke="#FF6A3D" stroke-width="4" stroke-linecap="round"/></svg>天越热、风越大，水干得越快</p>
+    <div class="try card">
+      <span class="pill wt">动手试一试</span>
+      <p>两个盘子各倒一勺水，<br>一个晒太阳，一个放柜子里。<br>2 小时后，哪个先干？</p>
+      <svg viewBox="0 0 120 80" aria-hidden="true">
+        <use href="art.svg#sun" x="2" y="0" width="34" height="34"/>
+        <ellipse cx="28" cy="58" rx="24" ry="8" fill="#FFFFFF" stroke="#1D1B3A" stroke-width="2.5"/>
+        <ellipse cx="28" cy="56" rx="10" ry="3" fill="#8ED6CC"/>
+        <rect x="64" y="18" width="52" height="56" rx="6" fill="#FFE2D6" stroke="#1D1B3A" stroke-width="2.5"/>
+        <ellipse cx="90" cy="58" rx="20" ry="7" fill="#FFFFFF" stroke="#1D1B3A" stroke-width="2.5"/>
+        <ellipse cx="90" cy="56" rx="12" ry="3.5" fill="#8ED6CC"/>
+      </svg>
+    </div>
+  </section>
+</main>
+</body>
+</html>

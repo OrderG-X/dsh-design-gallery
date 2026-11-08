@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="slides">
+<title>第二站：凝结成云 · 水的旅行</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="deck.css">
+<style>
+  .txt { position: absolute; top: 112px; left: var(--margin); width: 548px; }
+  .py { margin-top: 18px; font-size: 26px; font-weight: 800; color: var(--color-link); letter-spacing: .08em; }
+  .word { font-size: var(--text-word); line-height: 1.08; -webkit-text-stroke: 2px currentColor; }
+  .word small { font-size: 56px; margin-left: 8px; -webkit-text-stroke: 1px currentColor; }
+  .def { margin-top: 14px; font-size: 28px; line-height: 1.5; }
+  .def b { font-weight: 800; }
+  .life { position: relative; margin-top: 44px; padding: 36px 24px 26px; transform: rotate(-1deg); display: grid; grid-template-columns: 1fr 112px; column-gap: 16px; align-items: center; }
+  .life .pill { position: absolute; top: -20px; left: 18px; transform: rotate(-3deg); }
+  .life p { font-size: 21px; line-height: 1.6; }
+  .life svg { width: 112px; height: 104px; }
+
+  .pic { position: absolute; top: 108px; left: 640px; width: 584px; height: 556px; overflow: hidden; }
+  .pic svg { width: 580px; height: 552px; }
+  .pic text { font-family: var(--font-round); font-size: 17px; font-weight: 800; fill: var(--color-text); }
+  .pic .c { font-size: 15px; font-weight: 400; fill: var(--color-muted); }
+  .lab { position: absolute; z-index: 1; }
+  .l1 { top: 468px; left: 702px; }
+  .l2 { top: 132px; left: 1040px; }
+</style>
+</head>
+<body>
+<main class="slide">
+  <header class="top">
+    <a class="brand" href="01-cover.html"><svg viewBox="0 0 100 120" aria-hidden="true"><use href="art.svg#drop"/></svg>水的旅行<span>科学 · 四年级上册</span></a>
+    <ol class="route">
+      <li class="done"><b>1</b>蒸发</li>
+      <li class="on"><b>2</b>凝结</li>
+      <li><b>3</b>降水</li>
+      <li><b>4</b>汇流</li>
+    </ol>
+    <a class="pg" href="05-cycle.html">4 / 6</a>
+  </header>
+
+  <section class="txt">
+    <span class="pill or tl">第二站</span>
+    <p class="py">níng jié</p>
+    <h1 class="word head">凝结<small>成云</small></h1>
+    <p class="def">水蒸气飘到高空，遇冷又变回<b class="teal">小水珠</b>。<br>很多小水珠挤在一起，就成了云。</p>
+    <div class="life card">
+      <span class="pill wt">生活里也有</span>
+      <p>冬天对着玻璃哈一口气，<br>玻璃上马上起雾——这也是凝结！</p>
+      <svg viewBox="0 0 112 104" aria-hidden="true">
+        <rect x="6" y="4" width="100" height="94" rx="8" fill="#D6F1EC" stroke="#1D1B3A" stroke-width="2.5"/>
+        <path d="M56 4 V98 M6 51 H106" stroke="#1D1B3A" stroke-width="2.5"/>
+        <g fill="#FFFFFF" opacity=".9"><circle cx="28" cy="30" r="12"/><circle cx="40" cy="24" r="9"/><circle cx="84" cy="74" r="13"/><circle cx="72" cy="80" r="8"/></g>
+        <path d="M76 70 a1.6 1.6 0 1 0 0.1 0 M90 70 a1.6 1.6 0 1 0 0.1 0 M76 80 Q83 86 90 80" fill="none" stroke="#1D1B3A" stroke-width="2.2" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </section>
+
+  <div class="pic card">
+    <svg viewBox="0 0 580 552" role="img" aria-label="插画：水蒸气从海面升到高空，越往上越冷，在 4000 米左右凝结成云，云里挤着很多小水滴">
+      <defs>
+        <linearGradient id="therm" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#8ED6CC"/>
+          <stop offset=".5" stop-color="#FFFFFF"/>
+          <stop offset="1" stop-color="#FF6A3D"/>
+        </linearGradient>
+      </defs>
+      <rect x="34" y="72" width="18" height="398" rx="9" fill="url(#therm)" stroke="#1D1B3A" stroke-width="2.5"/>
+      <path d="M52 92 H62 M52 278 H62 M52 456 H62" stroke="#1D1B3A" stroke-width="2.5" stroke-linecap="round"/>
+      <text x="70" y="90">4000 米</text><text class="c" x="70" y="110">约 -2 °C</text>
+      <text x="70" y="276">2000 米</text><text class="c" x="70" y="296">约 10 °C</text>
+      <path d="M255 552 L410 268 Q420 250 430 268 L470 340 L500 300 Q508 288 516 300 L580 400 V552 Z" fill="#D6F1EC" stroke="#1D1B3A" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M392 302 L410 268 Q420 250 430 268 L448 300 L432 292 L420 304 L406 292 Z" fill="#FFFFFF" stroke="#1D1B3A" stroke-width="2.5" stroke-linejoin="round"/>
+      <g fill="none" stroke="#1D1B3A" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 10">
+        <path d="M222 448 Q208 418 222 388 T222 328 T222 268 T222 208"/>
+        <path d="M290 448 Q276 418 290 388 T290 328 T290 268 T290 208"/>
+      </g>
+      <use href="art.svg#vapor" x="228" y="300" width="56" height="67"/>
+      <use href="art.svg#cloud" x="104" y="22" width="320" height="200"/>
+      <g fill="#8ED6CC" stroke="#1D1B3A" stroke-width="2">
+        <circle cx="166" cy="150" r="5"/><circle cx="356" cy="160" r="5"/><circle cx="378" cy="128" r="4"/><circle cx="150" cy="178" r="4"/><circle cx="330" cy="186" r="4"/>
+      </g>
+      <use href="art.svg#drop" x="190" y="104" width="54" height="65"/>
+      <use href="art.svg#drop" x="236" y="88" width="62" height="74"/>
+      <use href="art.svg#drop" x="288" y="112" width="52" height="62"/>
+      <path d="M0 470 Q25 455 50 470 T100 470 T150 470 T200 470 T250 470 T300 470 T350 470 T400 470 T450 470 T500 470 T550 470 T600 470 V552 H0 Z" fill="#8ED6CC" stroke="#1D1B3A" stroke-width="3" stroke-linejoin="round"/>
+      <text x="70" y="506">海面</text><text class="c" x="116" y="506">约 22 °C</text>
+    </svg>
+  </div>
+  <span class="pill lab l1 tr">越高越冷</span>
+  <span class="pill lab l2 or tl">挤成一团 = 云</span>
+</main>
+</body>
+</html>

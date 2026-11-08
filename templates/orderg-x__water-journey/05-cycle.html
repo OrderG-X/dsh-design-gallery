@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="slides">
+<title>水循环 · 水的旅行</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="deck.css">
+<style>
+  .kick { position: absolute; top: 104px; left: var(--margin); }
+  .title { position: absolute; top: 152px; left: var(--margin); font-size: 52px; }
+  .lead { position: absolute; top: 112px; left: 820px; width: 404px; font-size: 22px; line-height: 1.6; }
+  .lead b { font-weight: 800; }
+  .pic { position: absolute; top: 236px; left: var(--margin); width: 1168px; height: 440px; overflow: hidden; }
+  .pic svg { width: 1164px; height: 436px; }
+  .st { position: absolute; z-index: 1; padding-left: 6px; }
+  .st b { display: grid; place-items: center; width: 28px; height: 28px; border: var(--border); border-radius: 50%; background: var(--color-primary); font-size: 15px; }
+  .s1 { top: 506px; left: 384px; }
+  .s2 { top: 246px; left: 900px; }
+  .s3 { top: 318px; left: 990px; }
+  .s4 { top: 596px; left: 900px; }
+</style>
+</head>
+<body>
+<main class="slide">
+  <header class="top">
+    <a class="brand" href="01-cover.html"><svg viewBox="0 0 100 120" aria-hidden="true"><use href="art.svg#drop"/></svg>水的旅行<span>科学 · 四年级上册</span></a>
+    <ol class="route">
+      <li class="done"><b>1</b>蒸发</li>
+      <li class="done"><b>2</b>凝结</li>
+      <li class="on"><b>3</b>降水</li>
+      <li class="on"><b>4</b>汇流</li>
+    </ol>
+    <a class="pg" href="06-quiz.html">5 / 6</a>
+  </header>
+
+  <span class="pill or tl kick">第三站 + 第四站</span>
+  <h1 class="title head">下雨啦，水又回到大海</h1>
+  <p class="lead">云里的小水珠越聚越大，掉下来就是<b>雨</b>。雨水流进小河，小河流回大海。转一圈，就叫<b class="mark">水循环</b>。</p>
+
+  <div class="pic card">
+    <svg viewBox="0 0 1164 436" role="img" aria-label="水循环图：海水蒸发上天，凝结成云，下雨落到山上，顺着小河流回大海">
+      <use href="art.svg#sun" x="40" y="22" width="120" height="120"/>
+      <path d="M0 336 Q25 321 50 336 T100 336 T150 336 T200 336 T250 336 T300 336 T350 336 T400 336 T450 336 T500 336 T550 336 V436 H0 Z" fill="#8ED6CC" stroke="#1D1B3A" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M60 390 Q80 378 100 390 T140 390 M300 404 Q320 392 340 404 T380 404" fill="none" stroke="#1D1B3A" stroke-width="3" stroke-linecap="round"/>
+      <path d="M850 236 L960 170 Q972 162 984 172 L1164 300 V436 H850 Z" fill="#D6F1EC" stroke="#1D1B3A" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M430 436 L468 332 C520 320 570 322 612 300 L776 196 Q790 186 804 198 L1000 330 C1060 350 1120 352 1164 350 V436 Z" fill="#FFE2D6" stroke="#1D1B3A" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M846 252 C812 270 800 290 760 298 C716 306 690 292 646 312 C600 332 556 334 500 338 L430 342 L430 378 L500 374 C560 370 606 362 652 344 C698 326 724 334 760 322 C806 308 824 280 852 258 Z" fill="#8ED6CC"/>
+      <path d="M846 252 C812 270 800 290 760 298 C716 306 690 292 646 312 C600 332 556 334 500 338 L462 340 M852 258 C824 280 806 308 760 322 C724 334 698 326 652 344 C606 362 560 370 500 374 L452 376" fill="none" stroke="#1D1B3A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M846 252 Q850 254 852 258" fill="none" stroke="#1D1B3A" stroke-width="3" stroke-linecap="round"/>
+      <path d="M1040 380 l-6 -12 M1046 380 l0 -14 M1052 380 l6 -12 M930 424 l-6 -12 M936 424 l0 -14 M942 424 l6 -12" stroke="#1D1B3A" stroke-width="3" stroke-linecap="round"/>
+      <use href="art.svg#cloud" x="600" y="10" width="256" height="160"/>
+      <g fill="#8ED6CC" stroke="#1D1B3A" stroke-width="2.5" stroke-linejoin="round">
+        <path d="M650 184 c-4 6 -7 10 -7 14 a7 7 0 0 0 14 0 c0 -4 -3 -8 -7 -14 Z"/>
+        <path d="M694 206 c-4 6 -7 10 -7 14 a7 7 0 0 0 14 0 c0 -4 -3 -8 -7 -14 Z"/>
+        <path d="M736 182 c-4 6 -7 10 -7 14 a7 7 0 0 0 14 0 c0 -4 -3 -8 -7 -14 Z"/>
+        <path d="M672 236 c-4 6 -7 10 -7 14 a7 7 0 0 0 14 0 c0 -4 -3 -8 -7 -14 Z"/>
+        <path d="M778 204 c-4 6 -7 10 -7 14 a7 7 0 0 0 14 0 c0 -4 -3 -8 -7 -14 Z"/>
+        <path d="M716 230 c-4 6 -7 10 -7 14 a7 7 0 0 0 14 0 c0 -4 -3 -8 -7 -14 Z"/>
+      </g>
+      <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M268 316 C276 214 400 120 560 96" stroke="#1D1B3A" stroke-width="11"/>
+        <path d="M268 316 C276 214 400 120 560 96" stroke="#FF6A3D" stroke-width="6"/>
+        <path d="M800 370 C720 398 630 410 540 408" stroke="#1D1B3A" stroke-width="11"/>
+        <path d="M800 370 C720 398 630 410 540 408" stroke="#FF6A3D" stroke-width="6"/>
+      </g>
+      <path d="M552 80 L586 94 L556 114 Z" fill="#FF6A3D" stroke="#1D1B3A" stroke-width="3" stroke-linejoin="round"/>
+      <path d="M548 392 L516 408 L548 424 Z" fill="#FF6A3D" stroke="#1D1B3A" stroke-width="3" stroke-linejoin="round"/>
+      <use href="art.svg#vapor" x="420" y="168" width="54" height="65"/>
+      <use href="art.svg#drop" x="132" y="270" width="72" height="86"/>
+      <use href="art.svg#drop" x="676" y="282" width="44" height="53"/>
+    </svg>
+  </div>
+  <span class="pill st s1 tl"><b>1</b>蒸发</span>
+  <span class="pill st s2 tr"><b>2</b>凝结</span>
+  <span class="pill st s3 tl"><b>3</b>降水</span>
+  <span class="pill st s4 tr"><b>4</b>汇流</span>
+</main>
+</body>
+</html>

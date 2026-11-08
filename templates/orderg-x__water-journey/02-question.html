@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="slides">
+<title>先想一想 · 水的旅行</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="deck.css">
+<style>
+  .kick { position: absolute; top: 106px; left: var(--margin); }
+  .title { position: absolute; top: 158px; left: var(--margin); font-size: 58px; }
+  .scene { position: absolute; top: 268px; width: 330px; height: 320px; overflow: hidden; }
+  .s1 { left: var(--margin); }
+  .s2 { left: 470px; }
+  .scene svg { width: 326px; height: 316px; }
+  .time { position: absolute; top: 254px; z-index: 1; }
+  .t1 { left: 76px; }
+  .t2 { left: 490px; }
+  .arrow { position: absolute; top: 380px; left: 392px; width: 72px; text-align: center; font-size: 16px; font-weight: 800; }
+  .arrow svg { width: 64px; height: 44px; margin: 0 auto 4px; }
+  .hint { position: absolute; top: 620px; left: var(--margin); display: flex; align-items: center; gap: 12px; font-size: 22px; color: var(--color-muted); }
+  .hint svg { width: 40px; height: 48px; }
+  .hint b { color: var(--color-link); }
+
+  .guess { position: absolute; top: 254px; left: 846px; width: 378px; }
+  .guess h2 { font-size: 30px; font-weight: 800; line-height: 1.2; }
+  .guess h2 span { font-size: 18px; font-weight: 400; color: var(--color-muted); margin-left: 8px; }
+  .guess li { display: grid; grid-template-columns: 52px 1fr; column-gap: 14px; align-items: center; padding: 16px 18px; margin-top: 22px; }
+  .guess li:nth-child(1) { transform: rotate(-1.5deg); }
+  .guess li:nth-child(2) { transform: rotate(1deg); }
+  .guess li:nth-child(3) { transform: rotate(-.8deg); }
+  .abc { display: grid; place-items: center; width: 52px; height: 52px; border: var(--border); border-radius: 50%; font-size: 24px; font-weight: 800; background: var(--color-surface); }
+  .guess li:nth-child(1) .abc { background: var(--color-primary); }
+  .guess p { font-size: 23px; font-weight: 800; line-height: 1.3; }
+  .vote { display: flex; align-items: center; gap: 10px; margin-top: 6px; font-size: 16px; color: var(--color-muted); }
+  .vote i { display: block; height: 12px; border: var(--border); border-radius: 99px; background: var(--water); }
+  .vote s { display: block; flex: 0 0 196px; height: 12px; border-radius: 99px; background: var(--water-soft); text-decoration: none; }
+  .vote s i { height: 12px; margin: 0; }
+  .w12 { width: 55%; }
+  .w7 { width: 32%; }
+  .w3 { width: 14%; }
+</style>
+</head>
+<body>
+<main class="slide">
+  <header class="top">
+    <a class="brand" href="01-cover.html"><svg viewBox="0 0 100 120" aria-hidden="true"><use href="art.svg#drop"/></svg>水的旅行<span>科学 · 四年级上册</span></a>
+    <ol class="route">
+      <li><b>1</b>蒸发</li>
+      <li><b>2</b>凝结</li>
+      <li><b>3</b>降水</li>
+      <li><b>4</b>汇流</li>
+    </ol>
+    <a class="pg" href="03-evaporate.html">2 / 6</a>
+  </header>
+
+  <span class="pill or tl kick">先想一想</span>
+  <h1 class="title head">水坑里的水，去哪儿了？</h1>
+
+  <span class="pill time t1 tl">早上 8:00</span>
+  <div class="scene s1 card">
+    <svg viewBox="0 0 326 316" role="img" aria-label="早上：太阳刚升起，地上有一大片水坑，水坑在笑">
+      <use href="art.svg#sun" x="24" y="64" width="72" height="72"/>
+      <path d="M0 214 H326 V316 H0 Z" fill="#FFE2D6"/>
+      <path d="M0 214 H326" stroke="#1D1B3A" stroke-width="3"/>
+      <ellipse cx="170" cy="246" rx="126" ry="26" fill="#8ED6CC" stroke="#1D1B3A" stroke-width="3"/>
+      <path d="M96 240 Q120 232 144 238" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+      <ellipse cx="160" cy="246" rx="3.5" ry="4.5" fill="#1D1B3A"/>
+      <ellipse cx="182" cy="246" rx="3.5" ry="4.5" fill="#1D1B3A"/>
+      <path d="M164 256 Q171 261 178 256" fill="none" stroke="#1D1B3A" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M34 214 l-6 -14 M40 214 l0 -16 M46 214 l6 -14 M284 214 l-6 -12 M290 214 l0 -14 M296 214 l6 -12" stroke="#1D1B3A" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <div class="arrow">
+    <svg viewBox="0 0 64 44" aria-hidden="true"><path d="M6 22 H50 M36 8 L54 22 L36 36" fill="none" stroke="#1D1B3A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    7 小时后
+  </div>
+
+  <span class="pill time t2 tr">下午 3:00</span>
+  <div class="scene s2 card">
+    <svg viewBox="0 0 326 316" role="img" aria-label="下午：太阳升到头顶，水坑只剩一小点，水坑很吃惊">
+      <use href="art.svg#sun" x="128" y="20" width="96" height="96"/>
+      <g fill="none" stroke="#1D1B3A" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 9">
+        <path d="M150 226 Q140 206 150 186 T150 146"/>
+        <path d="M190 226 Q180 206 190 186 T190 146"/>
+      </g>
+      <path d="M0 214 H326 V316 H0 Z" fill="#FFE2D6"/>
+      <path d="M0 214 H326" stroke="#1D1B3A" stroke-width="3"/>
+      <ellipse cx="170" cy="246" rx="40" ry="10" fill="#8ED6CC" stroke="#1D1B3A" stroke-width="3"/>
+      <circle cx="163" cy="245" r="2.6" fill="#1D1B3A"/>
+      <circle cx="177" cy="245" r="2.6" fill="#1D1B3A"/>
+      <ellipse cx="170" cy="246" rx="126" ry="26" fill="none" stroke="#1D1B3A" stroke-width="2.5" stroke-dasharray="3 8" stroke-linecap="round"/>
+      <path d="M34 214 l-6 -14 M40 214 l0 -16 M46 214 l6 -14 M284 214 l-6 -12 M290 214 l0 -14 M296 214 l6 -12" stroke="#1D1B3A" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+  </div>
+
+  <p class="hint"><svg viewBox="0 0 100 120" aria-hidden="true"><use href="art.svg#drop-wow"/></svg><span>想好了吗？答案就藏在 <b>第一站</b> 里。</span></p>
+
+  <section class="guess">
+    <h2>你猜呢？<span>全班 22 人举手</span></h2>
+    <ol>
+      <li class="card"><span class="abc">A</span><div><p>被太阳晒跑了</p><div class="vote"><s><i class="w12"></i></s>12 票</div></div></li>
+      <li class="card"><span class="abc">B</span><div><p>渗进泥土里了</p><div class="vote"><s><i class="w7"></i></s>7 票</div></div></li>
+      <li class="card"><span class="abc">C</span><div><p>被小鸟喝光了</p><div class="vote"><s><i class="w3"></i></s>3 票</div></div></li>
+    </ol>
+  </section>
+</main>
+</body>
+</html>

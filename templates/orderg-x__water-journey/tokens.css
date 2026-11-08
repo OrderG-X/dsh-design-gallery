@@ -1,0 +1,30 @@
+:root {
+  --color-bg: #FFF7E8;
+  --color-surface: #FFFFFF;
+  --color-text: #1D1B3A;
+  --color-muted: #5D5A82;
+  --color-line: #1D1B3A;
+  --color-primary: #FF6A3D;
+  --color-accent: #1F9E92;
+  --color-on-primary: #1D1B3A;
+  --color-link: #137167;
+
+  --water: #8ED6CC;
+  --water-soft: #D6F1EC;
+  --sun-soft: #FFE2D6;
+
+  --font-round: "Yuanti SC", "YouYuan", "SF Pro Rounded", "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", sans-serif;
+  --weight-head: 800;
+
+  --text-small: 18px;
+  --text-body: 24px;
+  --text-sub: 30px;
+  --text-title: 56px;
+  --text-word: 116px;
+
+  --margin: 56px;
+  --radius: 20px;
+  --border: 2px solid var(--color-line);
+  --shadow: 4px 4px 0 var(--color-line);
+  --shadow-big: 6px 6px 0 var(--color-line);
+}

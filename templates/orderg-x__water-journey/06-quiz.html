@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="slides">
+<title>小测验 · 水的旅行</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="deck.css">
+<style>
+  .kick { position: absolute; top: 104px; left: var(--margin); }
+  .title { position: absolute; top: 150px; left: var(--margin); font-size: 50px; }
+  .qs { position: absolute; top: 230px; left: var(--margin); width: 640px; }
+  .qs li { display: grid; grid-template-columns: 44px 1fr; column-gap: 14px; padding: 14px 20px 16px; margin-bottom: 16px; }
+  .qs li:nth-child(2) { transform: rotate(.8deg); }
+  .no { display: grid; place-items: center; width: 40px; height: 40px; border: var(--border); border-radius: 50%; background: var(--water); font-size: 20px; font-weight: 800; }
+  .qs p { font-size: 22px; font-weight: 800; line-height: 1.4; padding-top: 5px; }
+  .opt { display: flex; gap: 10px; margin-top: 10px; }
+  .opt span { padding: 4px 14px; border: var(--border); border-radius: 999px; font-size: 17px; line-height: 1.4; background: var(--color-bg); white-space: nowrap; }
+  .ans { position: absolute; top: 638px; left: var(--margin); display: flex; align-items: center; gap: 14px; font-size: 17px; color: var(--color-muted); }
+  .ans b { display: inline-block; transform: rotate(180deg); padding: 3px 14px; border: 2px dashed var(--color-muted); border-radius: 999px; font-weight: 800; color: var(--color-text); }
+
+  .sum { position: absolute; top: 104px; left: 752px; width: 472px; padding: 22px 24px 24px; }
+  .sum h2 { font-size: 28px; font-weight: 800; line-height: 1.2; }
+  .loop { display: grid; grid-template-columns: 1fr 40px 1fr; grid-template-rows: auto 46px auto; margin-top: 24px; }
+  .loop .c { display: grid; grid-template-columns: 62px 1fr; column-gap: 10px; align-items: center; }
+  .loop .c svg { width: 62px; height: 62px; }
+  .loop b { display: block; font-size: 23px; font-weight: 800; line-height: 1.3; }
+  .loop small { display: block; font-size: 16px; line-height: 1.4; color: var(--color-muted); }
+  .loop .ar { display: grid; place-items: center; }
+  .loop .ar svg { width: 26px; height: 26px; }
+  .p1 { grid-area: 1 / 1; } .r12 { grid-area: 1 / 2; } .p2 { grid-area: 1 / 3; }
+  .r23 { grid-area: 2 / 3; } .p3 { grid-area: 3 / 3; } .r34 { grid-area: 3 / 2; }
+  .p4 { grid-area: 3 / 1; } .r41 { grid-area: 2 / 1; }
+  .sum .eq { display: flex; justify-content: center; margin-top: 26px; }
+  .home { position: absolute; top: 522px; left: 752px; width: 472px; padding: 32px 24px 20px; background: var(--sun-soft); transform: rotate(-1.2deg); }
+  .home .pill { position: absolute; top: -20px; left: 20px; transform: rotate(-3deg); }
+  .home p { font-size: 21px; line-height: 1.55; }
+  .home .stars { display: flex; gap: 6px; position: absolute; right: 18px; bottom: 16px; }
+  .home .stars svg { width: 30px; height: 30px; }
+</style>
+</head>
+<body>
+<main class="slide">
+  <header class="top">
+    <a class="brand" href="01-cover.html"><svg viewBox="0 0 100 120" aria-hidden="true"><use href="art.svg#drop"/></svg>水的旅行<span>科学 · 四年级上册</span></a>
+    <ol class="route">
+      <li class="done"><b>1</b>蒸发</li>
+      <li class="done"><b>2</b>凝结</li>
+      <li class="done"><b>3</b>降水</li>
+      <li class="done"><b>4</b>汇流</li>
+    </ol>
+    <a class="pg" href="01-cover.html">6 / 6</a>
+  </header>
+
+  <span class="pill or tl kick">小测验</span>
+  <h1 class="title head">考考你：三道小题</h1>
+
+  <ol class="qs">
+    <li class="card"><span class="no">1</span><div><p>阳台上的湿衣服晒干了，水去哪儿了？</p><div class="opt"><span>A 凝结成云</span><span>B 蒸发到空气里</span><span>C 流进小河</span></div></div></li>
+    <li class="card"><span class="no">2</span><div><p>冰饮料杯子外面冒出小水珠，是因为……</p><div class="opt"><span>A 空气里的水蒸气遇冷</span><span>B 杯子漏水了</span></div></div></li>
+    <li class="card"><span class="no">3</span><div><p>哪个顺序是对的？</p><div class="opt"><span>A 降水 → 蒸发 → 凝结</span><span>B 蒸发 → 凝结 → 降水</span></div></div></li>
+  </ol>
+  <p class="ans">倒过来看答案<b>1 B　2 A　3 B</b></p>
+
+  <section class="sum card">
+    <h2>今天学到了</h2>
+    <div class="loop">
+      <div class="c p1"><svg viewBox="0 0 54 54" aria-hidden="true"><use href="art.svg#sun" x="0" y="0" width="54" height="54"/></svg><span><b>1 蒸发</b><small>水变成水蒸气</small></span></div>
+      <div class="ar r12"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M4 14 H22 M15 6 L23 14 L15 22" fill="none" stroke="#FF6A3D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="c p2"><svg viewBox="0 0 54 54" aria-hidden="true"><use href="art.svg#cloud" x="0" y="8" width="54" height="34"/></svg><span><b>2 凝结</b><small>遇冷变回小水珠</small></span></div>
+      <div class="ar r23"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M14 4 V22 M6 15 L14 23 L22 15" fill="none" stroke="#FF6A3D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="c p3"><svg viewBox="0 0 54 54" aria-hidden="true"><use href="art.svg#cloud" x="0" y="0" width="54" height="34"/><g fill="#8ED6CC" stroke="#1D1B3A" stroke-width="2" stroke-linejoin="round"><path d="M14 36 c-3 4 -5 7 -5 9 a5 5 0 0 0 10 0 c0 -2 -2 -5 -5 -9 Z"/><path d="M28 38 c-3 4 -5 7 -5 9 a5 5 0 0 0 10 0 c0 -2 -2 -5 -5 -9 Z"/><path d="M42 36 c-3 4 -5 7 -5 9 a5 5 0 0 0 10 0 c0 -2 -2 -5 -5 -9 Z"/></g></svg><span><b>3 降水</b><small>水珠变大落下来</small></span></div>
+      <div class="ar r34"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M24 14 H6 M13 6 L5 14 L13 22" fill="none" stroke="#FF6A3D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="c p4"><svg viewBox="0 0 54 54" aria-hidden="true"><path d="M4 42 Q11 35 18 42 T32 42 T46 42 T52 40 V50 H4 Z" fill="#8ED6CC" stroke="#1D1B3A" stroke-width="2.5" stroke-linejoin="round"/><path d="M8 28 Q15 22 22 28 T36 28 T48 26" fill="none" stroke="#1D1B3A" stroke-width="2.5" stroke-linecap="round"/><path d="M14 15 Q21 9 28 15 T42 15" fill="none" stroke="#1D1B3A" stroke-width="2.5" stroke-linecap="round"/></svg><span><b>4 汇流</b><small>顺着小河回大海</small></span></div>
+      <div class="ar r41"><svg viewBox="0 0 28 28" aria-hidden="true"><path d="M14 24 V6 M6 13 L14 5 L22 13" fill="none" stroke="#FF6A3D" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <p class="eq"><span class="pill or tr">转一圈 = 水循环</span></p>
+  </section>
+
+  <section class="home card">
+    <span class="pill wt">回家作业</span>
+    <p>找一找：家里哪里会「起雾」？<br>画下来，周五带到课上给大家看。</p>
+    <div class="stars" aria-hidden="true">
+      <svg viewBox="0 0 40 40"><use href="art.svg#star"/></svg>
+      <svg viewBox="0 0 40 40"><use href="art.svg#star"/></svg>
+      <svg viewBox="0 0 40 40"><use href="art.svg#star"/></svg>
+    </div>
+  </section>
+</main>
+</body>
+</html>
