@@ -125,11 +125,19 @@ jobs:
           remote="https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           git init -q shots-repo && cd shots-repo
           git -c user.name=dsh-design-gallery-bot -c user.email=bot@users.noreply.github.com commit -q --allow-empty -m init >/dev/null
-          if git fetch -q --depth=1 "$remote" review-shots 2>/dev/null; then git checkout -q -B review-shots FETCH_HEAD; else git checkout -q --orphan review-shots; git rm -rq --cached . 2>/dev/null || true; fi
-          cp -R "../stage/$N" .
-          git add "$N"
-          git -c user.name=dsh-design-gallery-bot -c user.email=bot@users.noreply.github.com commit -q -m "shots for #$N"
-          git push -q "$remote" HEAD:review-shots
+          # 几个投稿同时过闸门时会抢着推同一个分支：推不上就重新取最新的、在它上面再提交一次，最多试 6 次
+          ok=0
+          for i in 1 2 3 4 5 6; do
+            if git fetch -q --depth=1 "$remote" review-shots 2>/dev/null; then git checkout -q -f -B review-shots FETCH_HEAD; else git checkout -q -f --orphan "shots-$i"; git rm -rqf --cached . 2>/dev/null || true; fi
+            rm -rf "./$N/$RUN"; mkdir -p "./$N"
+            cp -R "../stage/$N/$RUN" "./$N/"
+            git add "$N"
+            git -c user.name=dsh-design-gallery-bot -c user.email=bot@users.noreply.github.com commit -q -m "shots for #$N"
+            if git push -q "$remote" HEAD:review-shots; then ok=1; break; fi
+            echo "review-shots 推送撞车，第 $i 次，稍后重试"
+            sleep $(( (RANDOM % 5) + 2 * i ))
+          done
+          [ "$ok" = 1 ] || { echo "review-shots 推了 6 次都没推上"; exit 1; }
           echo "base=https://raw.githubusercontent.com/${GITHUB_REPOSITORY}/review-shots/$N/$RUN" >> "$GITHUB_OUTPUT"
 
       - name: 定车道、写审核卡
