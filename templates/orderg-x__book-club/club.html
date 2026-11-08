@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="app">
+<title>读书会 · 书友会</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app.css">
+<style>
+  .topbar { display: flex; align-items: center; justify-content: space-between; height: 56px; }
+  .topbar h1 { font-size: var(--fs-h2); line-height: 1.3; }
+  .topbar-r { display: flex; gap: var(--space-3); }
+
+  .clubs { display: flex; gap: var(--space-2); margin-top: var(--space-1); }
+  .clubs a { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 14px; border-radius: var(--radius-pill); border: 2px solid var(--line); font-size: var(--fs-meta); font-weight: 600; color: var(--muted); white-space: nowrap; }
+  .clubs a.on { background: var(--ink); border-color: var(--ink); color: var(--on); font-weight: 700; }
+  .clubs a.add { width: 44px; padding: 0; justify-content: center; border-style: dashed; color: var(--ink); }
+  .clubs a .ico { width: 18px; height: 18px; stroke-width: 2.4; }
+
+  .banner { position: relative; margin-top: var(--space-4); padding: var(--space-4) var(--space-4) 26px; background: var(--primary); color: var(--on); border: var(--bd); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .banner::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 12px; background: linear-gradient(var(--accent) 0 4px, var(--on) 4px 8px, var(--link) 8px 12px); }
+  .b-top { display: flex; align-items: center; gap: 14px; }
+  .badge { flex: 0 0 76px; width: 76px; height: 76px; }
+  .b-txt { flex: 1; min-width: 0; line-height: 1.35; }
+  .b-txt h2 { font-size: var(--fs-h1); line-height: 1.25; letter-spacing: .04em; }
+  .b-txt p { margin-top: 2px; font-size: var(--fs-meta); color: #FBE6D4; }
+  .b-txt .chip { margin-top: 8px; }
+  .b-book { display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-4); padding: 10px 12px; background: var(--surface); color: var(--ink); border: var(--bd); border-radius: var(--radius-sm); }
+  .b-book-txt { flex: 1; min-width: 0; line-height: 1.35; }
+  .b-book-txt b { font-family: var(--font-head); font-weight: 900; font-size: var(--fs-body); }
+  .b-book-row { display: flex; align-items: center; gap: var(--space-2); margin-top: 6px; }
+  .b-book-row .bar { flex: 1; height: 10px; }
+  .w62 { width: 62%; }
+  .b-book-row .meta { white-space: nowrap; }
+
+  .ticket { position: relative; margin-top: var(--space-6); }
+  .t-main { display: flex; gap: 14px; padding: var(--space-4); }
+  .t-date { flex: 0 0 72px; height: 92px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: var(--radius-sm); background: var(--link); color: var(--on); border: var(--bd); line-height: 1.15; }
+  .t-date small { font-size: var(--fs-meta); font-weight: 600; }
+  .t-date .num { font-size: 36px; line-height: 1.05; }
+  .t-info { flex: 1; min-width: 0; }
+  .t-info h3 { margin-top: 6px; font-size: var(--fs-h3); line-height: 1.45; }
+  .t-row { display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: var(--fs-meta); color: var(--muted); }
+  .t-row .ico { width: 16px; height: 16px; color: var(--ink); }
+  .t-cut { position: relative; height: 2px; padding: 0 22px; background: repeating-linear-gradient(90deg, var(--line) 0 7px, transparent 7px 12px) content-box; }
+  .t-cut::before, .t-cut::after { content: ""; box-sizing: border-box; position: absolute; top: -11px; width: 24px; height: 24px; border-radius: 50%; background: url(grain.svg) 0 0 / 200px 200px repeat fixed var(--bg); border: var(--bd); }
+  .t-cut::before { left: -13px; clip-path: inset(-1px -1px -1px 10px); }
+  .t-cut::after { right: -13px; clip-path: inset(-1px 10px -1px -1px); }
+  .t-foot { display: flex; align-items: center; gap: var(--space-3); padding: 12px var(--space-4) var(--space-4); }
+  .stack { display: flex; }
+  .stack .av { width: 32px; height: 32px; font-size: var(--fs-meta); border-width: 2px; box-shadow: 0 0 0 2px var(--surface); }
+  .stack .av + .av { margin-left: -9px; }
+  .t-foot .who { flex: 1; min-width: 0; font-size: var(--fs-meta); line-height: 1.35; color: var(--muted); white-space: nowrap; }
+  .t-foot .who b { display: block; font-size: var(--fs-body); color: var(--ink); }
+  .t-foot .btn { min-height: 44px; padding: 0 16px; }
+
+  .members { display: flex; justify-content: space-between; }
+  .member { width: 54px; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: var(--fs-meta); font-weight: 600; line-height: 1.2; }
+  .member .av { width: 52px; height: 52px; font-size: var(--fs-h2); }
+  .member .chip { margin-top: -16px; position: relative; padding: 0 6px; line-height: 16px; }
+  .member.more .av { background: var(--surface); font-family: var(--font-num); font-size: var(--fs-body); }
+
+  .topic { padding: var(--space-4); background: var(--mustard-soft); }
+  .topic-top { display: flex; align-items: center; gap: var(--space-2); }
+  .topic-top .meta { margin-left: auto; }
+  .topic h3 { margin-top: var(--space-3); font-size: var(--fs-h3); line-height: 1.55; }
+  .topic .meta.foot { margin-top: var(--space-2); display: block; }
+
+  .composer { display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-5); }
+  .composer .av { width: 36px; height: 36px; font-size: var(--fs-body); }
+  .field { flex: 1; min-width: 0; min-height: 44px; display: flex; align-items: center; padding: 0 16px; border-radius: var(--radius-pill); background: var(--surface); border: 2px solid var(--line); color: var(--muted); }
+  .send { flex: 0 0 44px; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--primary); color: var(--on); border: var(--bd); box-shadow: var(--shadow-sm); }
+  .send .ico { width: 20px; height: 20px; }
+
+  .thread { margin-top: var(--space-3); }
+  .reply { display: flex; gap: var(--space-3); padding: var(--space-4) 0 0; }
+  .reply + .reply { border-top: 2px dashed var(--line); }
+  .reply .av { width: 36px; height: 36px; font-size: var(--fs-body); }
+  .reply.sub { margin-left: 48px; border-top: 0; padding-top: var(--space-2); }
+  .r-body { flex: 1; min-width: 0; }
+  .r-name { display: flex; align-items: center; gap: 6px; line-height: 1.35; }
+  .r-name b { font-weight: 700; }
+  .r-name .meta { margin-left: auto; }
+  .r-body p.txt { margin-top: 4px; }
+  .r-quote { margin-top: 8px; padding: 6px 12px; border-left: 4px solid var(--accent); background: var(--surface); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; font-family: var(--font-head); font-weight: 700; font-size: var(--fs-meta); line-height: 1.6; }
+  .r-quote span { display: block; font-family: var(--font-body); font-weight: 600; color: var(--muted); }
+  .r-acts { display: flex; gap: var(--space-4); margin-top: 2px; }
+  .r-acts span { display: inline-flex; align-items: center; gap: 5px; min-height: 44px; min-width: 44px; font-size: var(--fs-meta); font-weight: 600; color: var(--muted); }
+  .r-acts .ico { width: 18px; height: 18px; }
+  .r-acts .on { color: var(--primary); }
+  .r-acts .on .ico { fill: var(--primary); }
+  .to { color: var(--link); font-weight: 600; }
+</style>
+</head>
+<body>
+<svg class="sprite" aria-hidden="true">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m15.6 15.6 4.4 4.4"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5.5v13M5.5 12h13"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="14.5" rx="2.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/><circle cx="12" cy="14.8" r="1.2" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="m6.5 9.5 5.5 5.5 5.5-5.5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5.5 12.5l4.2 4.2 8.8-9"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7.8V12l2.8 2"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 20.5s-6-5.6-6-10.5a6 6 0 0 1 12 0c0 4.9-6 10.5-6 10.5z"/><circle cx="12" cy="10" r="2.2"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 19.5s-7.5-4.5-7.5-10a4.2 4.2 0 0 1 7.5-2.6 4.2 4.2 0 0 1 7.5 2.6c0 5.5-7.5 10-7.5 10z"/></symbol>
+  <symbol id="i-comment" viewBox="0 0 24 24"><path d="M19.5 11.5c0 3.9-3.4 6.9-7.5 6.9-1 0-2-.2-2.9-.5L5 19.3l1.1-3.4a6.4 6.4 0 0 1-1.6-4.4c0-3.9 3.4-6.9 7.5-6.9s7.5 3 7.5 6.9z"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M4.5 11.6 19.5 5l-5.2 14.2-3-5.6z"/><path d="m11.3 13.6 4.4-4.4"/></symbol>
+  <symbol id="i-tack" viewBox="0 0 24 24"><path d="M9 3.8h6l-1 5.4 3.2 3.3H6.8L10 9.2z"/><path d="M12 12.5v7.7"/></symbol>
+  <symbol id="i-feed" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M7 4.5h10M8 13h8M8 16.5h5"/></symbol>
+  <symbol id="i-shelf" viewBox="0 0 24 24"><rect x="4" y="5" width="4.4" height="14" rx="1"/><rect x="9.8" y="7.5" width="4.4" height="11.5" rx="1"/><path d="m15.7 8.6 3.6-1 2.9 10.6-3.6 1z"/><path d="M3 20.5h18"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M5 19.2 6 14.7 15.4 5.3a2.1 2.1 0 0 1 3 3L9 17.7z"/><path d="m13.6 7.1 3 3"/></symbol>
+  <symbol id="i-club" viewBox="0 0 24 24"><circle cx="9" cy="8.6" r="3.1"/><path d="M3.4 19.2c.8-3.2 3-5 5.6-5s4.8 1.8 5.6 5"/><circle cx="16.6" cy="9.4" r="2.5"/><path d="M15.8 14.2c2.6-.2 4.5 1.5 5.1 4.3"/></symbol>
+  <symbol id="i-me" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.6"/><path d="M5 20c1.3-3.6 4-5.4 7-5.4s5.7 1.8 7 5.4"/></symbol>
+  <symbol id="cv-fog" viewBox="0 0 120 172"><rect width="120" height="172" fill="#B5471D"/><path d="M14 80h36M66 72h40M8 90h22M84 86h26" stroke="#FFF6E8" stroke-width="4" stroke-linecap="round" opacity=".3"/><circle cx="60" cy="112" r="34" fill="#E0A526"/><path d="M20 96h80" stroke="#B5471D" stroke-width="2"/><path d="M20 102.5h80" stroke="#B5471D" stroke-width="3"/><path d="M20 109h80" stroke="#B5471D" stroke-width="4"/><rect y="112" width="120" height="60" fill="#2F5D50"/><path d="M48 121h24M52 130h16M56 139h8" stroke="#E0A526" stroke-width="3" stroke-linecap="round"/><path d="M8 126h26M86 126h24M14 146h30M78 150h28M30 160h60" stroke="#F3E6CF" stroke-width="2.4" stroke-linecap="round" opacity=".55"/><path d="M78 112h22l-4 6H82z" fill="#2E1F14"/><path d="M89 112V91" stroke="#2E1F14" stroke-width="1.8"/><path d="M90.5 93.5 98 109h-7.5z" fill="#FFF6E8"/><text x="60" y="38" text-anchor="middle" font-family="Songti SC, Noto Serif SC, serif" font-weight="900" font-size="21" fill="#FFF6E8">雾港来信</text><text x="60" y="56" text-anchor="middle" font-family="PingFang SC, sans-serif" font-size="8" letter-spacing="2" fill="#F5E0AA">林岫 著</text></symbol>
+</svg>
+
+<header class="status" aria-hidden="true">
+  <span class="status-time">9:41</span>
+  <span class="status-icons">
+    <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx=".8"/><rect x="5" y="5.5" width="3" height="6.5" rx=".8"/><rect x="10" y="3" width="3" height="9" rx=".8"/><rect x="15" y="0" width="3" height="12" rx=".8"/></svg>
+    <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1.5 4.3a9.5 9.5 0 0 1 13 0"/><path d="M4 7.1a6 6 0 0 1 8 0"/><circle cx="8" cy="10" r="1.3" fill="currentColor" stroke="none"/></svg>
+    <svg width="27" height="12" viewBox="0 0 27 12"><rect x=".5" y=".5" width="23" height="11" rx="3.2" fill="none" stroke="currentColor" stroke-opacity=".4"/><rect x="2" y="2" width="17" height="8" rx="1.8" fill="currentColor"/><path d="M25 4v4c.8-.3 1.4-1.1 1.4-2s-.6-1.7-1.4-2z" fill="currentColor" fill-opacity=".4"/></svg>
+  </span>
+</header>
+
+<main class="page">
+  <div class="topbar">
+    <h1 class="head">我的读书会</h1>
+    <div class="topbar-r">
+      <span class="round-btn" role="button" aria-label="找读书会"><svg class="ico"><use href="#i-search"/></svg></span>
+      <span class="round-btn" role="button" aria-label="活动日历"><svg class="ico"><use href="#i-cal"/></svg></span>
+    </div>
+  </div>
+
+  <nav class="clubs" aria-label="我加入的读书会">
+    <a class="on" href="club.html" aria-current="page">周四慢读会</a>
+    <a href="#">城西诗社</a>
+    <a href="#">推理夜行</a>
+    <a class="add" href="#" aria-label="发现更多读书会"><svg class="ico"><use href="#i-plus"/></svg></a>
+  </nav>
+
+  <section class="banner" aria-label="周四慢读会">
+    <div class="b-top">
+      <svg class="badge" viewBox="0 0 100 100" role="img" aria-label="周四慢读会会徽">
+        <defs><path id="club-ring" d="M50 50m-36 0a36 36 0 1 1 72 0a36 36 0 1 1-72 0"/></defs>
+        <circle cx="50" cy="50" r="47" fill="#E0A526" stroke="#2E1F14" stroke-width="3"/>
+        <circle cx="50" cy="50" r="26" fill="#2F5D50" stroke="#2E1F14" stroke-width="2.5"/>
+        <text font-family="PingFang SC, sans-serif" font-size="11" font-weight="700" fill="#2E1F14"><textPath href="#club-ring" textLength="222" lengthAdjust="spacing">周四慢读会 ★ SINCE 2024 ★ 慢慢读 ★</textPath></text>
+        <text x="50" y="58" text-anchor="middle" font-family="Songti SC, Noto Serif SC, serif" font-size="21" font-weight="900" fill="#FFF6E8">慢</text>
+      </svg>
+      <div class="b-txt">
+        <h2 class="head">周四慢读会</h2>
+        <p>128 位书友 · 每周四晚 · 第 23 期</p>
+        <span class="chip"><svg class="ico"><use href="#i-check"/></svg>已加入 · 第 41 周</span>
+      </div>
+    </div>
+    <a class="b-book" href="book.html">
+      <span class="cover s"><svg viewBox="0 0 120 172"><use href="#cv-fog"/></svg></span>
+      <span class="b-book-txt">
+        <span class="meta">本期共读 · 第 4–6 章</span><br><b>《雾港来信》</b>
+        <span class="b-book-row"><span class="bar"><i class="w62"></i></span><span class="meta">平均 62%</span></span>
+      </span>
+    </a>
+  </section>
+
+  <section class="card ticket" aria-label="下次见面">
+    <div class="t-main">
+      <div class="t-date"><small>11 月</small><span class="num">12</span><small>周四</small></div>
+      <div class="t-info">
+        <span class="chip m">下次见面 · 还有 4 天</span>
+        <h3 class="head">第五章：阿澄为何没上船？</h3>
+        <p class="t-row"><svg class="ico"><use href="#i-clock"/></svg>19:30 – 21:00</p>
+        <p class="t-row"><svg class="ico"><use href="#i-pin"/></svg>城西 · 灯塔咖啡二楼</p>
+      </div>
+    </div>
+    <div class="t-cut"></div>
+    <div class="t-foot">
+      <span class="stack"><span class="av s">周</span><span class="av">满</span><span class="av t">桥</span><span class="av o">苏</span></span>
+      <span class="who"><b>14 人会到</b>还剩 6 位</span>
+      <span class="btn t" role="button"><svg class="ico"><use href="#i-check"/></svg>我会到</span>
+    </div>
+  </section>
+
+  <div class="section-head"><h2 class="head">书友<small>128</small></h2><a class="more" href="#">全部<svg class="ico"><use href="#i-right"/></svg></a></div>
+  <div class="members">
+    <span class="member"><span class="av s">周</span><span class="chip t">会长</span>老周</span>
+    <span class="member"><span class="av">满</span><span class="chip m">领读</span>小满</span>
+    <span class="member"><span class="av t">桥</span>阿桥</span>
+    <span class="member"><span class="av o">苏</span>苏打</span>
+    <span class="member"><span class="av g">林</span>林间</span>
+    <span class="member more"><span class="av c">+123</span>更多</span>
+  </div>
+
+  <div class="section-head"><h2 class="head">讨论区<small>56</small></h2><a class="more" href="#">最新<svg class="ico"><use href="#i-down"/></svg></a></div>
+  <article class="card topic">
+    <div class="topic-top"><span class="chip o"><svg class="ico"><use href="#i-tack"/></svg>置顶</span><span class="chip">本期讨论题</span><span class="meta">老周 发起</span></div>
+    <h3 class="head">第五章结尾，阿澄已经买好了船票，为什么最后没有上船？换作你，会走吗？</h3>
+    <span class="meta foot">32 条回复 · 最后回复 10 分钟前</span>
+  </article>
+
+  <div class="composer">
+    <span class="av c">我</span>
+    <span class="field">说说你的看法…</span>
+    <span class="send" role="button" aria-label="发送"><svg class="ico"><use href="#i-send"/></svg></span>
+  </div>
+
+  <ul class="thread">
+    <li class="reply">
+      <span class="av">满</span>
+      <div class="r-body">
+        <div class="r-name"><b>小满</b><span class="chip m">领读</span><span class="meta">10 分钟前</span></div>
+        <p class="txt">我觉得她不是不想走，是那封信还没写完。信写完了，人才走得动。</p>
+        <div class="r-acts"><span class="on" role="button"><svg class="ico"><use href="#i-heart"/></svg>24</span><span role="button"><svg class="ico"><use href="#i-comment"/></svg>回复</span></div>
+      </div>
+    </li>
+    <li class="reply">
+      <span class="av g">林</span>
+      <div class="r-body">
+        <div class="r-name"><b>林间</b><span class="meta">32 分钟前</span></div>
+        <p class="r-quote"><span>第 188 页</span>她把船票夹在第六章里，好像只要不翻到那一页，船就永远不会开。</p>
+        <p class="txt">同意楼上。作者让她把船票夹进书里，这个细节太狠了，等于把离开也一起合上了。</p>
+        <div class="r-acts"><span role="button"><svg class="ico"><use href="#i-heart"/></svg>17</span><span role="button"><svg class="ico"><use href="#i-comment"/></svg>回复</span></div>
+      </div>
+    </li>
+    <li class="reply sub">
+      <span class="av t">桥</span>
+      <div class="r-body">
+        <div class="r-name"><b>阿桥</b><span class="meta">18 分钟前</span></div>
+        <p class="txt"><span class="to">@林间</span> 合上书就不用走，翻开就得走。这本书自己就是那张船票。</p>
+        <div class="r-acts"><span role="button"><svg class="ico"><use href="#i-heart"/></svg>9</span><span role="button"><svg class="ico"><use href="#i-comment"/></svg>回复</span></div>
+      </div>
+    </li>
+  </ul>
+</main>
+
+<nav class="tabbar" aria-label="主导航">
+  <a class="tab" href="feed.html"><span class="tab-ico"><svg class="ico"><use href="#i-feed"/></svg></span>动态</a>
+  <a class="tab" href="book.html"><span class="tab-ico"><svg class="ico"><use href="#i-shelf"/></svg></span>书架</a>
+  <span class="fab" role="button" aria-label="写笔记"><svg class="ico"><use href="#i-pen"/></svg></span>
+  <a class="tab is-on" href="club.html" aria-current="page"><span class="tab-ico"><svg class="ico"><use href="#i-club"/></svg></span>读书会</a>
+  <span class="tab"><span class="tab-ico"><svg class="ico"><use href="#i-me"/></svg></span>我的</span>
+</nav>
+</body>
+</html>

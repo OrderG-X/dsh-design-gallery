@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="app">
+<title>书页 · 书友会</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app.css">
+<style>
+  .page { padding-bottom: calc(76px + var(--home-bar) + var(--space-7)); }
+  .navbar { display: flex; align-items: center; justify-content: space-between; height: 56px; }
+  .navbar-r { display: flex; gap: var(--space-3); }
+
+  .hero { position: relative; height: 204px; margin-top: 6px; }
+  .arch { position: absolute; left: 0; right: 0; bottom: 2px; width: 100%; height: 176px; }
+  .hero::after { content: ""; position: absolute; left: -20px; right: -20px; bottom: 0; height: 2px; background: var(--ink); }
+  .hero .cover { position: absolute; left: 50%; bottom: 2px; width: 128px; height: 184px; margin-left: -64px; border-width: 2.5px; box-shadow: 6px 6px 0 var(--ink); }
+  .stamp { position: absolute; left: 50%; top: 0; width: 82px; height: 82px; margin-left: 46px; transform: rotate(12deg); }
+
+  .info { margin-top: var(--space-5); text-align: center; }
+  .info h1 { font-size: var(--fs-h1); line-height: 1.3; letter-spacing: .06em; }
+  .by { margin-top: 2px; }
+  .rate { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: var(--space-2); }
+  .rate .num { font-size: var(--fs-h3); }
+  .tags { display: flex; justify-content: center; gap: 6px; margin-top: var(--space-3); }
+
+  .prog { margin-top: var(--space-6); padding: var(--space-4); }
+  .prog-top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+  .prog-num { display: flex; align-items: baseline; gap: 4px; margin-top: 2px; line-height: 1.1; }
+  .prog-num .num { font-size: var(--fs-h1); }
+  .prog .bar { margin-top: var(--space-3); }
+  .w69 { width: 69%; }
+  .prog-foot { display: flex; justify-content: space-between; margin-top: var(--space-2); }
+  .prog-foot b { color: var(--primary); }
+
+  .tabs { display: flex; gap: 24px; margin-top: var(--space-6); border-bottom: 2px solid var(--line); }
+  .tabs a { position: relative; display: inline-flex; align-items: flex-end; justify-content: center; gap: 4px; min-width: 44px; min-height: 44px; padding-bottom: 9px; font-weight: 600; color: var(--muted); }
+  .tabs a small { font-family: var(--font-num); font-size: var(--fs-meta); }
+  .tabs a.on { color: var(--ink); font-weight: 700; }
+  .tabs a.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 6px; background: var(--stripes); }
+
+  .hl { padding: var(--space-4) 0; }
+  .hl + .hl { border-top: 2px dashed var(--line); }
+  .hl-txt { font-family: var(--font-head); font-weight: 900; font-size: var(--fs-h3); line-height: 1.75; }
+  .hl-txt mark { color: inherit; background: linear-gradient(transparent 52%, var(--mustard-soft) 52%, var(--mustard-soft) 92%, transparent 92%); }
+  .hl.mine .hl-txt mark { background: linear-gradient(transparent 52%, #EDB54A 52%, #EDB54A 92%, transparent 92%); }
+  .hl-meta { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .hl-meta .like { margin-left: auto; display: inline-flex; align-items: center; gap: 4px; min-height: 44px; min-width: 44px; justify-content: flex-end; }
+  .hl-meta .like .ico { width: 18px; height: 18px; }
+  .hl-meta .like.on { color: var(--primary); }
+  .hl-meta .like.on .ico { fill: var(--primary); }
+
+  .review { padding: var(--space-4); }
+  .review + .review { margin-top: var(--space-4); }
+  .rv-head { display: flex; align-items: center; gap: var(--space-3); }
+  .rv-head .who { flex: 1; min-width: 0; line-height: 1.35; }
+  .rv-head .who b { font-weight: 700; }
+  .rv-head .who .meta { display: block; }
+  .rv-head .stars { vertical-align: -2px; margin-left: 6px; }
+  .rv-head .stars svg { width: 12px; height: 12px; }
+  .review p.txt { margin-top: var(--space-3); }
+  .rv-foot { display: flex; gap: var(--space-4); margin: 4px 0 -12px; }
+  .rv-foot span { display: inline-flex; align-items: center; gap: 5px; min-height: 44px; font-size: var(--fs-meta); color: var(--muted); }
+  .rv-foot .ico { width: 18px; height: 18px; }
+
+  .also { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .also a { display: flex; flex-direction: column; gap: 8px; min-width: 0; line-height: 1.35; }
+  .also .cover { width: 100%; height: auto; aspect-ratio: 120 / 172; box-shadow: var(--shadow-sm); }
+  .also b { display: block; font-size: var(--fs-meta); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .also .meta { font-size: var(--fs-micro); }
+
+  .actionbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; align-items: center; gap: var(--space-2); padding: 10px var(--gutter) var(--home-bar); background: var(--surface); border-top: var(--bd); }
+  .ab-btn { flex: 0 0 auto; min-width: 52px; min-height: 52px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; font-size: var(--fs-micro); font-weight: 600; color: var(--muted); }
+  .ab-btn .ico { width: 23px; height: 23px; color: var(--ink); }
+  .ab-main { flex: 1; min-height: 50px; margin-left: var(--space-2); }
+</style>
+</head>
+<body>
+<svg class="sprite" aria-hidden="true">
+  <symbol id="i-left" viewBox="0 0 24 24"><path d="m14.5 6-6 6 6 6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 14.5V4.5M8 8.2l4-3.7 4 3.7"/><path d="M5.5 12.5v6a1.5 1.5 0 0 0 1.5 1.5h10a1.5 1.5 0 0 0 1.5-1.5v-6"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.7" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.7" fill="currentColor" stroke="none"/><circle cx="18.5" cy="12" r="1.7" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 19.5s-7.5-4.5-7.5-10a4.2 4.2 0 0 1 7.5-2.6 4.2 4.2 0 0 1 7.5 2.6c0 5.5-7.5 10-7.5 10z"/></symbol>
+  <symbol id="i-comment" viewBox="0 0 24 24"><path d="M19.5 11.5c0 3.9-3.4 6.9-7.5 6.9-1 0-2-.2-2.9-.5L5 19.3l1.1-3.4a6.4 6.4 0 0 1-1.6-4.4c0-3.9 3.4-6.9 7.5-6.9s7.5 3 7.5 6.9z"/></symbol>
+  <symbol id="i-thumb" viewBox="0 0 24 24"><path d="M8 10.5 11.5 4c1.6 0 2.6 1.2 2.3 2.8L13.3 10H18a2 2 0 0 1 2 2.3l-1.1 6A2 2 0 0 1 16.9 20H8z"/><path d="M4.5 10.5H8V20H4.5z"/></symbol>
+  <symbol id="i-shelf-add" viewBox="0 0 24 24"><rect x="4" y="5" width="4.4" height="14" rx="1"/><rect x="9.8" y="7.5" width="4.4" height="11.5" rx="1"/><path d="M18.5 6v7M15 9.5h7"/><path d="M3 20.5h18"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M5 19.2 6 14.7 15.4 5.3a2.1 2.1 0 0 1 3 3L9 17.7z"/><path d="m13.6 7.1 3 3"/></symbol>
+  <symbol id="i-open" viewBox="0 0 24 24"><path d="M3.5 6.5c3-1.3 5.9-1.1 8.5.6 2.6-1.7 5.5-1.9 8.5-.6v12c-3-1.3-5.9-1.1-8.5.6-2.6-1.7-5.5-1.9-8.5-.6z"/><path d="M12 7.1v12"/></symbol>
+  <symbol id="s-full" viewBox="0 0 24 24"><path d="M12 3.4l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.7l-5.3 2.9 1.1-5.9-4.3-4.1 5.9-.8z" fill="#E0A526" stroke="#2E1F14" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="s-half" viewBox="0 0 24 24"><clipPath id="s-left"><rect width="12" height="24"/></clipPath><path d="M12 3.4l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.7l-5.3 2.9 1.1-5.9-4.3-4.1 5.9-.8z" fill="#FBF2E2"/><path d="M12 3.4l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.7l-5.3 2.9 1.1-5.9-4.3-4.1 5.9-.8z" fill="#E0A526" clip-path="url(#s-left)"/><path d="M12 3.4l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.7l-5.3 2.9 1.1-5.9-4.3-4.1 5.9-.8z" fill="none" stroke="#2E1F14" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="s-empty" viewBox="0 0 24 24"><path d="M12 3.4l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.7l-5.3 2.9 1.1-5.9-4.3-4.1 5.9-.8z" fill="#FBF2E2" stroke="#2E1F14" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="cv-fog" viewBox="0 0 120 172"><rect width="120" height="172" fill="#B5471D"/><path d="M14 80h36M66 72h40M8 90h22M84 86h26" stroke="#FFF6E8" stroke-width="4" stroke-linecap="round" opacity=".3"/><circle cx="60" cy="112" r="34" fill="#E0A526"/><path d="M20 96h80" stroke="#B5471D" stroke-width="2"/><path d="M20 102.5h80" stroke="#B5471D" stroke-width="3"/><path d="M20 109h80" stroke="#B5471D" stroke-width="4"/><rect y="112" width="120" height="60" fill="#2F5D50"/><path d="M48 121h24M52 130h16M56 139h8" stroke="#E0A526" stroke-width="3" stroke-linecap="round"/><path d="M8 126h26M86 126h24M14 146h30M78 150h28M30 160h60" stroke="#F3E6CF" stroke-width="2.4" stroke-linecap="round" opacity=".55"/><path d="M78 112h22l-4 6H82z" fill="#2E1F14"/><path d="M89 112V91" stroke="#2E1F14" stroke-width="1.8"/><path d="M90.5 93.5 98 109h-7.5z" fill="#FFF6E8"/><text x="60" y="38" text-anchor="middle" font-family="Songti SC, Noto Serif SC, serif" font-weight="900" font-size="21" fill="#FFF6E8">雾港来信</text><text x="60" y="56" text-anchor="middle" font-family="PingFang SC, sans-serif" font-size="8" letter-spacing="2" fill="#F5E0AA">林岫 著</text></symbol>
+  <symbol id="cv-drawer" viewBox="0 0 120 172"><rect width="120" height="172" fill="#E0A526"/><text x="60" y="35" text-anchor="middle" font-family="Songti SC, Noto Serif SC, serif" font-weight="900" font-size="17" fill="#2E1F14">第七只抽屉</text><text x="60" y="52" text-anchor="middle" font-family="PingFang SC, sans-serif" font-size="8" letter-spacing="2" fill="#2E1F14">苏迟 著</text><rect x="16" y="64" width="88" height="94" rx="3" fill="#2E1F14"/><g fill="#F3E6CF"><rect x="21" y="69" width="24" height="25" rx="1.5"/><rect x="48" y="69" width="24" height="25" rx="1.5"/><rect x="75" y="69" width="24" height="25" rx="1.5"/><rect x="21" y="98" width="24" height="25" rx="1.5"/><rect x="48" y="98" width="24" height="25" rx="1.5"/><rect x="75" y="98" width="24" height="25" rx="1.5"/><rect x="48" y="127" width="24" height="25" rx="1.5"/><rect x="75" y="127" width="24" height="25" rx="1.5"/></g><g fill="#2E1F14"><circle cx="33" cy="84" r="2"/><circle cx="60" cy="84" r="2"/><circle cx="87" cy="84" r="2"/><circle cx="33" cy="113" r="2"/><circle cx="60" cy="113" r="2"/><circle cx="87" cy="113" r="2"/><circle cx="60" cy="142" r="2"/><circle cx="87" cy="142" r="2"/></g><rect x="21" y="127" width="24" height="25" fill="#7A2C0E"/><rect x="12" y="132" width="32" height="26" rx="1.5" fill="#B5471D" stroke="#2E1F14" stroke-width="2"/><circle cx="28" cy="147" r="2.2" fill="#FFF6E8"/><path d="M30 113l1.6 4.4 4.4 1.6-4.4 1.6-1.6 4.4-1.6-4.4-4.4-1.6 4.4-1.6z" fill="#FFF6E8"/></symbol>
+  <symbol id="cv-light" viewBox="0 0 120 172"><rect width="120" height="172" fill="#2F5D50"/><path d="M60 78 0 58v34zM60 78l60-20v34z" fill="#E0A526" opacity=".32"/><text x="60" y="36" text-anchor="middle" font-family="Songti SC, Noto Serif SC, serif" font-weight="900" font-size="20" fill="#FFF6E8">橘子灯塔</text><text x="60" y="52" text-anchor="middle" font-family="PingFang SC, sans-serif" font-size="8" letter-spacing="2" fill="#F5E0AA">何溪 著</text><path d="M50 142 54 88h12l4 54z" fill="#FFF6E8"/><path d="M53.3 98h13.4l.6 8H52.7zM51.9 116h16.2l.6 8H51.3zM50.6 134h18.8l.6 8H50z" fill="#B5471D"/><rect x="48" y="85" width="24" height="4" rx="1" fill="#2E1F14"/><circle cx="60" cy="77" r="7" fill="#E0A526" stroke="#2E1F14" stroke-width="2"/><path d="M60 70c1-3 4-4 6-3-1 2.6-3.4 3.6-6 3z" fill="#9CC2A4"/><path d="M0 142h120v30H0z" fill="#22463C"/><path d="M10 152h22M44 150h30M86 154h24M24 162h40M78 164h20" stroke="#F3E6CF" stroke-width="2.4" stroke-linecap="round" opacity=".5"/></symbol>
+  <symbol id="cv-city" viewBox="0 0 120 172"><rect width="120" height="172" fill="#FBF2E2"/><text x="60" y="36" text-anchor="middle" font-family="Songti SC, Noto Serif SC, serif" font-weight="900" font-size="17" fill="#2E1F14">绕远路的城</text><text x="60" y="52" text-anchor="middle" font-family="PingFang SC, sans-serif" font-size="8" letter-spacing="2" fill="#6A5240">温以舟 著</text><circle cx="88" cy="80" r="8" fill="#B5471D"/><path d="M26 82l4 3 4-3M38 74l3 2.4 3-2.4" fill="none" stroke="#2E1F14" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="60" cy="172" r="64" fill="#B5471D"/><circle cx="60" cy="172" r="52" fill="#E0A526"/><circle cx="60" cy="172" r="40" fill="#2F5D50"/><circle cx="60" cy="172" r="28" fill="#FBF2E2"/></symbol>
+  <symbol id="cv-whale" viewBox="0 0 120 172"><rect width="120" height="172" fill="#2E1F14"/><text x="60" y="36" text-anchor="middle" font-family="Songti SC, Noto Serif SC, serif" font-weight="900" font-size="20" fill="#FFF6E8">夜车与鲸</text><text x="60" y="52" text-anchor="middle" font-family="PingFang SC, sans-serif" font-size="8" letter-spacing="2" fill="#E0A526">叶枕 著</text><circle cx="88" cy="80" r="11" fill="#E0A526"/><g fill="#FFF6E8"><circle cx="24" cy="74" r="1.3"/><circle cx="44" cy="90" r="1"/><circle cx="106" cy="104" r="1.2"/><circle cx="16" cy="102" r="1"/><circle cx="62" cy="72" r="1"/></g><path d="M12 128c2-13 22-21 44-19 16 1 26 8 34 6l8-10c3 4 3 9 0 13l8 3c-5 3-11 3-16 1-6 10-20 16-40 16-20 0-36-3-38-10z" fill="#2F5D50"/><path d="M20 132c14 4 38 5 58-1" fill="none" stroke="#9CC2A4" stroke-width="2" stroke-linecap="round"/><circle cx="30" cy="123" r="1.8" fill="#FFF6E8"/><rect y="148" width="120" height="6" fill="#B5471D"/><rect y="154" width="120" height="6" fill="#E0A526"/><rect y="160" width="120" height="6" fill="#F3E6CF"/></symbol>
+</svg>
+
+<header class="status" aria-hidden="true">
+  <span class="status-time">9:41</span>
+  <span class="status-icons">
+    <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx=".8"/><rect x="5" y="5.5" width="3" height="6.5" rx=".8"/><rect x="10" y="3" width="3" height="9" rx=".8"/><rect x="15" y="0" width="3" height="12" rx=".8"/></svg>
+    <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1.5 4.3a9.5 9.5 0 0 1 13 0"/><path d="M4 7.1a6 6 0 0 1 8 0"/><circle cx="8" cy="10" r="1.3" fill="currentColor" stroke="none"/></svg>
+    <svg width="27" height="12" viewBox="0 0 27 12"><rect x=".5" y=".5" width="23" height="11" rx="3.2" fill="none" stroke="currentColor" stroke-opacity=".4"/><rect x="2" y="2" width="17" height="8" rx="1.8" fill="currentColor"/><path d="M25 4v4c.8-.3 1.4-1.1 1.4-2s-.6-1.7-1.4-2z" fill="currentColor" fill-opacity=".4"/></svg>
+  </span>
+</header>
+
+<main class="page">
+  <div class="navbar">
+    <a class="round-btn" href="feed.html" aria-label="返回"><svg class="ico"><use href="#i-left"/></svg></a>
+    <div class="navbar-r">
+      <span class="round-btn" role="button" aria-label="分享"><svg class="ico"><use href="#i-share"/></svg></span>
+      <span class="round-btn" role="button" aria-label="更多"><svg class="ico"><use href="#i-more"/></svg></span>
+    </div>
+  </div>
+
+  <section class="hero" aria-label="书封">
+    <svg class="arch" viewBox="0 0 350 180" preserveAspectRatio="xMidYMax meet" aria-hidden="true">
+      <path d="M16 180a159 159 0 0 1 318 0" fill="none" stroke="#B5471D" stroke-width="18"/>
+      <path d="M38 180a137 137 0 0 1 274 0" fill="none" stroke="#E0A526" stroke-width="18"/>
+      <path d="M60 180a115 115 0 0 1 230 0" fill="none" stroke="#2F5D50" stroke-width="18"/>
+      <g fill="#2E1F14"><circle cx="40" cy="40" r="2.5"/><circle cx="312" cy="56" r="2"/><circle cx="24" cy="96" r="1.6"/></g>
+      <path d="M318 18l2.6 6.4 6.4 2.6-6.4 2.6-2.6 6.4-2.6-6.4-6.4-2.6 6.4-2.6z" fill="#B5471D"/>
+    </svg>
+    <span class="cover"><svg viewBox="0 0 120 172" role="img" aria-label="《雾港来信》书封"><use href="#cv-fog"/></svg></span>
+    <svg class="stamp" viewBox="0 0 100 100" aria-hidden="true">
+      <defs><path id="ring" d="M50 50m-35 0a35 35 0 1 1 70 0a35 35 0 1 1-70 0"/></defs>
+      <circle cx="50" cy="50" r="47" fill="#E0A526" stroke="#2E1F14" stroke-width="3"/>
+      <circle cx="50" cy="50" r="24" fill="#B5471D" stroke="#2E1F14" stroke-width="2.5"/>
+      <text font-family="PingFang SC, sans-serif" font-size="11" font-weight="700" fill="#2E1F14"><textPath href="#ring" textLength="216" lengthAdjust="spacing">本周热读 ★ 书友会 ★ 本周热读 ★ 书友会 ★</textPath></text>
+      <text x="50" y="57.5" text-anchor="middle" font-family="Georgia, serif" font-size="21" font-weight="700" fill="#FFF6E8">No.1</text>
+    </svg>
+  </section>
+
+  <section class="info">
+    <h1 class="head">雾港来信</h1>
+    <p class="meta by">林岫 著 · 青檐出版社 · 2026 年 9 月</p>
+    <div class="rate">
+      <span class="stars" aria-label="4.5 星"><svg><use href="#s-full"/></svg><svg><use href="#s-full"/></svg><svg><use href="#s-full"/></svg><svg><use href="#s-full"/></svg><svg><use href="#s-half"/></svg></span>
+      <span class="num">8.7</span>
+      <span class="meta">2,316 人评分</span>
+    </div>
+    <div class="tags"><span class="chip t">长篇小说</span><span class="chip">312 页</span><span class="chip">1.2 万人在读</span></div>
+  </section>
+
+  <section class="card prog" aria-label="我的阅读进度">
+    <div class="prog-top">
+      <div>
+        <span class="meta">我的进度 · 第 11 天</span>
+        <p class="prog-num"><span class="num">214</span><span class="meta">/ 312 页</span></p>
+      </div>
+      <a class="btn" href="#"><svg class="ico"><use href="#i-open"/></svg>继续读</a>
+    </div>
+    <div class="bar"><i class="w69"></i></div>
+    <div class="prog-foot meta"><span>已读 <b>69%</b></span><span>还需约 2 小时 40 分</span></div>
+  </section>
+
+  <nav class="tabs" aria-label="书页内容">
+    <a href="#">简介</a>
+    <a class="on" href="#" aria-current="true">划线<small>128</small></a>
+    <a href="#">书评<small>342</small></a>
+  </nav>
+
+  <ul class="hls">
+    <li class="hl mine">
+      <p class="hl-txt"><mark>雾散得很慢，像有人在港口那头，一页一页翻一封写了很久的信。</mark></p>
+      <p class="hl-meta meta"><span class="chip m">我划的</span><span>第 214 页 · 37 人也划了</span><span class="like on" role="button"><svg class="ico"><use href="#i-heart"/></svg>37</span></p>
+    </li>
+    <li class="hl">
+      <p class="hl-txt"><mark>她把船票夹在第六章里，好像只要不翻到那一页，船就永远不会开。</mark></p>
+      <p class="hl-meta meta"><span>第 188 页 · 阿桥 等 52 人划了</span><span class="like" role="button"><svg class="ico"><use href="#i-heart"/></svg>52</span></p>
+    </li>
+    <li class="hl">
+      <p class="hl-txt"><mark>离开不是一个动作，是一种天气。</mark></p>
+      <p class="hl-meta meta"><span>第 96 页 · 211 人划了</span><span class="like" role="button"><svg class="ico"><use href="#i-heart"/></svg>211</span></p>
+    </li>
+  </ul>
+
+  <div class="section-head"><h2 class="head">书评<small>342</small></h2><a class="more" href="#">全部<svg class="ico"><use href="#i-right"/></svg></a></div>
+  <article class="card review">
+    <header class="rv-head">
+      <span class="av t">桥</span>
+      <div class="who"><b>阿桥</b><span class="stars" aria-label="5 星"><svg><use href="#s-full"/></svg><svg><use href="#s-full"/></svg><svg><use href="#s-full"/></svg><svg><use href="#s-full"/></svg><svg><use href="#s-full"/></svg></span><span class="meta">11 月 3 日 · 读完</span></div>
+    </header>
+    <p class="txt">整本书只有一个港口、十一封信，却像过完了好几个冬天。林岫写人从不直接写心事，全藏在天气里：起雾、退潮、晒网。读完很想给谁写封信。</p>
+    <footer class="rv-foot"><span><svg class="ico"><use href="#i-thumb"/></svg>有用 213</span><span><svg class="ico"><use href="#i-comment"/></svg>18</span></footer>
+  </article>
+  <article class="card review">
+    <header class="rv-head">
+      <span class="av o">苏</span>
+      <div class="who"><b>苏打</b><span class="stars" aria-label="4 星"><svg><use href="#s-full"/></svg><svg><use href="#s-full"/></svg><svg><use href="#s-full"/></svg><svg><use href="#s-full"/></svg><svg><use href="#s-empty"/></svg></span><span class="meta">10 月 28 日 · 读到一半</span></div>
+    </header>
+    <p class="txt">前三章有点慢，别急着放下。从第四章阿澄收到第一封回信开始，节奏一下就起来了。</p>
+    <footer class="rv-foot"><span><svg class="ico"><use href="#i-thumb"/></svg>有用 96</span><span><svg class="ico"><use href="#i-comment"/></svg>7</span></footer>
+  </article>
+
+  <div class="section-head"><h2 class="head">读过的人也在读</h2></div>
+  <div class="also">
+    <a href="#"><span class="cover"><svg viewBox="0 0 120 172"><use href="#cv-drawer"/></svg></span><span><b>第七只抽屉</b><span class="meta">苏迟</span></span></a>
+    <a href="#"><span class="cover"><svg viewBox="0 0 120 172"><use href="#cv-light"/></svg></span><span><b>橘子灯塔</b><span class="meta">何溪</span></span></a>
+    <a href="#"><span class="cover"><svg viewBox="0 0 120 172"><use href="#cv-whale"/></svg></span><span><b>夜车与鲸</b><span class="meta">叶枕</span></span></a>
+    <a href="#"><span class="cover"><svg viewBox="0 0 120 172"><use href="#cv-city"/></svg></span><span><b>绕远路的城</b><span class="meta">温以舟</span></span></a>
+  </div>
+</main>
+
+<div class="actionbar">
+  <span class="ab-btn" role="button"><svg class="ico"><use href="#i-shelf-add"/></svg>加书架</span>
+  <span class="ab-btn" role="button"><svg class="ico"><use href="#i-pen"/></svg>写书评</span>
+  <a class="btn ab-main" href="club.html">参加共读 · 周四慢读会</a>
+</div>
+</body>
+</html>

@@ -1,0 +1,56 @@
+:root {
+  /* 颜色：焦橙、芥末黄、墨绿，奶油底 */
+  --bg: #F3E6CF;
+  --surface: #FBF2E2;
+  --text: #2E1F14;
+  --muted: #6A5240;
+  --line: #DDC7A4;
+  --primary: #B5471D;
+  --accent: #E0A526;
+  --on: #FFF6E8;
+  --link: #2F5D50;
+  --ink: #2E1F14;
+  --orange-soft: #F2D3B8;
+  --mustard-soft: #F5E0AA;
+  --teal-soft: #D5DFCC;
+
+  /* 字体：粗衬线标题 + 系统无衬线正文 */
+  --font-head: "Songti SC", "Noto Serif SC", "Source Han Serif SC", "STSong", "SimSun", serif;
+  --font-body: "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-num: Georgia, "Songti SC", "Noto Serif SC", serif;
+  --w-head: 800;
+
+  /* 字号阶梯 */
+  --fs-micro: 11px;
+  --fs-meta: 13px;
+  --fs-body: 15px;
+  --fs-h3: 17px;
+  --fs-h2: 21px;
+  --fs-h1: 28px;
+
+  /* 间距 */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --gutter: 20px;
+
+  /* 形状：14 圆角、粗墨线、底下一道实心硬阴影 */
+  --radius: 14px;
+  --radius-sm: 10px;
+  --radius-pill: 999px;
+  --bd: 2px solid var(--ink);
+  --shadow: 0 4px 0 var(--ink);
+  --shadow-sm: 0 3px 0 var(--ink);
+
+  /* 彩虹三色条 */
+  --stripes: linear-gradient(var(--primary) 0 33.4%, var(--accent) 33.4% 66.7%, var(--link) 66.7% 100%);
+
+  /* 手机安全区 */
+  --status-h: 54px;
+  --tab-h: 49px;
+  --home-bar: 34px;
+}
