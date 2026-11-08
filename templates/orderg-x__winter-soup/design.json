@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": { "zh": "立冬 · 一碗汤", "en": "Start of Winter Soup" },
+  "description": {
+    "zh": "街坊汤馆的立冬节气社交海报：宣纸留白、细宋大字、水墨淡彩的一碗热汤，附节气问候、三款立冬汤品和店铺信息",
+    "en": "A Start of Winter social poster for a neighbourhood soup shop: paper white, light Song title, an ink-wash bowl of hot soup, a seasonal greeting, three soups and shop info"
+  },
+  "kind": "poster",
+  "size": "1080x1350",
+  "screens": [
+    { "file": "poster.html", "title": { "zh": "海报", "en": "Poster" } }
+  ],
+  "style": "ink",
+  "categories": ["food"],
+  "tags": ["cover", "menu", "illustration"],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": { "login": "orderg-x", "id": 271418316 },
+  "ai": { "generated": true, "tool": "claude-opus-5-5" }
+}

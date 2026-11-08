@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1080">
+<meta name="dsh-design" content="poster 1080x1350">
+<title>海报 · 一碗汤</title>
+<link rel="stylesheet" href="tokens.css">
+<style>
+  html, body { margin: 0; width: 1080px; height: 1350px; overflow: hidden; }
+  body { background: var(--color-bg); color: var(--color-text); font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+  p, h1, h2, h3 { margin: 0; font-weight: 400; }
+  .poster { position: relative; width: 1080px; height: 1350px; overflow: hidden; }
+  .abs { position: absolute; }
+  .grain { position: absolute; inset: 0; pointer-events: none; }
+  .head { font-family: var(--font-head); }
+
+  .meta { left: var(--safe); right: var(--safe); top: 64px; display: flex; justify-content: space-between; padding-bottom: 22px; border-bottom: var(--hair); font-size: var(--text-sm); letter-spacing: .3em; color: var(--color-muted); }
+
+  .art { left: 380px; top: 120px; }
+
+  .title { left: 64px; top: 160px; font-family: var(--font-head); font-weight: var(--weight-title); font-size: var(--text-title); line-height: 1; letter-spacing: .1em; color: var(--color-text); white-space: nowrap; }
+  .en { left: var(--safe); top: 486px; display: flex; align-items: center; gap: 16px; font-size: var(--text-sm); letter-spacing: .32em; color: var(--color-muted); }
+  .en::before { content: ""; width: 48px; border-top: 1px solid var(--color-muted); }
+
+  .seal { right: 82px; top: 170px; width: 64px; padding: 12px 0 14px; box-sizing: border-box; background: var(--color-accent); color: var(--color-on); font-family: var(--font-head); font-weight: 700; font-size: var(--text-lg); line-height: 1.12; text-align: center; writing-mode: vertical-rl; letter-spacing: .06em; box-shadow: inset 0 0 0 4px var(--color-accent), inset 0 0 0 6px var(--color-on); clip-path: polygon(1px 2px, 30% 0, 100% 1px, calc(100% - 1px) 46%, 100% calc(100% - 2px), 62% 100%, 0 calc(100% - 1px), 2px 58%); }
+
+  .greet { left: var(--safe); top: 556px; font-family: var(--font-head); font-weight: var(--weight-head); font-size: var(--text-xl); line-height: 1.5; letter-spacing: .14em; }
+  .lede { left: var(--safe); top: 740px; font-size: var(--text-md); line-height: 1.85; color: var(--color-muted); letter-spacing: .04em; }
+
+  .menu { left: var(--safe); right: var(--safe); top: 918px; border-top: var(--hair); padding-top: 30px; }
+  .menu-h { display: flex; align-items: baseline; justify-content: space-between; }
+  .menu-h h2 { font-family: var(--font-head); font-weight: var(--weight-head); font-size: var(--text-lg); letter-spacing: .3em; }
+  .menu-h h2 span { margin-left: 16px; font-family: var(--font-sans); font-size: var(--text-sm); letter-spacing: .1em; color: var(--color-muted); }
+  .menu-h p { font-size: var(--text-sm); color: var(--color-muted); letter-spacing: .08em; }
+  .menu-h p b { font-weight: 600; color: var(--color-text); }
+  .bowls { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 28px; }
+  .bowl { padding: 4px 26px 6px; border-left: var(--hair); }
+  .bowl:first-child { padding-left: 0; border-left: 0; }
+  .bowl:last-child { padding-right: 0; }
+  .bowl .no { font-family: var(--font-head); font-size: var(--text-sm); color: var(--color-muted); letter-spacing: .2em; }
+  .bowl h3 { display: flex; justify-content: space-between; align-items: baseline; margin-top: 8px; font-family: var(--font-head); font-weight: var(--weight-head); font-size: var(--text-lg); letter-spacing: .06em; }
+  .bowl h3 span { font-size: var(--text-md); letter-spacing: 0; }
+  .bowl .desc { margin-top: 8px; font-size: var(--text-sm); line-height: 1.5; color: var(--color-muted); }
+
+  .foot { left: var(--safe); right: var(--safe); bottom: 64px; display: flex; justify-content: space-between; align-items: flex-end; padding-top: 28px; border-top: var(--hair); }
+  .brand { display: flex; align-items: center; gap: 18px; font-family: var(--font-head); font-weight: var(--weight-head); font-size: var(--text-lg); letter-spacing: .4em; }
+  .brand i { display: grid; place-items: center; width: 46px; height: 46px; background: var(--color-accent); color: var(--color-on); font-style: normal; font-weight: 700; font-size: var(--text-md); letter-spacing: 0; box-shadow: inset 0 0 0 3px var(--color-accent), inset 0 0 0 4.5px var(--color-on); }
+  .brand small { margin-left: -4px; font-family: var(--font-sans); font-weight: 400; font-size: var(--text-sm); letter-spacing: .08em; color: var(--color-muted); }
+  .addr { font-size: var(--text-sm); line-height: 1.6; color: var(--color-muted); text-align: right; letter-spacing: .06em; }
+</style>
+</head>
+<body>
+<main class="poster">
+  <header class="abs meta"><span>二十四节气 · 第十九</span><span>丙午年 · 十一月七日</span></header>
+
+  <svg class="abs art" width="700" height="800" viewBox="0 0 700 800" role="img" aria-label="水墨淡彩：一碗冒着热气的汤，一把瓷勺">
+    <defs>
+      <filter id="wash" x="-40%" y="-300%" width="180%" height="700%"><feGaussianBlur stdDeviation="14"/></filter>
+      <filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3"/></filter>
+      <filter id="hair" x="-20%" y="-10%" width="140%" height="120%"><feGaussianBlur stdDeviation="1.2"/></filter>
+      <filter id="brush" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="4"/></filter>
+      <filter id="bleed" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".02" numOctaves="3" seed="9"/><feDisplacementMap in="SourceGraphic" scale="18"/><feGaussianBlur stdDeviation="2.5"/></filter>
+      <linearGradient id="steam" x1="0" y1="470" x2="0" y2="20" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#2F3B37" stop-opacity=".55"/>
+        <stop offset=".6" stop-color="#2F3B37" stop-opacity=".22"/>
+        <stop offset="1" stop-color="#2F3B37" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="body" x1="0" y1="480" x2="0" y2="700" gradientUnits="userSpaceOnUse">
+        <stop offset="0" stop-color="#2F3B37" stop-opacity=".08"/>
+        <stop offset=".55" stop-color="#2F3B37" stop-opacity=".22"/>
+        <stop offset="1" stop-color="#2F3B37" stop-opacity=".5"/>
+      </linearGradient>
+      <radialGradient id="broth" cx="50%" cy="40%" r="60%">
+        <stop offset="0" stop-color="#D9B98A" stop-opacity=".55"/>
+        <stop offset="1" stop-color="#B98E57" stop-opacity=".7"/>
+      </radialGradient>
+    </defs>
+
+    <ellipse cx="420" cy="560" rx="300" ry="190" fill="#D9B98A" opacity=".18" filter="url(#wash)"/>
+    <path d="M360 470C270 380 410 300 320 190S350 40 430 0" fill="none" stroke="#2F3B37" stroke-opacity=".06" stroke-width="70" stroke-linecap="round" filter="url(#wash)"/>
+
+    <g fill="url(#steam)" filter="url(#hair)">
+      <path d="M374.3 463.7 L370.5 455.1 L368.2 446.6 L367.2 438.2 L367.1 429.7 L367.9 421.1 L369.3 412.4 L371.3 403.5 L373.5 394.5 L375.7 385.4 L377.8 376.2 L379.5 366.9 L380.6 357.5 L380.8 348.0 L380.0 338.4 L377.9 328.7 L374.2 318.9 L368.8 308.9 L361.4 298.8 L354.7 290.3 L348.6 281.5 L342.9 272.4 L337.8 262.9 L333.3 253.1 L329.4 243.0 L326.1 232.6 L323.6 222.0 L321.7 211.0 L320.6 199.8 L320.2 188.2 L320.7 176.4 L322.1 164.4 L324.5 152.0 L327.8 139.4 L332.2 126.5 L337.6 113.4 L344.1 100.1 L343.9 99.9 L336.9 113.1 L331.0 126.1 L326.2 138.9 L322.4 151.5 L319.6 163.9 L317.8 176.2 L316.9 188.2 L316.9 200.0 L317.8 211.5 L319.6 222.8 L322.1 233.7 L325.4 244.4 L329.4 254.7 L334.1 264.7 L339.4 274.4 L345.3 283.7 L351.7 292.6 L358.6 301.2 L365.7 310.9 L370.8 320.4 L374.2 329.8 L375.9 339.0 L376.4 348.0 L375.7 357.0 L374.2 365.9 L371.9 374.8 L369.3 383.6 L366.4 392.5 L363.6 401.4 L361.0 410.5 L359.0 419.7 L357.7 429.1 L357.5 438.7 L358.6 448.5 L361.3 458.4 L365.7 468.3Z"/>
+      <path d="M445.8 458.4 L452.2 446.9 L456.4 435.4 L458.8 424.0 L459.4 412.5 L458.6 401.2 L456.7 390.1 L454.0 379.1 L450.8 368.3 L447.3 357.6 L443.8 347.0 L440.7 336.4 L438.2 325.9 L436.4 315.3 L435.8 304.6 L436.6 293.7 L439.0 282.6 L443.4 271.2 L450.1 259.4 L456.2 249.4 L461.5 239.1 L465.8 228.6 L469.4 217.9 L472.0 206.9 L473.7 195.5 L474.6 183.9 L474.5 171.9 L473.4 159.5 L471.4 146.8 L468.4 133.7 L464.5 120.1 L459.6 106.2 L453.7 91.8 L446.8 77.1 L438.9 61.8 L430.1 46.1 L420.2 29.9 L419.8 30.1 L428.9 46.7 L437.2 62.7 L444.6 78.1 L451.0 93.0 L456.5 107.3 L461.1 121.2 L464.8 134.6 L467.7 147.5 L469.6 160.0 L470.6 172.1 L470.8 183.8 L470.0 195.1 L468.3 206.1 L465.7 216.8 L462.1 227.2 L457.6 237.3 L452.2 247.1 L445.9 256.6 L438.4 268.6 L433.0 280.6 L429.7 292.5 L428.0 304.3 L427.9 315.9 L429.0 327.5 L431.0 338.8 L433.7 349.9 L436.7 360.9 L439.9 371.6 L442.9 382.2 L445.5 392.6 L447.5 402.8 L448.5 412.8 L448.3 422.9 L446.8 432.9 L443.5 443.2 L438.2 453.6Z"/>
+      <path d="M513.4 470.2 L518.0 461.7 L521.2 453.1 L523.3 444.6 L524.3 436.1 L524.6 427.7 L524.3 419.3 L523.5 411.0 L522.4 402.7 L521.2 394.5 L520.0 386.3 L519.0 378.1 L518.4 369.9 L518.2 361.7 L518.7 353.5 L519.9 345.3 L522.0 337.2 L525.2 329.0 L529.5 320.9 L533.2 314.4 L536.6 307.6 L539.8 300.6 L542.7 293.3 L545.2 285.8 L547.4 278.1 L549.1 270.1 L550.4 262.0 L551.3 253.6 L551.7 245.1 L551.5 236.4 L550.9 227.6 L549.6 218.6 L547.8 209.5 L545.4 200.3 L542.3 191.0 L538.6 181.5 L534.1 171.9 L533.9 172.1 L538.0 181.7 L541.5 191.2 L544.2 200.6 L546.3 209.8 L547.8 218.9 L548.7 227.8 L549.0 236.5 L548.9 245.0 L548.2 253.4 L547.1 261.5 L545.6 269.4 L543.7 277.2 L541.6 284.7 L539.0 292.0 L536.3 299.1 L533.2 306.0 L530.0 312.7 L526.5 319.1 L522.1 327.6 L518.9 336.2 L516.8 344.7 L515.5 353.1 L515.0 361.6 L515.0 370.0 L515.4 378.4 L516.1 386.7 L516.8 395.0 L517.6 403.3 L518.1 411.4 L518.4 419.5 L518.2 427.5 L517.5 435.4 L516.1 443.1 L513.9 450.7 L510.7 458.3 L506.6 465.8Z"/>
+      <path d="M406.2 461.0 L403.5 454.4 L401.9 448.1 L401.2 442.0 L401.3 435.9 L402.0 429.9 L403.3 424.0 L404.9 418.0 L406.9 412.0 L409.0 406.0 L411.1 399.9 L413.1 393.7 L414.8 387.4 L416.1 381.0 L416.8 374.4 L416.8 367.6 L415.9 360.5 L414.0 353.2 L410.9 345.5 L408.2 339.5 L406.0 333.2 L404.1 326.8 L402.6 320.2 L401.6 313.5 L400.9 306.6 L400.5 299.6 L400.6 292.5 L401.0 285.3 L401.7 278.1 L402.9 270.8 L404.3 263.5 L406.1 256.2 L408.3 248.8 L410.7 241.6 L413.6 234.3 L416.7 227.2 L420.1 220.1 L419.9 219.9 L416.3 227.0 L413.0 234.1 L410.0 241.3 L407.3 248.5 L405.0 255.8 L402.9 263.2 L401.3 270.5 L400.0 277.8 L399.0 285.2 L398.5 292.4 L398.3 299.6 L398.5 306.7 L399.2 313.8 L400.3 320.6 L401.8 327.4 L403.8 333.9 L406.2 340.3 L409.1 346.5 L412.1 353.8 L414.0 360.9 L414.8 367.7 L414.9 374.3 L414.1 380.7 L412.8 386.9 L411.0 393.1 L408.8 399.1 L406.5 405.0 L404.2 411.0 L401.9 417.0 L399.9 423.0 L398.2 429.2 L397.2 435.5 L396.8 442.1 L397.4 448.9 L399.0 455.8 L401.8 463.0Z"/>
+    </g>
+
+    <ellipse cx="420" cy="738" rx="280" ry="18" fill="#2F3B37" opacity=".14" filter="url(#wash)"/>
+    <path d="M346 688L354 716H486L494 688Z" fill="#2F3B37" fill-opacity=".2" filter="url(#bleed)"/>
+    <path d="M350.0 716.1 L358.2 716.9 L366.3 717.5 L374.2 718.1 L382.0 718.7 L389.7 719.3 L397.4 719.9 L404.9 720.4 L412.5 720.6 L420.0 720.6 L427.5 720.4 L435.1 720.0 L442.6 719.5 L450.3 719.0 L458.0 718.5 L465.8 718.1 L473.7 717.6 L481.8 717.0 L490.0 716.2 L490.0 715.8 L481.7 715.9 L473.6 716.2 L465.7 716.4 L457.9 716.6 L450.2 716.6 L442.6 716.5 L435.0 716.3 L427.5 716.0 L420.0 715.9 L412.5 715.8 L405.0 715.9 L397.4 716.1 L389.8 716.3 L382.1 716.4 L374.3 716.4 L366.4 716.3 L358.3 716.0 L350.0 715.9Z" fill="#1E1E1C" fill-opacity=".6"/>
+    <path d="M186 484C192 600 292 690 420 694C548 690 648 600 654 484Z" fill="url(#body)" filter="url(#bleed)"/>
+    <path d="M500 676C580 650 632 590 646 512C620 600 560 650 470 680Z" fill="#2F3B37" fill-opacity=".22" filter="url(#soft)"/>
+    <path d="M214 540C238 612 304 660 384 674" fill="none" stroke="#FBF9F5" stroke-opacity=".7" stroke-width="12" stroke-linecap="round" filter="url(#soft)"/>
+    <path d="M187.9 500.0 L191.9 518.2 L197.2 535.8 L203.6 552.8 L211.2 569.2 L220.0 584.9 L229.8 599.9 L240.6 614.1 L252.5 627.5 L265.4 639.9 L279.2 651.4 L294.0 661.8 L309.7 671.1 L326.3 679.1 L343.6 685.9 L361.7 691.4 L380.5 695.5 L399.9 698.1 L420.1 699.3 L440.0 697.7 L459.3 694.6 L478.0 690.2 L495.9 684.5 L513.1 677.7 L529.5 669.6 L545.2 660.5 L560.0 650.3 L573.9 639.1 L587.0 626.9 L599.0 613.8 L610.1 599.8 L620.1 585.0 L629.0 569.3 L636.7 553.0 L643.2 535.9 L648.4 518.3 L652.2 500.0 L651.8 500.0 L647.0 517.9 L641.2 535.2 L634.3 551.9 L626.3 567.9 L617.4 583.2 L607.4 597.8 L596.4 611.5 L584.4 624.4 L571.6 636.4 L557.8 647.4 L543.1 657.3 L527.7 666.1 L511.4 673.7 L494.4 680.1 L476.7 685.2 L458.3 689.1 L439.4 691.6 L419.9 692.7 L400.7 691.1 L381.8 688.2 L363.6 684.1 L346.1 678.7 L329.3 672.2 L313.1 664.6 L297.7 656.0 L283.0 646.3 L269.1 635.6 L256.1 623.9 L244.0 611.2 L232.8 597.7 L222.6 583.3 L213.4 568.1 L205.3 552.1 L198.4 535.3 L192.7 518.0 L188.1 500.0Z" fill="#1E1E1C" fill-opacity=".62" filter="url(#brush)"/>
+
+    <ellipse cx="420" cy="484" rx="226" ry="46" fill="url(#broth)"/>
+    <path d="M206 480C240 450 330 440 420 440S600 450 634 480C590 462 500 456 420 456S250 462 206 480Z" fill="#6E4F2A" fill-opacity=".22" filter="url(#soft)"/>
+    <g fill="#7A5732" fill-opacity=".55" filter="url(#hair)"><path d="M290 498C294 489 312 487 320 494S315 507 303 506 287 504 290 498Z"/><path d="M446 488C452 481 468 481 474 488S468 497 458 497 443 494 446 488Z"/><path d="M492 502C496 496 508 496 512 501S506 508 500 508 489 506 492 502Z"/><path d="M590 470C594 466 604 466 606 470S601 476 597 476 588 474 590 470Z"/></g>
+    <g stroke="#8C7A5E" stroke-opacity=".6" stroke-width="1.4" stroke-linejoin="round">
+      <path d="M350 492L370 484L392 490L372 498Z" fill="#F6EDDA"/><path d="M350 492L372 498L372 512L352 506Z" fill="#E2CFA8"/><path d="M372 498L392 490L392 504L372 512Z" fill="#D7C097"/>
+      <path d="M404 506L420 500L438 505L422 511Z" fill="#F6EDDA"/><path d="M404 506L422 511L422 522L405 517Z" fill="#E2CFA8"/><path d="M422 511L438 505L438 516L422 522Z" fill="#D7C097"/>
+      <path d="M528 488L544 482L560 487L544 493Z" fill="#F6EDDA"/><path d="M528 488L544 493L544 503L529 498Z" fill="#E2CFA8"/>
+    </g>
+    <g fill="none" stroke="#5E6E4E" stroke-width="2.6">
+      <circle cx="342" cy="470" r="6"/><circle cx="452" cy="478" r="5.5"/><circle cx="408" cy="488" r="4.5"/><circle cx="584" cy="482" r="5"/><circle cx="262" cy="484" r="5"/>
+    </g>
+    <g fill="#F6E7C6" fill-opacity=".85"><ellipse cx="280" cy="470" rx="7" ry="3"/><ellipse cx="490" cy="468" rx="5" ry="2.2"/><ellipse cx="430" cy="460" rx="4" ry="1.8"/><ellipse cx="236" cy="492" rx="4" ry="1.8"/><ellipse cx="610" cy="494" rx="5" ry="2"/></g>
+
+    <path d="M582 470Q630 424 682 388L690 400Q640 440 594 482Z" fill="#FBF9F5" stroke="#5F5B54" stroke-width="1.8" stroke-linejoin="round"/>
+    <ellipse cx="560" cy="484" rx="44" ry="15" fill="#FBF9F5" stroke="#5F5B54" stroke-width="1.8" transform="rotate(-12 560 484)"/>
+    <ellipse cx="558" cy="486" rx="30" ry="8" fill="#C9A46A" fill-opacity=".7" transform="rotate(-12 558 486)"/>
+
+    <path d="M182.2 484.0 L183.4 478.9 L186.4 474.1 L191.1 469.4 L197.5 464.8 L205.5 460.4 L215.1 456.2 L226.1 452.2 L238.6 448.5 L252.3 445.0 L267.3 441.8 L283.4 439.0 L300.5 436.5 L318.6 434.4 L337.5 432.6 L357.2 431.3 L377.6 430.4 L398.5 429.8 L420.0 429.7 L441.5 430.1 L462.4 430.8 L482.8 431.9 L502.5 433.4 L521.4 435.2 L539.4 437.4 L556.5 439.8 L572.6 442.6 L587.5 445.6 L601.3 448.9 L613.8 452.5 L624.9 456.3 L634.5 460.4 L642.6 464.7 L649.1 469.2 L653.8 473.9 L656.8 478.9 L657.9 484.0 L658.1 484.0 L657.3 478.7 L654.5 473.5 L649.8 468.4 L643.4 463.5 L635.3 458.9 L625.7 454.4 L614.5 450.2 L602.0 446.2 L588.3 442.6 L573.2 439.2 L557.1 436.2 L539.9 433.5 L521.8 431.3 L502.8 429.4 L483.0 428.0 L462.6 426.9 L441.5 426.4 L420.0 426.3 L398.5 426.6 L377.4 427.4 L357.0 428.6 L337.3 430.2 L318.3 432.1 L300.2 434.4 L283.0 437.0 L266.9 439.9 L251.9 443.1 L238.1 446.6 L225.5 450.4 L214.4 454.5 L204.7 458.8 L196.6 463.4 L190.1 468.2 L185.4 473.3 L182.5 478.6 L181.8 484.0Z" fill="#1E1E1C" fill-opacity=".55" filter="url(#brush)"/>
+    <path d="M181.8 484.0 L182.3 489.5 L185.1 494.9 L189.7 500.2 L196.2 505.2 L204.4 509.9 L214.1 514.3 L225.3 518.4 L237.8 522.2 L251.7 525.7 L266.7 528.9 L282.9 531.7 L300.1 534.3 L318.2 536.5 L337.2 538.4 L357.0 540.0 L377.4 541.2 L398.4 542.0 L420.0 542.4 L441.6 542.4 L462.6 541.9 L483.1 541.0 L502.9 539.6 L521.9 537.8 L540.1 535.6 L557.3 533.0 L573.5 529.9 L588.5 526.6 L602.3 522.8 L614.9 518.8 L626.0 514.4 L635.6 509.8 L643.7 505.0 L650.1 499.9 L654.7 494.7 L657.4 489.4 L658.1 484.0 L657.9 484.0 L656.6 489.1 L653.6 493.9 L648.8 498.4 L642.3 502.8 L634.2 507.0 L624.6 510.9 L613.5 514.6 L601.0 518.1 L587.3 521.3 L572.4 524.3 L556.3 527.0 L539.2 529.5 L521.2 531.7 L502.4 533.6 L482.7 535.2 L462.4 536.4 L441.5 537.2 L420.0 537.6 L398.5 537.6 L377.6 537.1 L357.2 536.1 L337.5 534.8 L318.6 533.0 L300.6 530.8 L283.5 528.2 L267.4 525.4 L252.5 522.1 L238.8 518.7 L226.4 514.9 L215.4 511.0 L205.8 506.9 L197.8 502.6 L191.4 498.2 L186.7 493.7 L183.6 489.0 L182.2 484.0Z" fill="#1E1E1C" fill-opacity=".85" filter="url(#brush)"/>
+    <ellipse cx="420" cy="484" rx="228" ry="47" fill="none" stroke="#1E1E1C" stroke-opacity=".18" stroke-width="1.5"/>
+  </svg>
+
+  <h1 class="abs title">立冬</h1>
+  <p class="abs en">START OF WINTER</p>
+  <p class="abs seal">补冬</p>
+
+  <p class="abs greet">天冷了，<br>回来喝碗汤。</p>
+  <p class="abs lede">水始冰，地始冻。<br>巷口的炉子一早就生了火，<br>一锅汤，慢慢滚到傍晚。</p>
+
+  <section class="abs menu">
+    <div class="menu-h">
+      <h2>立冬三碗<span>11.07 — 11.09</span></h2>
+      <p>每桌送一碟<b>手包饺子</b></p>
+    </div>
+    <div class="bowls">
+      <div class="bowl"><p class="no">壹</p><h3>萝卜羊肉汤<span>¥38</span></h3><p class="desc">羊骨老姜，炖足四小时</p></div>
+      <div class="bowl"><p class="no">贰</p><h3>莲藕排骨汤<span>¥32</span></h3><p class="desc">七孔粉藕，越煮越糯</p></div>
+      <div class="bowl"><p class="no">叁</p><h3>菌菇老鸡汤<span>¥36</span></h3><p class="desc">五种山菌，清亮不油</p></div>
+    </div>
+  </section>
+
+  <footer class="abs foot">
+    <p class="brand"><i>汤</i>一碗汤<small>街坊小馆 · 第九个冬天</small></p>
+    <p class="addr">巷子口第三家 · 10:30 – 21:30<br>订座 138 0000 0000</p>
+  </footer>
+
+  <svg class="grain" width="1080" height="1350" aria-hidden="true">
+    <filter id="paper"><feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 .3  0 0 0 0 .27  0 0 0 0 .22  0 0 0 .07 0"/></filter>
+    <rect width="1080" height="1350" filter="url(#paper)"/>
+  </svg>
+</main>
+</body>
+</html>
