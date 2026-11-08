@@ -1,0 +1,1068 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="dsh-design" content="web">
+<title>组件 · 墨刻 Inkwell</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<style>
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+  body { margin: 0; }
+  .sym { display: none; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 40px; }
+  .f1 { fill: var(--ink-1); } .f2 { fill: var(--ink-2); } .f3 { fill: var(--ink-3); } .f4 { fill: var(--ink-4); } .f5 { fill: var(--ink-5); }
+  .fa { fill: var(--color-accent); } .fh { fill: var(--color-highlight); } .fb { fill: var(--color-bg); }
+  .s3 { fill: none; stroke: var(--ink-3); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+  .s4 { fill: none; stroke: var(--ink-4); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+
+  .masthead { padding-top: 20px; }
+  .masthead .seal { margin-right: 4px; }
+  .masthead .latin { margin-left: 2px; font: italic 400 30px/1 var(--font-serif); letter-spacing: 0; color: var(--color-muted); }
+
+  .hero { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 56px; padding-top: 56px; align-items: start; }
+  .hero-text .display { margin-top: 20px; font-size: 60px; line-height: 1.2; letter-spacing: 0.03em; }
+  .hero-text .dek { margin-top: 24px; font-size: 19px; }
+  .facts { display: grid; grid-template-columns: repeat(4, auto); margin: 36px 0 0; border-top: var(--rule-mid) solid var(--color-rule); border-bottom: 1px solid var(--color-line); }
+  .facts div { padding: 12px 16px 14px; border-left: 1px solid var(--color-line); }
+  .facts div:first-child { padding-left: 0; border-left: 0; }
+  .facts dt { font: var(--weight-regular) var(--text-xs)/1.3 var(--font-sans); letter-spacing: 0.06em; color: var(--color-muted); }
+  .facts dd { margin: 6px 0 0; font: var(--weight-bold) 22px/1.1 var(--font-serif); font-variant-numeric: tabular-nums; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+  .hero-files { margin-top: 28px; }
+
+  .sheet { position: relative; height: 640px; overflow: hidden; background: var(--color-surface); border: 1px solid var(--color-line); box-shadow: var(--shadow-lg); }
+  .sheet::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 120px; background: linear-gradient(rgb(251 248 242 / 0), var(--color-surface)); pointer-events: none; }
+  .sheet .reading-progress { position: relative; }
+  .sheet-bar { display: flex; align-items: center; gap: 22px; height: 56px; padding: 0 16px 0 24px; border-bottom: 1px solid var(--color-line); }
+  .brand { display: inline-flex; align-items: center; gap: 8px; color: var(--color-text); font: var(--weight-bold) 18px/1 var(--font-serif); letter-spacing: 0.1em; text-decoration: none; }
+  .sheet-nav { display: flex; gap: 18px; font: var(--weight-regular) 14px/1 var(--font-sans); }
+  .sheet-nav a { color: var(--color-muted); text-decoration: none; }
+  .sheet-nav a[aria-current] { color: var(--color-text); font-weight: var(--weight-semibold); }
+  .spacer { flex: 1; }
+  .sheet-body { display: grid; grid-template-columns: minmax(0, 1fr) 148px; gap: 36px; padding: 32px 28px 0 36px; }
+  .sheet .headline { font-size: 32px; }
+  .sheet .dek { font-size: 16px; }
+  .sheet .prose { margin-top: 24px; }
+  .sheet-side { display: grid; gap: 28px; align-content: start; padding-top: 4px; }
+  .tools { display: flex; gap: 2px; }
+
+  .sec { padding-top: 104px; scroll-margin-top: 8px; }
+  .sec-head { display: grid; grid-template-columns: 64px minmax(0, 1fr) minmax(0, 440px); align-items: baseline; gap: 24px; margin-bottom: 36px; padding-top: 14px; border-top: var(--rule-thick) solid var(--color-rule); }
+  .sec-no { font: var(--weight-bold) 30px/1 var(--font-serif); font-variant-numeric: tabular-nums; color: var(--color-accent); }
+  .sec-head h2 { margin: 0; font: var(--weight-bold) 32px/1.3 var(--font-serif); letter-spacing: 0.06em; }
+  .sec-head p { margin: 0; font: var(--weight-regular) 14px/1.75 var(--font-sans); color: var(--color-muted); }
+  .sub { display: flex; align-items: center; gap: 12px; margin: 44px 0 18px; font: var(--weight-semibold) var(--text-xs)/1 var(--font-sans); letter-spacing: 0.12em; color: var(--color-muted); }
+  .sub::after { content: ""; flex: 1; height: 1px; background: var(--color-line); }
+  .sub:first-child { margin-top: 0; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+  .grid-75 { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 48px; }
+  .grid-57 { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 48px; }
+  .grid-84 { display: grid; grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: 48px; }
+  .demo { box-sizing: border-box; padding: 28px; border: 1px solid var(--color-line); background: var(--color-surface); }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .stack { display: grid; gap: 16px; align-content: start; }
+  .lab { margin: 0 0 12px; font: var(--weight-regular) var(--text-xs)/1.4 var(--font-sans); letter-spacing: 0.04em; color: var(--color-muted); }
+  .lab code, .v { font: 11.5px/1.4 var(--font-mono); color: var(--color-muted); }
+
+  .rules { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px; }
+  .yi, .ji { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 12px; align-items: start; padding: 14px 18px; border-top: 2px solid var(--color-success); background: var(--color-surface); font: var(--weight-regular) 14px/1.75 var(--font-sans); }
+  .ji { border-top-color: var(--color-danger); }
+  .yi::before, .ji::before { content: "宜"; display: grid; place-items: center; width: 26px; height: 26px; margin-top: 1px; background: var(--color-success); color: var(--color-surface); font: var(--weight-bold) 14px/1 var(--font-serif); }
+  .ji::before { content: "忌"; background: var(--color-danger); }
+  .yi p, .ji p { margin: 0; }
+
+  .trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .big-sw { margin: 0; border: 1px solid var(--color-line); background: var(--color-surface); }
+  .big-sw .chip { box-sizing: border-box; display: flex; align-items: flex-end; justify-content: space-between; height: 176px; padding: 16px 20px; }
+  .big-sw .chip b { font: var(--weight-bold) 76px/1 var(--font-serif); }
+  .big-sw .chip span { font: var(--weight-medium) 12px/1 var(--font-sans); font-variant-numeric: tabular-nums; }
+  .big-sw figcaption { display: grid; gap: 3px; padding: 14px 20px 16px; font: var(--weight-regular) 13px/1.5 var(--font-sans); color: var(--color-muted); }
+  .big-sw figcaption strong { font: var(--weight-semibold) 15px/1.4 var(--font-sans); color: var(--color-text); }
+  .sws { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+  .sw { margin: 0; }
+  .sw i { display: block; height: 60px; border: 1px solid var(--color-line); }
+  .sw figcaption { display: grid; gap: 1px; padding-top: 8px; font: var(--weight-regular) 11.5px/1.45 var(--font-sans); color: var(--color-muted); }
+  .sw b { font: var(--weight-semibold) 13px/1.4 var(--font-sans); color: var(--color-text); }
+  .ramp { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .ramp div { box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; height: 104px; padding: 12px 14px; font: var(--weight-regular) 12px/1.3 var(--font-sans); font-variant-numeric: tabular-nums; }
+  .ramp b { font: var(--weight-bold) 30px/1 var(--font-serif); }
+  .status-row { display: flex; flex-wrap: wrap; gap: 10px; }
+  .status-row .tag { height: 28px; padding: 0 12px; font-size: 12.5px; }
+  .ratio { display: flex; height: 34px; border: 1px solid var(--color-line); font: var(--weight-medium) 12px/32px var(--font-sans); }
+  .ratio i { overflow: hidden; padding: 0 12px; font-style: normal; white-space: nowrap; }
+
+  .font-card { display: grid; gap: 10px; align-content: start; padding: 20px 24px 24px; border-top: var(--rule-thick) solid var(--color-rule); background: var(--color-surface); }
+  .font-card .glyph { display: flex; align-items: flex-end; justify-content: space-between; height: 96px; font-size: 88px; line-height: 1; }
+  .font-card .glyph small { font: var(--weight-regular) 12px/1 var(--font-sans); color: var(--color-muted); }
+  .font-card p { margin: 0; font: var(--weight-regular) 13.5px/1.7 var(--font-sans); color: var(--color-muted); }
+  .font-card .say { font-size: 17px; line-height: 1.7; color: var(--color-text); }
+  .scale { border-top: var(--rule-mid) solid var(--color-rule); }
+  .scale-row { display: grid; grid-template-columns: 176px 48px minmax(0, 1fr); align-items: baseline; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--color-line); }
+  .scale-row code { font: 11.5px/1.3 var(--font-mono); color: var(--color-muted); }
+  .scale-row .px { font: var(--weight-regular) 12px/1 var(--font-sans); font-variant-numeric: tabular-nums; color: var(--color-muted); }
+  .scale-row .smp { overflow: hidden; color: var(--color-text); white-space: nowrap; text-overflow: ellipsis; }
+  .lh-demo p:not(.lab) { margin: 0; font: var(--weight-regular) 16px/var(--lh) var(--font-serif); letter-spacing: 0.02em; text-align: justify; }
+  .lh-demo .lab b { color: var(--color-text); font-weight: var(--weight-semibold); }
+  .details { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 24px; }
+  .detail { padding: 16px 18px 18px; border: 1px solid var(--color-line); background: var(--color-surface); }
+  .detail .smp { margin: 0 0 10px; font: var(--weight-regular) 17px/1.8 var(--font-serif); }
+  .detail p { margin: 0; font: var(--weight-regular) 12.5px/1.65 var(--font-sans); color: var(--color-muted); }
+  .detail .bad { color: var(--color-muted); text-decoration: line-through; text-decoration-color: var(--color-danger); }
+
+  .spaces { display: grid; gap: 9px; }
+  .space { display: grid; grid-template-columns: 76px 40px minmax(0, 1fr); align-items: center; gap: 12px; font: var(--weight-regular) 12px/1 var(--font-sans); font-variant-numeric: tabular-nums; color: var(--color-muted); }
+  .space code { font: 11.5px/1 var(--font-mono); }
+  .space i { display: block; height: 10px; background: var(--color-text); }
+  .rules-demo { display: grid; gap: 20px; }
+  .rules-demo div { display: grid; grid-template-columns: 112px minmax(0, 1fr); align-items: center; gap: 16px; font: var(--weight-regular) 12px/1.4 var(--font-sans); color: var(--color-muted); }
+  .rules-demo hr { width: 100%; }
+  .radii { display: flex; gap: 18px; }
+  .radii div { display: grid; justify-items: center; gap: 8px; font: var(--weight-regular) 12px/1.3 var(--font-sans); color: var(--color-muted); text-align: center; }
+  .radii i { display: block; width: 52px; height: 52px; border: 1px solid var(--color-text); background: var(--color-surface-2); }
+  .shadows { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .shadows div { display: grid; place-items: center; height: 84px; background: var(--color-surface); font: var(--weight-regular) 12px/1.5 var(--font-sans); color: var(--color-muted); text-align: center; }
+  .measure-row { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 48px; align-items: center; }
+  .measure-demo { position: relative; padding-top: 30px; }
+  .measure-notes { margin: 0; padding: 0 0 0 24px; list-style: none; border-left: 1px solid var(--color-line); display: grid; gap: 12px; font: var(--weight-regular) 13px/1.6 var(--font-sans); color: var(--color-muted); }
+  .measure-notes b { display: block; font: var(--weight-bold) 16px/1.4 var(--font-serif); color: var(--color-text); }
+  .ruler { position: absolute; top: 0; left: 0; width: 36em; height: 18px; border: solid var(--color-accent); border-width: 0 1px; font: var(--weight-regular) 17px/1 var(--font-serif); }
+  .ruler::before { content: ""; position: absolute; left: 0; right: 0; top: 8px; border-top: 1px dashed var(--color-accent); }
+  .ruler span { position: absolute; left: 50%; top: 0; transform: translateX(-50%); padding: 0 8px; background: var(--color-surface); color: var(--color-accent); font: var(--weight-semibold) 11px/18px var(--font-sans); letter-spacing: 0.06em; }
+  .colgrid { position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 12px; height: 200px; }
+  .colgrid > i { background: color-mix(in oklab, var(--color-accent-soft) 70%, var(--color-surface)); }
+  .colgrid .zones { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 12px; padding: 24px 0; }
+  .zone { box-sizing: border-box; display: grid; align-content: start; gap: 6px; padding: 12px 14px; border: 1px solid var(--color-text); background: var(--color-surface); font: var(--weight-regular) 12px/1.5 var(--font-sans); color: var(--color-muted); }
+  .zone b { font: var(--weight-bold) 16px/1.3 var(--font-serif); color: var(--color-text); }
+  .zone .bars { display: grid; gap: 7px; margin-top: 6px; }
+  .zone .bars i { display: block; height: 5px; background: var(--ink-1); }
+
+  .ah-b { padding: 40px 32px 32px; }
+  .ah-b .seal { margin-bottom: 4px; }
+
+  .annot.prose { display: grid; grid-template-columns: minmax(0, 36em) minmax(0, 1fr); column-gap: 56px; max-width: none; }
+  .annot.prose > * { grid-column: 1; }
+  .annot.prose > .an { grid-column: 2; align-self: start; padding: 2px 0 2px 14px; border-left: 1px solid var(--color-line); color: var(--color-muted); font: var(--weight-regular) 12.5px/1.65 var(--font-sans); letter-spacing: 0; text-align: left; }
+  .annot.prose > .an code { display: block; margin-bottom: 2px; padding: 0; background: none; color: var(--color-accent); font: var(--weight-semibold) 12px/1.5 var(--font-mono); }
+  .annot.prose > .an { margin-top: calc(var(--text-reading) * 1.1); }
+  .annot.prose > .an-0 { margin-top: 0; }
+  .annot.prose > .an-2 { margin-top: calc(var(--text-reading) * 2); }
+  .annot.prose > .an-pq { margin-top: calc(var(--text-reading) * 1.4 * 2); }
+  .annot.prose > .an-22 { margin-top: calc(var(--text-reading) * 1.4 * 2.2); }
+  .annot.prose > .an-h3 { margin-top: calc(var(--text-reading) * 1.15 * 1.8); }
+  .annot.prose > .an-3 { margin-top: calc(var(--text-sm) * 3); }
+
+  .read-grid { display: grid; grid-template-columns: 220px minmax(0, 1fr) 320px; gap: 48px; align-items: start; }
+  .prog-demo { display: grid; gap: 14px; }
+  .prog-demo .reading-progress { position: relative; }
+  .sel-demo { position: relative; padding: 84px 22px 22px; border: 1px solid var(--color-line); background: var(--color-bg); }
+  .sel-demo .select-bar { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); }
+  .sel-demo .select-bar::after { content: ""; position: absolute; left: 50%; bottom: -6px; width: 12px; height: 12px; margin-left: -6px; background: var(--color-inverse); transform: rotate(45deg); }
+  .sel-demo p { margin: 0; font: var(--weight-regular) 16px/1.9 var(--font-serif); letter-spacing: 0.02em; text-align: justify; }
+
+  .front { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0 32px; }
+  .front .story-lead { grid-column: 1 / -1; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; }
+  .front .story-lead .story-thumb { order: 0; }
+  .front .story-lead .story-body { align-content: center; }
+  .side-col { display: grid; gap: 40px; align-content: start; }
+  .topics { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 16px; }
+
+  .thread-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-bottom: 12px; border-bottom: var(--rule-mid) solid var(--color-rule); }
+  .thread-head .h3 b { margin-left: 8px; font: var(--weight-regular) 15px/1 var(--font-sans); color: var(--color-muted); }
+  .composer { display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 12px; padding: 20px 0; }
+  .composer-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
+  .more-comments { padding-top: 16px; border-top: 1px solid var(--color-line); }
+
+  .matrix { display: grid; grid-template-columns: 96px repeat(4, minmax(0, 1fr)); align-items: center; gap: 16px 20px; }
+  .matrix .h { font: var(--weight-regular) 12px/1.3 var(--font-sans); letter-spacing: 0.04em; color: var(--color-muted); }
+
+  .form-demo { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 24px; }
+  .form-demo .full { grid-column: 1 / -1; }
+  .opts { display: flex; flex-wrap: wrap; gap: 4px 22px; }
+  .settings .list > li { min-height: 56px; }
+  .settings .grow b { display: block; font: var(--weight-medium) 15px/1.4 var(--font-sans); }
+  .settings .grow span { display: block; margin-top: 2px; font: var(--weight-regular) 12.5px/1.5 var(--font-sans); color: var(--color-muted); }
+
+  .mini-app { width: 375px; border: 1px solid var(--color-line); background: var(--color-bg); }
+  .mini-app .feed { padding: 4px 16px 8px; }
+  .mini-app .story { padding: 14px 0; gap: 4px 14px; }
+  .mini-app .story-title { font-size: 16px; }
+  .mini-app .story-thumb { width: 96px; }
+
+  .stage { position: relative; height: 380px; overflow: hidden; border: 1px solid var(--color-line); background: var(--color-bg); }
+  .stage .dialog-scrim { position: absolute; inset: 0; }
+  .ghost { padding: 28px 36px; }
+  .ghost i { display: block; height: 10px; margin-bottom: 14px; background: var(--ink-1); }
+  .ghost i:first-child { width: 40%; height: 26px; margin-bottom: 22px; background: var(--ink-2); }
+  .toasts { display: grid; gap: 14px; justify-items: start; }
+
+  .empties { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: var(--rule-mid) solid var(--color-rule); border-bottom: 1px solid var(--color-line); }
+  .empties .empty + .empty { border-left: 1px solid var(--color-line); }
+
+  .phones { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; justify-items: center; }
+  .phone-wrap { display: grid; gap: 14px; justify-items: center; text-align: center; }
+  .phone { position: relative; text-align: left; display: flex; flex-direction: column; box-sizing: border-box; width: 320px; height: 664px; overflow: hidden; border: 10px solid #1B1915; border-radius: 42px; box-shadow: var(--shadow-lg); }
+  .ph-status { display: flex; align-items: center; justify-content: space-between; height: 34px; padding: 4px 22px 0; font: var(--weight-semibold) 13px/1 var(--font-sans); font-variant-numeric: tabular-nums; }
+  .ph-status .bat { display: inline-block; width: 22px; height: 11px; border: 1.5px solid currentColor; border-radius: 3px; box-sizing: border-box; padding: 1px; }
+  .ph-status .bat i { display: block; width: 70%; height: 100%; border-radius: 1px; background: currentColor; }
+  .phone .topbar { height: 44px; border-bottom: 0; }
+  .phone .topbar-title { font-size: 14px; color: var(--color-muted); font-weight: var(--weight-regular); }
+  .phone .reading-progress { position: relative; height: 2px; }
+  .ph-body { position: relative; flex: 1; overflow: hidden; padding: 20px 22px 0; }
+  .ph-body .kicker { font-size: 12px; }
+  .ph-body h3 { margin: 8px 0 6px; font: var(--weight-bold) 22px/1.4 var(--font-serif); letter-spacing: 0.02em; }
+  .ph-body .meta { font-size: 12px; }
+  .ph-body .prose { margin-top: 16px; }
+  .ph-tools { display: grid; grid-template-columns: repeat(4, 1fr); align-items: center; height: 54px; padding-bottom: 14px; border-top: 1px solid var(--color-line); }
+  .ph-tools a { display: grid; justify-items: center; gap: 3px; color: var(--color-muted); font: var(--weight-regular) 10.5px/1 var(--font-sans); text-decoration: none; }
+  .ph-tools svg { width: 20px; height: 20px; }
+  .ph-scrim { position: absolute; inset: 34px 0 0; background: var(--color-overlay); }
+  .ph-sheet { position: absolute; left: 0; right: 0; bottom: 0; border-radius: 14px 14px 0 0; box-shadow: none; border: 0; padding: 22px 20px 28px; }
+  .ph-sheet .grab { justify-self: center; width: 36px; height: 4px; margin-top: -10px; border-radius: 2px; background: var(--color-line-strong); }
+  .ph-sel { position: absolute; left: 50%; top: 106px; transform: translateX(-50%); }
+  .ph-sel::after { content: ""; position: absolute; left: 50%; bottom: -5px; width: 10px; height: 10px; margin-left: -5px; background: var(--color-inverse); transform: rotate(45deg); }
+  .ph-toast { position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); white-space: nowrap; font-size: 13px; min-height: 40px; }
+  .phone-cap b { display: block; font: var(--weight-bold) 17px/1.4 var(--font-serif); }
+  .phone-cap span { font: var(--weight-regular) 12.5px/1.5 var(--font-sans); color: var(--color-muted); }
+  .dark-strip { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr); gap: 40px; margin-top: 48px; padding: 32px 36px 36px; }
+  .dark-strip .comment { border-top: 0; padding-top: 0; }
+
+  .colophon { margin-top: 120px; padding-bottom: 56px; }
+  .colophon-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr)); gap: 40px; padding-top: 24px; }
+  .colophon h4 { margin: 0 0 10px; font: var(--weight-semibold) 12px/1 var(--font-sans); letter-spacing: 0.12em; color: var(--color-muted); }
+  .colophon p, .colophon li { margin: 0; font: var(--weight-regular) 13.5px/1.8 var(--font-sans); color: var(--color-text); }
+  .colophon ul { margin: 0; padding: 0; list-style: none; }
+  .colophon .brand { font-size: 22px; }
+</style>
+</head>
+<body class="paper">
+<svg class="sym" aria-hidden="true">
+  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></symbol>
+  <symbol id="i-bookmark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M6.5 3.5h11v17L12 16.5l-5.5 4z"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3.5M7.5 8 12 3.5 16.5 8"/><path d="M5 12v8h14v-8"/></symbol>
+  <symbol id="i-like" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 19.5s-7.5-4.4-7.5-10A4.2 4.2 0 0 1 12 7a4.2 4.2 0 0 1 7.5 2.5c0 5.6-7.5 10-7.5 10z"/></symbol>
+  <symbol id="i-reply" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M4.5 5.5h15v10.5H11l-4.5 3.5V16h-2z"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24" fill="currentColor"><circle cx="5.5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="18.5" cy="12" r="1.5"/></symbol>
+  <symbol id="i-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 6-6 6 6 6"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9.5 6 6 6-6 6"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15M14 7l5 5-5 5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="m8.5 12.3 2.4 2.4 4.8-5"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5M12 7.8v.4"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 4.6 3 17.6a2 2 0 0 0 1.7 2.9h14.6a2 2 0 0 0 1.7-2.9L13.7 4.6a2 2 0 0 0-3.4 0z"/><path d="M12 10v4M12 17v.3"/></symbol>
+  <symbol id="i-err" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="m9.2 9.2 5.6 5.6M14.8 9.2l-5.6 5.6"/></symbol>
+  <symbol id="i-toc" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M9 6.5h11M9 12h11M9 17.5h11M4.5 6.5h.5M4.5 12h.5M4.5 17.5h.5"/></symbol>
+  <symbol id="i-aa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m3 18 5-12 5 12M5 14h6M15 18l3.2-7.5L21.5 18M16 16h4.5"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m14.5 5.5 4 4L9 19H5v-4z"/><path d="M4 21.5h16"/></symbol>
+  <symbol id="i-note" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h14v11l-4.5 4.5H5z"/><path d="M14.5 20v-4.5H19M8.5 9h7M8.5 12.5h4"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="8.5" y="8.5" width="11" height="11"/><path d="M5 15.5V4.5h11"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 6.5c-2-1.6-4.7-2-8-1.5v13c3.3-.5 6 0 8 1.5 2-1.5 4.7-2 8-1.5V5c-3.3-.5-6-.1-8 1.5zM12 6.5v13"/></symbol>
+  <symbol id="i-paper" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><path d="M4.5 5h12v14.5H6.5a2 2 0 0 1-2-2zM16.5 9h3v8.5a2 2 0 0 1-2 2"/><path d="M8 9h5M8 12.5h5M8 16h3"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="8.5" r="3.8"/><path d="M4.5 20.5c.8-4 3.8-6 7.5-6s6.7 2 7.5 6"/></symbol>
+  <symbol id="i-listen" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 16v-3.5a7.5 7.5 0 0 1 15 0V16"/><rect x="4.5" y="14" width="3.5" height="6"/><rect x="16" y="14" width="3.5" height="6"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M19.5 14.5A8 8 0 0 1 9.5 4.5a8 8 0 1 0 10 10z"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="5.5" y="10.5" width="13" height="9.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 10.5 12 15l4.5-4.5M5 20h14"/></symbol>
+</svg>
+
+<header class="wrap masthead" id="top">
+  <div class="masthead-top"><span>设计系统 · 第 1 版</span><span>二〇二六年十一月八日　星期日</span><span>CC0 · 随便用，不用署名</span></div>
+  <a class="masthead-title" href="#top"><span class="seal">墨刻</span>墨刻<span class="latin">Inkwell</span></a>
+  <nav class="masthead-nav" aria-label="目录">
+    <a href="#color" aria-current="page">颜色</a><a href="#type">字体</a><a href="#layout">版式</a><a href="#header">文章头</a><a href="#prose">正文</a><a href="#reading">阅读</a><a href="#lists">列表</a><a href="#people">作者与评论</a><a href="#newsletter">订阅</a><a href="#buttons">按钮</a><a href="#forms">表单</a><a href="#navs">导航</a><a href="#feedback">浮层</a><a href="#themes">夜读</a>
+  </nav>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div class="hero-text">
+      <p class="kicker">设计系统<span class="sep"></span>阅读与出版</p>
+      <h1 class="display">白纸黑字，<br>一点朱红。</h1>
+      <p class="dek">给新闻站、杂志、博客和长文阅读 App 用的设计系统：宋体标题、黑体界面、行高 1.9 的正文、细线分栏，全套只用一种朱砂红。带米黄和夜读两套主题。</p>
+      <dl class="facts">
+        <div><dt>正文</dt><dd>17px</dd></div>
+        <div><dt>行高</dt><dd>1.9</dd></div>
+        <div><dt>每行</dt><dd>≤ 36 字</dd></div>
+        <div><dt>墨对纸</dt><dd>15.6:1</dd></div>
+      </dl>
+      <div class="hero-actions">
+        <a class="btn btn-lg" href="#header">看文章组件<svg><use href="#i-arrow"/></svg></a>
+        <a class="btn btn-secondary btn-lg" href="#themes"><svg><use href="#i-moon"/></svg>夜读主题</a>
+      </div>
+      <p class="caption hero-files">文件：<span class="mono">tokens.css</span> 设计变量 · <span class="mono">components.css</span> 组件 · 本页是样张。</p>
+    </div>
+
+    <div class="sheet" aria-label="文章页示例">
+      <div class="reading-progress" style="--progress:42%"><i></i></div>
+      <div class="sheet-bar">
+        <a class="brand" href="#top"><span class="seal seal-sm">檐</span>檐下周刊</a>
+        <nav class="sheet-nav" aria-label="栏目"><a href="#lists" aria-current="page">城市</a><a href="#lists">人物</a><a href="#lists">书评</a><a href="#lists">食物</a></nav>
+        <span class="spacer"></span>
+        <button class="btn btn-ghost btn-icon btn-sm" aria-label="搜索"><svg><use href="#i-search"/></svg></button>
+        <a class="btn btn-accent btn-sm" href="#newsletter">订阅</a>
+      </div>
+      <div class="sheet-body">
+        <article>
+          <header class="article-header">
+            <p class="kicker">城市<span class="sep"></span>特稿</p>
+            <h2 class="headline">夜班公交上的四十七站</h2>
+            <p class="dek">全城最后一班车，从晚上十点四十开到凌晨两点。我们跟着它跑了一个星期。</p>
+            <div class="article-header-foot">
+              <div class="byline"><span class="avatar">林</span><span class="byline-names"><span><span class="byline-role">文</span><b>林晚舟</b>　<span class="byline-role">插画</span><b>陈砚</b></span><span class="dateline">2026 年 11 月 6 日<span class="sep"></span>约 12 分钟</span></span></div>
+              <div class="tools"><button class="btn btn-ghost btn-icon btn-sm" aria-label="收藏"><svg><use href="#i-bookmark"/></svg></button><button class="btn btn-ghost btn-icon btn-sm" aria-label="分享"><svg><use href="#i-share"/></svg></button></div>
+            </div>
+          </header>
+          <div class="prose prose-sm">
+            <p class="dropcap">晚上十点四十分，夜 47 路从城北总站发车。这是全城最后一班车，也是唯一一条要开到凌晨两点的线路。司机老何开了九年，他说这条线上的乘客，他闭着眼睛都能认出一半。</p>
+            <blockquote class="pullquote"><p>「这条线上的人，白天你都见不到。他们是这座城市的另一半。」</p><cite>—— 夜 47 路司机　老何</cite></blockquote>
+            <p>坐在第三排靠窗的，是在医院做夜班护工的周阿姨；她每周有五个晚上搭这班车，从不迟到。</p>
+          </div>
+        </article>
+        <aside class="sheet-side">
+          <nav class="toc" aria-label="文章目录">
+            <p class="toc-title">目录</p>
+            <ol>
+              <li><a class="is-read" href="#reading">发车</a></li>
+              <li><a href="#reading" aria-current="true">末班车上的人</a></li>
+              <li><a href="#reading">江边的最后一段</a></li>
+              <li><a href="#reading">一张时刻表</a></li>
+              <li><a href="#reading">回到总站</a></li>
+            </ol>
+          </nav>
+          <span class="progress-chip"><span class="progress-ring" style="--p:42"></span>已读 42%</span>
+          <div class="stack" style="gap:8px">
+            <p class="overline">本文话题</p>
+            <a class="topic" href="#lists">城市夜行</a>
+            <a class="topic" href="#lists">公共交通</a>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="color">
+    <div class="sec-head"><span class="sec-no">01</span><h2>颜色</h2><p>纸、墨、朱，三个颜色撑起整套。主按钮是墨，不是彩色；朱砂只落在栏目名、首字、进度和订阅上。</p></div>
+    <div class="trio">
+      <figure class="big-sw"><div class="chip" style="background:var(--color-bg);color:var(--color-text);border-bottom:1px solid var(--color-line)"><b>纸</b><span>墨字 15.6 : 1</span></div><figcaption><strong>页面背景 bg</strong><span class="v">--color-bg · #F5F1E8</span><span>暖白，不是纯白；整页底色</span></figcaption></figure>
+      <figure class="big-sw"><div class="chip" style="background:var(--color-text);color:var(--color-bg)"><b>墨</b><span>纸字 15.6 : 1</span></div><figcaption><strong>正文 text · 主色 primary</strong><span class="v">--color-text · #1B1915</span><span>正文、标题、主按钮、粗线，都是这一个墨色</span></figcaption></figure>
+      <figure class="big-sw"><div class="chip" style="background:var(--color-accent);color:var(--color-accent-ink)"><b>朱</b><span>纸字 5.8 : 1 · 在纸上 5.4 : 1</span></div><figcaption><strong>点缀 accent · 朱砂</strong><span class="v">--color-accent · #B3341C</span><span>栏目名、首字下沉、阅读进度、订阅按钮</span></figcaption></figure>
+    </div>
+    <div class="sws">
+      <figure class="sw"><i style="background:var(--color-surface)"></i><figcaption><b>表面</b><span class="v">surface</span>#FBF8F2</figcaption></figure>
+      <figure class="sw"><i style="background:var(--color-surface-2)"></i><figcaption><b>次表面</b><span class="v">surface-2</span>#ECE6D9</figcaption></figure>
+      <figure class="sw"><i style="background:var(--color-line)"></i><figcaption><b>细线</b><span class="v">line</span>#DCD4C3</figcaption></figure>
+      <figure class="sw"><i style="background:var(--color-line-strong)"></i><figcaption><b>控件边</b><span class="v">line-strong</span>#8F856F · 3.4:1</figcaption></figure>
+      <figure class="sw"><i style="background:var(--color-muted)"></i><figcaption><b>淡墨</b><span class="v">muted</span>#67604F · 5.5:1</figcaption></figure>
+      <figure class="sw"><i style="background:var(--color-primary-soft)"></i><figcaption><b>墨浅底</b><span class="v">primary-soft</span>#E9E3D5</figcaption></figure>
+      <figure class="sw"><i style="background:var(--color-accent-soft)"></i><figcaption><b>朱浅底</b><span class="v">accent-soft</span>#F4E2DA</figcaption></figure>
+      <figure class="sw"><i style="background:var(--color-highlight)"></i><figcaption><b>划线黄</b><span class="v">highlight</span>#F2E3A6</figcaption></figure>
+    </div>
+
+    <div class="grid-2" style="margin-top:40px">
+      <div>
+        <p class="sub">墨分五色 · 插图、占位、图表用</p>
+        <div class="ramp">
+          <div style="background:var(--ink-1);color:var(--ink-5)"><b>清</b><span>--ink-1<br>#E4DDCF</span></div>
+          <div style="background:var(--ink-2);color:var(--ink-5)"><b>淡</b><span>--ink-2<br>#C5BBA8</span></div>
+          <div style="background:var(--ink-3);color:var(--color-bg)"><b>重</b><span>--ink-3<br>#8E8573</span></div>
+          <div style="background:var(--ink-4);color:var(--color-bg)"><b>浓</b><span>--ink-4<br>#4A443A</span></div>
+          <div style="background:var(--ink-5);color:var(--color-bg)"><b>焦</b><span>--ink-5<br>#1B1915</span></div>
+        </div>
+      </div>
+      <div>
+        <p class="sub">状态 · 浅底配同色深字</p>
+        <div class="status-row">
+          <span class="tag tag-success">松绿 已订阅 · 5.3:1</span>
+          <span class="tag tag-warning">赭石 草稿 · 4.9:1</span>
+          <span class="tag tag-danger">胭脂 出错 · 5.9:1</span>
+          <span class="tag tag-info">靛青 通知 · 6.8:1</span>
+        </div>
+        <p class="sub" style="margin-top:26px">大约的用量</p>
+        <div class="ratio">
+          <i style="width:70%;background:var(--color-bg);color:var(--color-muted)">纸 70%</i>
+          <i style="width:22%;background:var(--color-text);color:var(--color-bg)">墨 22%</i>
+          <i style="width:6%;background:var(--color-line)"></i>
+          <i style="width:2%;background:var(--color-accent)"></i>
+        </div>
+        <p class="caption" style="margin-top:8px">余下是细线和次表面（约 6%），朱砂只占 2% 左右。</p>
+      </div>
+    </div>
+    <div class="rules">
+      <div class="yi"><p><b>一屏的朱砂不超过三处。</b>栏目名、首字和一个订阅按钮已经够了；链接用墨字加朱砂下划线，不整段变红。</p></div>
+      <div class="ji"><p><b>别用朱砂报错。</b>出错、删除用胭脂 <span class="mono">danger</span>，而且一定配图标和一句说明，读者才分得清「点这里」和「出问题了」。</p></div>
+    </div>
+  </section>
+
+  <section class="sec" id="type">
+    <div class="sec-head"><span class="sec-no">02</span><h2>字体</h2><p>宋体管读，黑体管用，楷体管「说话」。字号大约 1.25 倍一档，正文 17px、行高 1.9。</p></div>
+    <div class="grid-3">
+      <div class="font-card"><div class="glyph" style="font-family:var(--font-serif);font-weight:700">宋<small>--font-serif</small></div><p class="say" style="font-family:var(--font-serif)">标题、正文、引文摘句。标题用 700，正文用 400。</p><p>Songti SC / 思源宋体 / 华文宋体；拉丁字母先走 Charter、Georgia。</p></div>
+      <div class="font-card"><div class="glyph" style="font-family:var(--font-sans);font-weight:500">黑<small>--font-sans</small></div><p class="say" style="font-family:var(--font-sans)">按钮、导航、署名、时间、图注、评论。</p><p>系统 UI 字体，中文落到苹方 / 鸿蒙黑体 / MiSans / 微软雅黑。</p></div>
+      <div class="font-card"><div class="glyph" style="font-family:var(--font-kai)">楷<small>--font-kai</small></div><p class="say" style="font-family:var(--font-kai)">导语、题记、引文、划线摘录。</p><p>楷体 SC / 华文楷体 / 楷体。一屏一两段，别拿它排正文。</p></div>
+    </div>
+
+    <p class="sub" style="margin-top:48px">字号阶梯</p>
+    <div class="scale">
+      <div class="scale-row"><code>--text-6xl</code><span class="px">64</span><span class="smp" style="font:700 64px/1.15 var(--font-serif)">白纸黑字</span></div>
+      <div class="scale-row"><code>--text-5xl · .display</code><span class="px">48</span><span class="smp" style="font:700 48px/1.2 var(--font-serif)">一点朱红，落在要紧处</span></div>
+      <div class="scale-row"><code>--text-4xl · .headline</code><span class="px">38</span><span class="smp" style="font:700 38px/1.3 var(--font-serif)">夜班公交上的四十七站</span></div>
+      <div class="scale-row"><code>--text-3xl · .h1</code><span class="px">30</span><span class="smp" style="font:700 30px/1.3 var(--font-serif)">末班车上的人</span></div>
+      <div class="scale-row"><code>--text-2xl · .h2</code><span class="px">24</span><span class="smp" style="font:700 24px/1.35 var(--font-serif)">江边的最后一段路</span></div>
+      <div class="scale-row"><code>--text-xl · .dek .h3</code><span class="px">20</span><span class="smp" style="font:400 20px/1.6 var(--font-kai)">全城最后一班车，从晚上十点四十开到凌晨两点。</span></div>
+      <div class="scale-row"><code>--text-lg · .prose</code><span class="px">17</span><span class="smp" style="font:400 17px/1.9 var(--font-serif);letter-spacing:.02em">晚上十点四十分，夜 47 路从城北总站发车，这是全城最后一班车。</span></div>
+      <div class="scale-row"><code>--text-md · .body .btn</code><span class="px">15</span><span class="smp" style="font:400 15px/1.6 var(--font-sans)">订阅 · 收藏 · 分享 · 写评论 · 阅读设置</span></div>
+      <div class="scale-row"><code>--text-sm · .meta</code><span class="px">13</span><span class="smp" style="font:400 13px/1.5 var(--font-sans);color:var(--color-muted)">2026 年 11 月 6 日 · 约 12 分钟 · 1.4 万次阅读</span></div>
+      <div class="scale-row"><code>--text-xs · .overline</code><span class="px">12</span><span class="smp" style="font:600 12px/1.4 var(--font-sans);letter-spacing:.12em;color:var(--color-muted)">本期目录 · 编辑推荐 · 最多阅读</span></div>
+    </div>
+
+    <div class="grid-2" style="margin-top:48px">
+      <div class="demo lh-demo" style="--lh:1.5"><p class="lab"><b>行高 1.5</b> · 西文习惯，中文挤成一片</p><p>坐在第三排靠窗的，是在医院做夜班护工的周阿姨；她每周有五个晚上搭这班车，从不迟到。中途在纺织厂站上车的几个年轻人，刚下了晚班，总是一上车就睡着。</p></div>
+      <div class="demo lh-demo" style="--lh:1.9"><p class="lab"><b>行高 1.9</b> · 墨刻的正文，字和行之间都透气</p><p>坐在第三排靠窗的，是在医院做夜班护工的周阿姨；她每周有五个晚上搭这班车，从不迟到。中途在纺织厂站上车的几个年轻人，刚下了晚班，总是一上车就睡着。</p></div>
+    </div>
+    <div class="details">
+      <div class="detail"><p class="smp">他们<em class="em-dot">总是</em>一上车就睡着。</p><p>中文不用斜体。强调用着重号 <span class="mono">em</span>，或者加粗，别两样一起上。</p></div>
+      <div class="detail"><p class="smp">他说：「再坐一站。」</p><p>引号用直角「」，书名用《》；不用弯引号 <span class="bad">“ ”</span>。</p></div>
+      <div class="detail"><p class="smp">夜 47 路，Night Bus</p><p>中文和数字、西文之间加一个空格；数字用等宽 <span class="mono">.num</span>。</p></div>
+      <div class="detail"><p class="smp" style="text-align:justify">正文两端对齐，标点不出头也不落单。</p><p>正文 <span class="mono">text-align: justify</span>；标题和图注左对齐，不对齐两端。</p></div>
+    </div>
+  </section>
+
+  <section class="sec" id="layout">
+    <div class="sec-head"><span class="sec-no">03</span><h2>版式</h2><p>4px 起步的间距，36 字的版心，粗细两种线分栏。几乎没有圆角，平时也没有阴影，层次靠线和留白。</p></div>
+    <div class="grid-2">
+      <div>
+        <p class="sub">间距</p>
+        <div class="spaces">
+          <div class="space"><code>--space-1</code><span>4</span><i style="width:4px"></i></div>
+          <div class="space"><code>--space-2</code><span>8</span><i style="width:8px"></i></div>
+          <div class="space"><code>--space-3</code><span>12</span><i style="width:12px"></i></div>
+          <div class="space"><code>--space-4</code><span>16</span><i style="width:16px"></i></div>
+          <div class="space"><code>--space-5</code><span>24</span><i style="width:24px"></i></div>
+          <div class="space"><code>--space-6</code><span>32</span><i style="width:32px"></i></div>
+          <div class="space"><code>--space-7</code><span>48</span><i style="width:48px"></i></div>
+          <div class="space"><code>--space-8</code><span>64</span><i style="width:64px"></i></div>
+          <div class="space"><code>--space-9</code><span>96</span><i style="width:96px"></i></div>
+        </div>
+        <p class="caption" style="margin-top:14px">组内 8–12，组间 24，栏目之间 64–96。阅读页宁可空，也别挤。</p>
+        <p class="sub" style="margin-top:32px">阴影 · 只给浮起来的</p>
+        <div class="shadows">
+          <div style="border:1px solid var(--color-line)">无阴影<br>卡片、文章、表格</div>
+          <div style="box-shadow:var(--shadow-md)"><span><span class="mono">--shadow-md</span><br>菜单、阅读设置</span></div>
+          <div style="box-shadow:var(--shadow-lg)"><span><span class="mono">--shadow-lg</span><br>弹窗、轻提示</span></div>
+        </div>
+      </div>
+      <div>
+        <p class="sub">线</p>
+        <div class="rules-demo">
+          <div><span><span class="mono">.rule</span> 1px 细线<br>行与行之间</span><hr class="rule"></div>
+          <div><span><span class="mono">--rule-mid</span> 2px<br>表头、目录头</span><hr class="rule-thick" style="border-top-width:2px"></div>
+          <div><span><span class="mono">.rule-thick</span> 3px<br>开一个栏目</span><hr class="rule-thick"></div>
+          <div><span><span class="mono">.rule-double</span><br>报头、页脚</span><hr class="rule-double"></div>
+        </div>
+        <p class="sub" style="margin-top:32px">圆角</p>
+        <div class="radii">
+          <div><i style="border-radius:0"></i>0<br>卡片、按语</div>
+          <div><i style="border-radius:var(--radius-sm)"></i>2<br>按钮、输入框</div>
+          <div><i style="border-radius:var(--radius-md)"></i>3<br>分段、轻提示</div>
+          <div><i style="border-radius:var(--radius-lg)"></i>4<br>面板、弹窗</div>
+          <div><i style="border-radius:var(--radius-full)"></i>全圆<br>头像、开关</div>
+        </div>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:44px">版心 · 一行 36 字以内</p>
+    <div class="demo measure-row">
+      <div class="measure-demo"><span class="ruler"><span>--measure 36em ≈ 612px</span></span><p class="prose">中文一行 30 到 38 个字最好读。再长，眼睛换行时容易找错下一行；再短，句子总被拦腰截断，读起来一顿一顿的。所以正文一律用 --measure 管住宽度，屏幕再宽也只是两边留白变多，标题和图片可以放宽，正文不放。</p></div>
+      <ul class="measure-notes">
+        <li><b>正文</b>36em，约 35 个字</li>
+        <li><b>宽版</b><span class="mono">--measure-wide</span> 46em，给标题区、图和表</li>
+        <li><b>手机</b>左右各留 20–24px，不再限宽</li>
+      </ul>
+    </div>
+    <p class="sub" style="margin-top:44px">文章页的十二栏</p>
+    <div class="colgrid" aria-hidden="true">
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      <div class="zones">
+        <div class="zone" style="grid-column:1 / span 2"><b>目录</b>2 栏，跟着滚动<div class="bars"><i style="width:80%"></i><i style="width:60%"></i><i style="width:70%"></i></div></div>
+        <div class="zone" style="grid-column:3 / span 7"><b>正文</b>7 栏 ≈ 36 字；图可以放宽到 9 栏<div class="bars"><i></i><i></i><i style="width:92%"></i><i></i><i style="width:64%"></i></div></div>
+        <div class="zone" style="grid-column:10 / span 3"><b>边栏</b>3 栏：作者、相关文章、订阅<div class="bars"><i style="width:70%"></i><i></i><i style="width:50%"></i></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="header">
+    <div class="sec-head"><span class="sec-no">04</span><h2>文章头</h2><p>栏目 → 标题 → 导语 → 署名和日期，顺序不变。标题宋体粗，导语楷体，署名和时间用黑体小字。</p></div>
+    <div class="grid-75">
+      <div>
+        <p class="sub">标准 · <span class="mono">.article-header</span></p>
+        <header class="article-header">
+          <p class="kicker">人物<span class="sep"></span>长篇</p>
+          <h3 class="headline">一个钟表匠的四十年：他修好的每一块表，都记在一本蓝皮账上</h3>
+          <p class="dek">老街拐角的那间铺子只有四平米。四十年里，沈师傅修过一万两千多块表，最贵的和最便宜的，他都用同一把镊子。</p>
+          <div class="article-header-foot">
+            <div class="byline"><span class="avatar avatar-lg">周</span><span class="byline-names"><span><span class="byline-role">文</span><b>周知秋</b></span><span><span class="byline-role">编辑</span><b>许一苇</b></span></span></div>
+            <div class="dateline"><span>2026 年 11 月 4 日 08:30</span><span class="sep"></span><span>约 18 分钟</span><span class="sep"></span><span>2.3 万次阅读</span></div>
+            <div class="tools"><button class="btn btn-secondary btn-sm"><svg><use href="#i-listen"/></svg>听全文 21:40</button><button class="btn btn-ghost btn-icon btn-sm" aria-label="收藏"><svg><use href="#i-bookmark"/></svg></button><button class="btn btn-ghost btn-icon btn-sm" aria-label="分享"><svg><use href="#i-share"/></svg></button></div>
+          </div>
+        </header>
+        <div class="rules" style="grid-template-columns:1fr;gap:12px;margin-top:32px">
+          <div class="yi"><p><b>标题最多两行，导语最多三行。</b>标题说事实，导语说为什么值得读；不在标题里用感叹号和「震惊」。</p></div>
+          <div class="ji"><p><b>别把署名、时间和标签挤进标题区。</b>标题和导语之间只放空白；元信息统一放到细线下面那一行。</p></div>
+        </div>
+      </div>
+      <div>
+        <p class="sub">专题封面 · <span class="mono">.article-header.is-center</span></p>
+        <div class="demo ah-b">
+          <header class="article-header is-center">
+            <span class="seal seal-lg">编辑<br>推荐</span>
+            <p class="kicker kicker-ink">专题 · 城市夜行 · 第三篇</p>
+            <h3 class="headline" style="font-size:34px">江边的四十七个夜晚</h3>
+            <blockquote class="epigraph" style="padding-left:0;text-align:center">灯一盏一盏地灭了，<br>车还在往前开。<cite>—— 写在夜 47 路的终点站</cite></blockquote>
+            <div class="article-header-foot"><div class="dateline"><span>文 / 林晚舟</span><span class="sep"></span><span>插画 / 陈砚</span><span class="sep"></span><span>共 5 篇</span></div></div>
+          </header>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="prose">
+    <div class="sec-head"><span class="sec-no">05</span><h2>正文</h2><p>给内容区套 <span class="mono">.prose</span>，里面直接写 p、h2、blockquote、figure、ol……不用逐个加类。右边是每一处的写法。</p></div>
+    <article class="prose annot">
+      <p class="dropcap">晚上十点四十分，夜 47 路从城北总站发车。这是全城最后一班车，也是唯一一条要开到凌晨两点的线路。司机老何开了九年，他说这条线上的乘客，他闭着眼睛都能认出一半。</p>
+      <p class="an an-0"><code>p.dropcap</code>首字下沉两行，朱砂、宋体粗。一篇只用一次，放第一段。</p>
+      <h2>末班车上的人</h2>
+      <p class="an an-22"><code>h2 · h3</code>小标题 1.4em / 1.15em，上方空 2.2em，左对齐。</p>
+      <p>坐在第三排靠窗的，是在医院做夜班护工的周阿姨；她每周有五个晚上搭这班车，从不迟到。中途在纺织厂站上车的几个年轻人，刚下了晚班，<em>总是</em>一上车就睡着<sup class="footnote-ref"><a href="#fn1">[1]</a></sup>。</p>
+      <p class="an"><code>em · sup.footnote-ref</code>着重号代替斜体；脚注号朱砂小字，点了跳到文末。</p>
+      <blockquote class="pullquote"><p>「这条线上的人，白天你都见不到。他们是这座城市的另一半。」</p><cite>—— 夜 47 路司机　老何</cite></blockquote>
+      <p class="an an-pq"><code>blockquote.pullquote</code>摘句：大一号宋体粗，上面一截朱砂短线。一篇最多两处。</p>
+      <p>我们跟着这班车跑了整整一个星期，记下了四十七个站名，也记下了<mark>每一盏在车窗外慢慢熄灭的灯</mark>。完整的发车记录见<a href="#data">文末附表</a>。</p>
+      <p class="an"><code>mark · a</code>划线高亮是一道半高的黄；链接是墨字加朱砂下划线，悬停变朱。</p>
+      <figure class="figure">
+        <svg viewBox="0 0 612 300" role="img" aria-label="插画：夜里的公交车驶过江边">
+          <rect class="f1" width="612" height="300"/>
+          <circle class="fa" cx="468" cy="92" r="34"/>
+          <path class="f2" d="M0 176 70 132l52 24 84-62 90 64 58-30 96 52 72-38 90 46v112H0z"/>
+          <path class="f3" d="M0 214 92 178l70 22 96-44 104 52 80-26 94 30 76-18v106H0z"/>
+          <rect class="f4" y="236" width="612" height="64"/>
+          <path d="M0 248h612" style="stroke:var(--ink-3)" stroke-width="1"/>
+          <g transform="translate(206 206)"><rect class="f5" width="128" height="40" rx="3"/><rect class="fh" x="10" y="8" width="18" height="14"/><rect class="fh" x="34" y="8" width="18" height="14"/><rect class="fh" x="58" y="8" width="18" height="14"/><rect class="f3" x="82" y="8" width="18" height="14"/><rect class="fh" x="106" y="8" width="14" height="22"/><circle class="f2" cx="26" cy="42" r="7"/><circle class="f2" cx="104" cy="42" r="7"/></g>
+          <path d="M346 232h70M372 240h90M120 240h60" style="stroke:var(--color-highlight)" stroke-width="1.5" opacity=".7"/>
+        </svg>
+        <figcaption class="figure-caption"><span><b>图 1</b>凌晨一点，夜 47 路驶过江边的最后一段路。</span><span class="credit">插画 / 陈砚</span></figcaption>
+      </figure>
+      <p class="an an-2"><code>figure.figure · .figure-caption</code>图注黑体 13px：左边编号和说明，右边作者。图片底色是 <span class="mono">--ink-1</span>。</p>
+      <h3>一张时刻表</h3>
+      <p class="an an-h3"><code>h3</code>三级小标题，正文里的「小节」。</p>
+      <ol>
+        <li>22:40，城北总站发车，车上只有两位乘客。</li>
+        <li>23:55，经过纺织厂，一下子上来十一个人。</li>
+        <li>01:20，到江边终点站，老何下车抽一支烟。</li>
+      </ol>
+      <p class="an"><code>ol · ul</code>编号淡墨，缩进 1.6em，条目之间留 0.35em。</p>
+      <aside class="aside"><span class="aside-title">编者按</span><p>这是「城市夜行」系列的第三篇。我们想记下那些在大多数人睡着以后，仍在运转的东西：夜班车、早点铺、通宵亮着的药店。</p></aside>
+      <p class="an"><code>aside.aside · .aside-title</code>按语、延伸阅读：次表面底、顶上一道粗墨线，黑体。</p>
+      <hr>
+      <p class="an an-2"><code>hr</code>换场用三个小菱形，不用整条横线。</p>
+      <p>凌晨两点零五分，老何把车停回总站，熄火，关灯。车厢里很安静，只剩下仪表盘上的一点红光。<span class="endmark" aria-hidden="true"></span></p>
+      <p class="an"><code>span.endmark</code>文末一个朱砂小方块，告诉读者「读完了」。</p>
+      <section class="footnotes" id="fn1"><ol><li>纺织厂站在 2026 年 9 月改名为「新桥东」，老乘客仍然这么叫它。</li><li>文中乘客均为化名，照片和插画已得到本人同意。</li></ol></section>
+      <p class="an an-3"><code>section.footnotes</code>脚注黑体 13px，编号朱砂，和正文隔一道细线。</p>
+    </article>
+
+    <div class="grid-2" style="margin-top:56px" id="data">
+      <div>
+        <p class="sub">数据表 · <span class="mono">.table</span></p>
+        <table class="table">
+          <caption>夜 47 路 · 一周记录</caption>
+          <thead><tr><th>日期</th><th class="num">发车</th><th class="num">到终点</th><th class="num">乘客</th><th class="num">最远一站</th></tr></thead>
+          <tbody>
+            <tr><td>11 月 2 日 周一</td><td class="num">22:40</td><td class="num">01:18</td><td class="num">37</td><td class="num">第 47 站</td></tr>
+            <tr><td>11 月 3 日 周二</td><td class="num">22:40</td><td class="num">01:22</td><td class="num">41</td><td class="num">第 47 站</td></tr>
+            <tr class="is-marked"><td>11 月 4 日 周三</td><td class="num">22:41</td><td class="num">01:35</td><td class="num">58</td><td class="num">第 47 站</td></tr>
+            <tr><td>11 月 5 日 周四</td><td class="num">22:40</td><td class="num">01:19</td><td class="num">33</td><td class="num">第 45 站</td></tr>
+            <tr><td>11 月 6 日 周五</td><td class="num">22:40</td><td class="num">01:27</td><td class="num">46</td><td class="num">第 47 站</td></tr>
+          </tbody>
+        </table>
+        <p class="table-note">数据：本刊记者随车记录。周三晚上江边有夜市，乘客最多（标出的那行）。</p>
+      </div>
+      <div>
+        <p class="sub">代码 · 给技术博客 · <span class="mono">pre</span></p>
+        <div class="prose" style="max-width:none">
+          <p>把整页切到夜读，只要在 <code>html</code> 上加一个属性；读者调字号时，也只改一个变量：</p>
+<pre><code><span class="c">/* 夜读主题 */</span>
+&lt;html data-theme="dark"&gt;
+
+<span class="c">/* 读者选了大字号 */</span>
+<span class="k">.prose</span> { --text-reading: 19px; }</code></pre>
+          <p>行内代码用 <code>.code</code>，等宽、浅底、小一号。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="reading">
+    <div class="sec-head"><span class="sec-no">06</span><h2>阅读</h2><p>长文和连载离不开的几样：目录、章节、阅读进度、划词工具条、阅读设置。进度一律朱砂。</p></div>
+    <div class="read-grid">
+      <div class="stack" style="gap:40px">
+        <nav class="toc" aria-label="文章目录">
+          <p class="toc-title">目录 · <span class="mono">.toc</span></p>
+          <ol>
+            <li><a class="is-read" href="#reading">发车</a></li>
+            <li><a href="#reading" aria-current="true">末班车上的人</a>
+              <ol><li><a href="#reading">第三排靠窗</a></li><li><a href="#reading">纺织厂站</a></li></ol>
+            </li>
+            <li><a href="#reading">江边的最后一段</a></li>
+            <li><a href="#reading">一张时刻表</a></li>
+            <li><a href="#reading">回到总站</a></li>
+          </ol>
+        </nav>
+        <div class="prog-demo">
+          <p class="lab">阅读进度 · <code>.reading-progress</code></p>
+          <div class="reading-progress" style="--progress:12%"><i></i></div>
+          <div class="reading-progress" style="--progress:42%"><i></i></div>
+          <div class="reading-progress" style="--progress:100%"><i></i></div>
+          <span class="progress-chip" style="margin-top:6px"><span class="progress-ring" style="--p:42"></span>已读 42% · 还剩 7 分钟</span>
+          <span class="progress-chip"><span class="progress-ring" style="--p:100"></span>读完了</span>
+        </div>
+      </div>
+
+      <div>
+        <p class="lab">连载章节 · <code>.chapter-list</code></p>
+        <div class="row" style="justify-content:space-between;padding-bottom:12px;border-bottom:var(--rule-mid) solid var(--color-rule)">
+          <div><h3 class="h3">江边的四十七个夜晚</h3><p class="meta" style="margin-top:2px">林晚舟 著<span class="sep"></span>连载中 · 8 章<span class="sep"></span>每周五更新</p></div>
+          <a class="btn btn-sm" href="#reading">继续读第 3 章</a>
+        </div>
+        <ol class="chapter-list">
+          <li><span class="ch-no">第一章</span><span><a class="ch-title" href="#reading">发车</a><span class="ch-sub">10 月 9 日 · 6,200 字</span></span><span class="ch-side">已读</span></li>
+          <li><span class="ch-no">第二章</span><span><a class="ch-title" href="#reading">纺织厂站的年轻人</a><span class="ch-sub">10 月 16 日 · 5,800 字</span></span><span class="ch-side">已读</span></li>
+          <li class="is-current"><span class="ch-no">第三章</span><span><a class="ch-title" href="#reading">末班车上的人</a><span class="ch-sub">10 月 23 日 · 7,100 字</span></span><span class="ch-side"><span class="progress-ring" style="--p:42"></span>42%</span></li>
+          <li><span class="ch-no">第四章</span><span><a class="ch-title" href="#reading">江边的最后一段</a><span class="ch-sub">10 月 30 日 · 6,400 字</span></span><span class="ch-side">未读</span></li>
+          <li><span class="ch-no">第五章</span><span><a class="ch-title" href="#reading">一张时刻表</a><span class="ch-sub">11 月 6 日 · 5,900 字</span></span><span class="tag tag-accent tag-sm">新</span></li>
+          <li class="is-locked"><span class="ch-no">第六章</span><span><span class="ch-title">回到总站</span><span class="ch-sub">11 月 13 日更新</span></span><span class="ch-side"><svg width="14" height="14"><use href="#i-lock"/></svg>订阅后可读</span></li>
+        </ol>
+      </div>
+
+      <div class="stack" style="gap:28px">
+        <div>
+          <p class="lab">划词工具条 · <code>.select-bar</code></p>
+          <div class="sel-demo">
+            <div class="select-bar" role="toolbar" aria-label="选中文字">
+              <button class="is-accent"><svg><use href="#i-pen"/></svg>划线</button>
+              <button><svg><use href="#i-note"/></svg>写想法</button>
+              <button><svg><use href="#i-copy"/></svg>复制</button>
+              <button><svg><use href="#i-share"/></svg>分享</button>
+            </div>
+            <p>我们跟着这班车跑了整整一个星期，记下了四十七个站名，也记下了<mark class="highlight">每一盏在车窗外慢慢熄灭的灯</mark>。</p>
+          </div>
+        </div>
+        <div>
+          <p class="lab">阅读设置 · <code>.reader-panel</code></p>
+          <div class="reader-panel">
+            <div class="reader-row"><span class="label">字号</span><div class="font-steps"><button class="btn btn-ghost btn-sm btn-icon" aria-label="小一号" style="font-size:13px">A</button><span class="step is-on"></span><span class="step is-on"></span><span class="step"></span><span class="step"></span><button class="btn btn-ghost btn-sm btn-icon" aria-label="大一号" style="font-size:19px">A</button></div></div>
+            <div class="reader-row"><span class="label">行距</span><div class="segmented" role="tablist"><button class="tab" role="tab">紧凑</button><button class="tab" role="tab" aria-selected="true">标准</button><button class="tab" role="tab">宽松</button></div></div>
+            <div class="reader-row"><span class="label">字体</span><div class="segmented" role="tablist"><button class="tab" role="tab" aria-selected="true" style="font-family:var(--font-serif)">宋体</button><button class="tab" role="tab">黑体</button></div></div>
+            <div class="reader-row"><span class="label">主题</span><div class="theme-swatches"><button class="theme-swatch" data-theme="light" aria-pressed="true" aria-label="纸">纸</button><button class="theme-swatch" data-theme="sepia" aria-label="米黄">米</button><button class="theme-swatch" data-theme="dark" aria-label="夜读">夜</button></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="lists">
+    <div class="sec-head"><span class="sec-no">07</span><h2>列表与标签</h2><p>首页、栏目页、搜索结果都是文章列表。标题宋体粗，导语黑体淡墨两行，缩略图 4:3、方角，排行用大号数字。</p></div>
+    <div class="grid-84">
+      <div>
+        <div class="section-head"><h3>城市</h3><a href="#lists">更多城市 →</a></div>
+        <div class="front">
+          <article class="story story-lead">
+            <a class="story-thumb" href="#lists" aria-label="夜班公交上的四十七站">
+              <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice"><rect class="f4" width="320" height="180"/><circle class="fh" cx="250" cy="44" r="16" opacity=".9"/><rect class="f5" y="128" width="320" height="52"/><rect class="f3" x="40" y="40" width="4" height="96"/><path class="fh" d="M30 40h24l-4 8H34z"/><path class="fh" d="M42 48 20 128h44z" opacity=".18"/><g transform="translate(96 92)"><rect class="f2" width="168" height="48" rx="4"/><rect class="fh" x="12" y="10" width="22" height="18"/><rect class="fh" x="40" y="10" width="22" height="18"/><rect class="f4" x="68" y="10" width="22" height="18"/><rect class="fh" x="96" y="10" width="22" height="18"/><rect class="fh" x="140" y="10" width="16" height="30"/><circle class="f5" cx="34" cy="50" r="8"/><circle class="f5" cx="134" cy="50" r="8"/></g></svg>
+            </a>
+            <div class="story-body">
+              <p class="kicker">城市<span class="sep"></span>特稿</p>
+              <h3 class="story-title"><a href="#lists">夜班公交上的四十七站</a></h3>
+              <p class="story-dek">全城最后一班车，从晚上十点四十开到凌晨两点。我们跟着它跑了一个星期，记下了四十七个站名，和车窗外一盏一盏熄灭的灯。</p>
+              <p class="meta"><b>林晚舟</b><span class="sep"></span>11 月 6 日<span class="sep"></span>约 12 分钟</p>
+            </div>
+          </article>
+          <article class="story">
+            <div class="story-body"><p class="kicker">城市</p><h3 class="story-title"><a href="#lists">旧书摊还剩最后七家</a></h3><p class="meta">何小满<span class="sep"></span>11 月 5 日</p></div>
+            <span class="story-thumb" style="width:112px"><svg viewBox="0 0 160 120" preserveAspectRatio="xMidYMid slice"><rect class="f1" width="160" height="120"/><rect class="f4" x="20" y="34" width="14" height="62"/><rect class="f3" x="36" y="44" width="12" height="52"/><rect class="fa" x="50" y="28" width="10" height="68"/><rect class="f2" x="62" y="40" width="16" height="56"/><rect class="f5" x="80" y="36" width="12" height="60"/><rect class="f3" x="94" y="50" width="14" height="46" transform="rotate(-12 101 96)"/><rect class="f4" x="14" y="96" width="132" height="6"/></svg></span>
+          </article>
+          <article class="story">
+            <div class="story-body"><p class="kicker">食物</p><h3 class="story-title"><a href="#lists">柿子红了的第三周</a></h3><p class="meta">沈眠<span class="sep"></span>11 月 4 日</p></div>
+            <span class="story-thumb" style="width:112px"><svg viewBox="0 0 160 120" preserveAspectRatio="xMidYMid slice"><rect class="f1" width="160" height="120"/><path class="s4" d="M10 30c40 6 80 2 140 14M60 33l10 22M110 40l-4 26"/><circle class="fa" cx="70" cy="70" r="16"/><circle class="f3" cx="106" cy="80" r="14"/><circle class="f2" cx="40" cy="88" r="11"/><path class="f4" d="M64 54h12l-6 4zM100 66h12l-6 4z"/></svg></span>
+          </article>
+          <article class="story story-compact" style="border-bottom:0">
+            <div class="story-body"><p class="kicker kicker-ink">书评</p><h3 class="story-title"><a href="#lists">一本关于等待的小说，读了三个冬天</a></h3><p class="story-dek">它的故事几乎没有情节，可每次读到最后一章，窗外都正好在下雪。</p></div>
+          </article>
+          <article class="story story-compact" style="border-bottom:0">
+            <div class="story-body"><p class="kicker kicker-ink">人物</p><h3 class="story-title"><a href="#lists">在山里种了十年茶以后</a></h3><p class="story-dek">她把城里的房子租了出去，换来一片朝东的坡地和每年四月的二十天。</p></div>
+          </article>
+        </div>
+      </div>
+      <div class="side-col">
+        <div>
+          <div class="section-head"><h3>最多阅读</h3><a href="#lists">本周</a></div>
+          <ol class="rank-list">
+            <li><div><a href="#lists">夜班公交上的四十七站</a><p class="meta">1.4 万次阅读</p></div></li>
+            <li><div><a href="#lists">一个钟表匠的四十年</a><p class="meta">9,860 次阅读</p></div></li>
+            <li><div><a href="#lists">菜市场里的一本账</a><p class="meta">7,215 次阅读</p></div></li>
+            <li><div><a href="#lists">秋天，去河边看芦苇</a><p class="meta">5,402 次阅读</p></div></li>
+            <li><div><a href="#lists">写给十年后的自己的一封信</a><p class="meta">4,977 次阅读</p></div></li>
+          </ol>
+        </div>
+        <div>
+          <div class="section-head"><h3>话题</h3></div>
+          <div class="topics"><a class="topic" href="#lists">城市夜行</a><a class="topic" href="#lists">手艺人</a><a class="topic" href="#lists">时令</a><a class="topic" href="#lists">慢慢读</a><a class="topic" href="#lists">旧物</a><a class="topic" href="#lists">一人食</a></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="sub" style="margin-top:56px">标签、角标、状态点</p>
+    <div class="grid-3">
+      <div class="demo"><p class="lab">栏目、属性 · <code>.tag</code></p><div class="row"><span class="tag">城市</span><span class="tag tag-accent">独家</span><span class="tag tag-solid">付费</span><span class="tag tag-soft">图集</span><span class="tag tag-sm">音频</span></div></div>
+      <div class="demo"><p class="lab">稿件状态 · <code>.tag-success</code> 等</p><div class="row"><span class="tag tag-success">已发布</span><span class="tag tag-warning">草稿</span><span class="tag tag-info">待审</span><span class="tag tag-danger">已撤稿</span></div></div>
+      <div class="demo"><p class="lab">计数和状态 · <code>.badge .dot</code></p><div class="row" style="gap:20px"><span class="row" style="gap:6px">消息<span class="badge">3</span></span><span class="row" style="gap:6px">评论<span class="badge badge-muted">128</span></span><span class="row" style="gap:6px"><span class="dot dot-accent"></span>直播中</span><span class="row" style="gap:6px"><span class="dot dot-success"></span>已同步</span></div></div>
+    </div>
+  </section>
+
+  <section class="sec" id="people">
+    <div class="sec-head"><span class="sec-no">08</span><h2>作者与评论</h2><p>作者卡放文末和作者页；评论用黑体、比正文小一号，和文章本身分开。划线评论引用读者划过的那一句。</p></div>
+    <div class="grid-57">
+      <div class="stack" style="gap:32px">
+        <div>
+          <p class="lab">作者卡 · <code>.author-card</code></p>
+          <div class="author-card">
+            <span class="avatar avatar-xl">林</span>
+            <div class="author-head"><div><p class="author-name">林晚舟</p><p class="author-role">本刊特约记者 · 写城市和夜晚</p></div><button class="btn btn-secondary btn-sm">关注</button></div>
+            <p class="author-bio">做过五年夜班编辑，后来开始写那些在夜里仍在运转的东西。最近在写一部关于公交车的连载。</p>
+            <div class="author-stats"><span><b>86</b>篇文章</span><span><b>1.2 万</b>位关注</span><span><b>3</b>个专题</span></div>
+          </div>
+        </div>
+        <div>
+          <p class="lab">盒子版 · <code>.author-card.is-box</code></p>
+          <div class="author-card is-box">
+            <span class="avatar avatar-lg avatar-ink">周</span>
+            <div class="author-head"><div><p class="author-name">周知秋</p><p class="author-role">人物版主笔</p></div><button class="btn btn-sm"><svg><use href="#i-user"/></svg>已关注</button></div>
+            <p class="author-bio">相信每个手艺人都值得一篇长文。</p>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <p class="lab">评论区 · <code>.comment</code></p>
+        <div class="thread-head"><h3 class="h3">评论<b>128</b></h3><div class="segmented" role="tablist"><button class="tab" role="tab" aria-selected="true">最热</button><button class="tab" role="tab">最新</button><button class="tab" role="tab">划线</button></div></div>
+        <div class="composer">
+          <span class="avatar avatar-accent">我</span>
+          <div><textarea class="textarea" style="min-height:72px" placeholder="写下你的想法，友善一点。" aria-label="写评论"></textarea><div class="composer-foot"><span class="hint">评论经作者筛选后公开</span><button class="btn btn-sm">发表</button></div></div>
+        </div>
+        <div class="comment">
+          <span class="avatar">澄</span>
+          <div class="comment-main">
+            <div class="comment-head"><span class="comment-name">阿澄</span><span class="comment-time">昨天 23:48</span></div>
+            <p class="comment-quote">每一盏在车窗外慢慢熄灭的灯</p>
+            <p class="comment-body">我也坐过很多年的夜班车。读到这一句的时候正好在车上，窗外的灯真的在一盏一盏地灭。</p>
+            <div class="comment-actions"><button class="comment-action is-active" aria-pressed="true"><svg><use href="#i-like"/></svg>236</button><button class="comment-action"><svg><use href="#i-reply"/></svg>回复</button><button class="comment-action" aria-label="更多"><svg><use href="#i-more"/></svg></button></div>
+            <div class="comment-replies">
+              <div class="comment">
+                <span class="avatar avatar-sm avatar-ink">林</span>
+                <div class="comment-main">
+                  <div class="comment-head"><span class="comment-name">林晚舟</span><span class="tag tag-solid tag-sm">作者</span><span class="comment-time">今天 08:12</span></div>
+                  <p class="comment-body">谢谢你在车上读完它。下一章写的就是终点站，周五见。</p>
+                  <div class="comment-actions"><button class="comment-action"><svg><use href="#i-like"/></svg>58</button><button class="comment-action"><svg><use href="#i-reply"/></svg>回复</button></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="comment">
+          <span class="avatar">周</span>
+          <div class="comment-main">
+            <div class="comment-head"><span class="comment-name">老周不熬夜</span><span class="comment-time">11 月 6 日</span></div>
+            <p class="comment-body">想知道纺织厂那几个年轻人后来怎么样了，能不能写一篇续？</p>
+            <div class="comment-actions"><button class="comment-action"><svg><use href="#i-like"/></svg>41</button><button class="comment-action"><svg><use href="#i-reply"/></svg>3 条回复</button></div>
+          </div>
+        </div>
+        <div class="more-comments"><a class="btn btn-link" href="#people">展开其余 126 条评论</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="newsletter">
+    <div class="sec-head"><span class="sec-no">09</span><h2>订阅</h2><p>订阅框是一屏里唯一的朱砂按钮。标题说清多久来一封、来了写什么；下面一行写人数和「随时可退」。</p></div>
+    <div class="grid-75">
+      <div class="newsletter">
+        <span class="seal seal-lg">慢信</span>
+        <h3 class="newsletter-title">每周五早上七点，一封慢信</h3>
+        <p class="newsletter-text">编辑部挑五篇值得慢慢读的文章，再附一段只写给订阅者的编后记。不推广告，不催你点开。</p>
+        <form class="newsletter-form"><input class="input input-lg" type="email" placeholder="hello@example.com" aria-label="邮箱"><button class="btn btn-accent btn-lg" type="button">订阅</button></form>
+        <p class="newsletter-note">已有 12,408 位读者订阅 · 随时可退订</p>
+      </div>
+      <div class="stack" style="gap:24px">
+        <div class="field"><label class="label" for="nl-bad">邮箱</label><input class="input" id="nl-bad" type="email" value="hello@example" aria-invalid="true"><p class="hint is-error">邮箱少了后缀，比如 hello@example.com</p></div>
+        <div class="notice notice-success"><svg><use href="#i-ok"/></svg><p class="notice-title">订好了，周五见</p><p class="notice-text">确认信已经发到 hello@example.com，点一下里面的链接就生效。</p></div>
+        <div class="notice"><svg><use href="#i-info"/></svg><p class="notice-title">你已经在收「周五慢信」</p><p class="notice-text">想换个邮箱或者退订，去「我的 · 订阅」。</p></div>
+      </div>
+    </div>
+    <div class="newsletter is-inline" style="margin-top:40px">
+      <h3 class="newsletter-title">喜欢这篇？每周五收一封慢信</h3>
+      <form class="newsletter-form"><div class="input-group" style="flex:1"><input class="input" type="email" placeholder="hello@example.com" aria-label="邮箱"><button class="btn" type="button">订阅</button></div></form>
+      <p class="newsletter-note">文末的一行版 · <span class="mono">.newsletter.is-inline</span>，按钮用墨，不和页面上方的朱砂按钮抢</p>
+    </div>
+  </section>
+
+  <section class="sec" id="buttons">
+    <div class="sec-head"><span class="sec-no">10</span><h2>按钮</h2><p>主按钮是墨底纸字，次按钮是一道墨线。朱砂按钮只给「订阅」「开始阅读」这类最想让人点的那一个。方角 2px，字距放宽一点。</p></div>
+    <div class="demo">
+      <div class="matrix">
+        <span></span><span class="h">默认</span><span class="h">悬停</span><span class="h">键盘焦点</span><span class="h">禁用</span>
+        <span class="h">墨 <span class="mono">.btn</span></span><span><button class="btn">开始阅读</button></span><span><button class="btn is-hover">开始阅读</button></span><span><button class="btn is-focus">开始阅读</button></span><span><button class="btn" disabled>开始阅读</button></span>
+        <span class="h">描边 <span class="mono">-secondary</span></span><span><button class="btn btn-secondary">加入书架</button></span><span><button class="btn btn-secondary is-hover">加入书架</button></span><span><button class="btn btn-secondary is-focus">加入书架</button></span><span><button class="btn btn-secondary" disabled>加入书架</button></span>
+        <span class="h">文字 <span class="mono">-ghost</span></span><span><button class="btn btn-ghost">稍后再读</button></span><span><button class="btn btn-ghost is-hover">稍后再读</button></span><span><button class="btn btn-ghost is-focus">稍后再读</button></span><span><button class="btn btn-ghost" disabled>稍后再读</button></span>
+        <span class="h">朱砂 <span class="mono">-accent</span></span><span><button class="btn btn-accent">订阅</button></span><span><button class="btn btn-accent is-hover">订阅</button></span><span><button class="btn btn-accent is-focus">订阅</button></span><span><button class="btn btn-accent" disabled>订阅</button></span>
+        <span class="h">危险 <span class="mono">-danger</span></span><span><button class="btn btn-danger">删除划线</button></span><span><button class="btn btn-danger is-hover">删除划线</button></span><span><button class="btn btn-danger is-focus">删除划线</button></span><span><button class="btn btn-danger" disabled>删除划线</button></span>
+        <span class="h">文字链 <span class="mono">-link</span></span><span><a class="btn btn-link" href="#buttons">阅读全文</a></span><span><a class="btn btn-link is-hover" href="#buttons">阅读全文</a></span><span><a class="btn btn-link is-focus" href="#buttons">阅读全文</a></span><span><a class="btn btn-link" aria-disabled="true">阅读全文</a></span>
+      </div>
+      <hr class="rule" style="margin:28px 0 24px">
+      <div class="row" style="gap:16px;justify-content:space-between">
+        <div class="row"><span class="h lab" style="margin:0 6px 0 0">尺寸</span><button class="btn btn-sm">小 32</button><button class="btn">中 40</button><button class="btn btn-lg">大 48</button></div>
+        <div class="row"><span class="h lab" style="margin:0 6px 0 0">带图标</span><button class="btn btn-secondary"><svg><use href="#i-listen"/></svg>听全文</button><button class="btn btn-secondary btn-icon" aria-label="收藏"><svg><use href="#i-bookmark"/></svg></button><button class="btn btn-ghost btn-icon" aria-label="分享"><svg><use href="#i-share"/></svg></button><button class="btn btn-ghost btn-icon" aria-label="阅读设置"><svg><use href="#i-aa"/></svg></button><button class="btn btn-danger btn-secondary btn-sm">退订</button><a class="btn btn-link" href="#buttons">下一篇<svg><use href="#i-arrow"/></svg></a></div>
+      </div>
+    </div>
+    <div class="rules">
+      <div class="yi"><p><b>一块区域一个实心按钮。</b>文章底部是「订阅」，书籍页是「开始阅读」；其余用描边或文字。按钮文案动词开头，说清结果。</p></div>
+      <div class="ji"><p><b>别做胶囊按钮，别加阴影。</b>按钮是方角的「铅字块」，不浮起来；全圆只留给头像和开关。</p></div>
+    </div>
+  </section>
+
+  <section class="sec" id="forms">
+    <div class="sec-head"><span class="sec-no">11</span><h2>表单</h2><p>控件 40 高、2px 方角、淡墨边；聚焦时整圈变成两道墨线。标签在上、说明在下，出错用胭脂一句话说怎么改。</p></div>
+    <div class="grid-75">
+      <div class="demo">
+        <p class="lab">投稿 · 读者来稿</p>
+        <div class="form-demo">
+          <div class="field"><label class="label" for="f-name">署名</label><input class="input" id="f-name" value="何小满"><p class="hint">发表时用这个名字，可以是笔名</p></div>
+          <div class="field"><label class="label" for="f-mail">邮箱</label><input class="input is-focus" id="f-mail" value="hello@example.com"><p class="hint">只用来通知你审稿结果</p></div>
+          <div class="field"><label class="label" for="f-col">投给哪个栏目</label><select class="select" id="f-col"><option>城市</option><option>人物</option><option>书评</option><option>食物</option></select></div>
+          <div class="field"><label class="label" for="f-title">标题<span class="opt">选填</span></label><input class="input" id="f-title" aria-invalid="true" value="菜市场里的一本账"><p class="hint is-error">和 10 月的一篇旧稿重名了，换个说法试试</p></div>
+          <div class="field full"><label class="label" for="f-body">正文</label><textarea class="textarea" id="f-body">每天早上六点，菜市场东门的王阿姨会翻开一本旧账本……</textarea><p class="hint">2,000 到 8,000 字；可以先存草稿</p></div>
+          <div class="field"><span class="label">署名方式</span><div class="opts"><label class="radio"><input type="radio" name="sig" checked>真名</label><label class="radio"><input type="radio" name="sig">笔名</label><label class="radio"><input type="radio" name="sig" disabled>匿名（这个栏目不收）</label></div></div>
+          <div class="field"><span class="label">附带</span><div class="opts"><label class="check"><input type="checkbox" checked>配图 3 张</label><label class="check"><input type="checkbox">录音</label></div></div>
+          <div class="full row" style="justify-content:space-between;padding-top:8px;border-top:1px solid var(--color-line)"><label class="check"><input type="checkbox" checked>我确认这是原创，并同意编辑部修改标题</label><div class="row"><button class="btn btn-ghost" type="button">存草稿</button><button class="btn" type="button">提交稿件</button></div></div>
+        </div>
+      </div>
+      <div class="stack" style="gap:32px">
+        <div>
+          <p class="lab">搜索 · <code>.input-line</code> 和 <code>.input-group</code></p>
+          <div class="stack" style="gap:20px">
+            <label class="input-wrap"><svg><use href="#i-search"/></svg><input class="input input-line input-lg" placeholder="搜文章、作者、话题" aria-label="搜索"></label>
+            <div class="input-group"><input class="input" value="夜班公交" aria-label="搜索"><button class="btn" type="button"><svg><use href="#i-search"/></svg>搜索</button></div>
+            <input class="input" disabled value="已锁定：稿件审核中" aria-label="已锁定">
+          </div>
+        </div>
+        <div class="settings">
+          <p class="lab">设置 · <code>.switch</code></p>
+          <ul class="list">
+            <li><span class="grow"><b>每日早报</b><span>每天 07:30 推送一封</span></span><label class="switch"><input type="checkbox" role="switch" checked aria-label="每日早报"></label></li>
+            <li><span class="grow"><b>晚上自动切到夜读</b><span>21:00 到 07:00</span></span><label class="switch"><input type="checkbox" role="switch" checked aria-label="自动夜读"></label></li>
+            <li><span class="grow"><b>只用 Wi-Fi 下载离线文章</b><span>已下载 6 篇 · 38 MB</span></span><label class="switch"><input type="checkbox" role="switch" aria-label="只用 Wi-Fi"></label></li>
+            <li><span class="grow"><b>朗读时显示字幕</b><span>需要先开启听全文</span></span><label class="switch"><input type="checkbox" role="switch" disabled aria-label="朗读字幕"></label></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="navs">
+    <div class="sec-head"><span class="sec-no">12</span><h2>导航</h2><p>网页用报头 <span class="mono">.masthead</span>（本页顶上就是）和栏目头；App 用顶栏和底部标签栏。翻页有页码，也有「上一篇 / 下一篇」。</p></div>
+    <div class="grid-57" style="grid-template-columns:minmax(0,1fr) 375px;gap:64px">
+      <div class="stack" style="gap:32px">
+        <div><p class="lab">标签页 · <code>.tabs</code></p><div class="tabs" role="tablist"><button class="tab" role="tab" aria-selected="true">全部</button><button class="tab" role="tab">城市</button><button class="tab" role="tab">人物</button><button class="tab" role="tab">书评<span class="badge">2</span></button><button class="tab" role="tab">食物</button></div></div>
+        <div><p class="lab">分段 · <code>.segmented</code></p><div class="row"><div class="segmented" role="tablist"><button class="tab" role="tab" aria-selected="true">本周</button><button class="tab" role="tab">本月</button><button class="tab" role="tab">今年</button></div><div class="segmented" role="tablist"><button class="tab" role="tab">列表</button><button class="tab" role="tab" aria-selected="true">卡片</button></div></div></div>
+        <div><p class="lab">面包屑 · <code>.breadcrumb</code></p><nav class="breadcrumb" aria-label="位置"><a href="#navs">首页</a><span class="sep">/</span><a href="#navs">城市</a><span class="sep">/</span><a href="#navs">城市夜行</a><span class="sep">/</span><span aria-current="page">夜班公交上的四十七站</span></nav></div>
+        <div><p class="lab">分页 · <code>.pagination</code></p><nav class="pagination" aria-label="分页"><a href="#navs"><svg><use href="#i-left"/></svg>上一页</a><a href="#navs">1</a><span aria-current="page">2</span><a href="#navs">3</a><a href="#navs">4</a><span class="is-gap">…</span><a href="#navs">18</a><a href="#navs">下一页<svg><use href="#i-right"/></svg></a></nav></div>
+        <div><p class="lab">上一篇 / 下一篇 · <code>.pager</code></p><nav class="pager" aria-label="相邻文章"><a href="#navs"><span class="pager-label">← 上一篇</span><span class="pager-title">纺织厂站的年轻人</span></a><a href="#navs"><span class="pager-label">下一篇 →</span><span class="pager-title">江边的最后一段</span></a></nav></div>
+      </div>
+      <div>
+        <p class="lab">App 顶栏和底部标签栏 · <code>.topbar</code> <code>.tabbar</code></p>
+        <div class="mini-app">
+          <div class="topbar"><button class="btn btn-ghost btn-icon" aria-label="搜索"><svg><use href="#i-search"/></svg></button><span class="topbar-title" style="font:700 18px/1 var(--font-serif);letter-spacing:.12em">檐下周刊</span><button class="btn btn-ghost btn-icon" aria-label="书签"><svg><use href="#i-bookmark"/></svg></button></div>
+          <div class="tabs" role="tablist" style="padding:0 16px;gap:20px"><button class="tab" role="tab" aria-selected="true">推荐</button><button class="tab" role="tab">城市</button><button class="tab" role="tab">人物</button><button class="tab" role="tab">书评</button><button class="tab" role="tab">食物</button></div>
+          <div class="feed">
+            <article class="story"><div class="story-body"><p class="kicker">特稿</p><h3 class="story-title"><a href="#navs">夜班公交上的四十七站</a></h3><p class="meta">林晚舟<span class="sep"></span>12 分钟</p></div><span class="story-thumb"><svg viewBox="0 0 160 120" preserveAspectRatio="xMidYMid slice"><rect class="f4" width="160" height="120"/><circle class="fh" cx="124" cy="30" r="10"/><rect class="f5" y="86" width="160" height="34"/><g transform="translate(26 58)"><rect class="f2" width="104" height="32" rx="3"/><rect class="fh" x="8" y="7" width="14" height="12"/><rect class="fh" x="26" y="7" width="14" height="12"/><rect class="fh" x="44" y="7" width="14" height="12"/><rect class="fh" x="88" y="7" width="10" height="20"/></g></svg></span></article>
+            <article class="story" style="border-bottom:0"><div class="story-body"><p class="kicker">人物</p><h3 class="story-title"><a href="#navs">一个钟表匠的四十年</a></h3><p class="meta">周知秋<span class="sep"></span>18 分钟</p></div><span class="story-thumb"><svg viewBox="0 0 160 120" preserveAspectRatio="xMidYMid slice"><rect class="f1" width="160" height="120"/><circle class="f2" cx="80" cy="60" r="38"/><circle class="fb" cx="80" cy="60" r="30"/><path class="s4" d="M80 60V38M80 60l14 8"/><circle class="fa" cx="80" cy="60" r="3"/></svg></span></article>
+          </div>
+          <nav class="tabbar" aria-label="主导航"><a href="#navs" aria-current="page"><svg><use href="#i-paper"/></svg>首页</a><a href="#navs"><svg><use href="#i-book"/></svg>书架</a><a href="#navs"><svg><use href="#i-listen"/></svg>听</a><a href="#navs"><svg><use href="#i-user"/></svg>我的</a></nav>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="feedback">
+    <div class="sec-head"><span class="sec-no">13</span><h2>提示与浮层</h2><p>提示条左边一道色线；轻提示是墨底纸字，从底部出来、3 秒消失；弹窗是一张纸，顶上一道粗墨线，标题是一个问题。</p></div>
+    <div class="grid-2">
+      <div class="stack">
+        <p class="lab" style="margin:0">提示条 · <code>.notice</code></p>
+        <div class="notice"><svg><use href="#i-paper"/></svg><p class="notice-title">这篇文章更新过</p><p class="notice-text">11 月 7 日补充了第三节的数据，改动处已标出。</p></div>
+        <div class="notice notice-info"><svg><use href="#i-info"/></svg><p class="notice-title">你上次读到第 3 章</p><p class="notice-text">从「末班车上的人」接着读？</p><a class="btn btn-secondary btn-sm notice-action" href="#feedback">接着读</a></div>
+        <div class="notice notice-warning"><svg><use href="#i-warn"/></svg><p class="notice-title">草稿还没保存</p><p class="notice-text">离开这一页前，记得点「存草稿」。</p></div>
+        <div class="notice notice-danger"><svg><use href="#i-err"/></svg><p class="notice-title">评论没发出去</p><p class="notice-text">网络断了一下。内容还在输入框里，连上后再点一次「发表」。</p></div>
+        <p class="lab" style="margin:16px 0 0">轻提示 · <code>.toast</code></p>
+        <div class="toasts">
+          <div class="toast" role="status"><svg><use href="#i-ok"/></svg>已加入书架<button class="btn btn-ghost">去看看</button></div>
+          <div class="toast toast-danger" role="status"><svg><use href="#i-err"/></svg>划线没保存，稍后会自动重试</div>
+        </div>
+      </div>
+      <div>
+        <p class="lab">弹窗 · <code>.dialog</code></p>
+        <div class="stage">
+          <div class="ghost" aria-hidden="true"><i></i><i></i><i style="width:92%"></i><i></i><i style="width:76%"></i><i></i><i style="width:84%"></i><i></i><i style="width:60%"></i></div>
+          <div class="dialog-scrim">
+            <div class="dialog" role="dialog" aria-labelledby="dlg-t">
+              <div class="dialog-header"><h3 class="dialog-title" id="dlg-t">退订「周五慢信」？</h3><button class="btn btn-ghost btn-icon btn-sm" aria-label="关闭"><svg><use href="#i-x"/></svg></button></div>
+              <div class="dialog-body"><p>退订后，周五早上不会再收到邮件。你在网站上的书架、划线和评论都不受影响，想回来随时可以再订。</p></div>
+              <div class="dialog-footer"><button class="btn btn-ghost">再想想</button><button class="btn btn-danger">退订</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="rules" style="grid-template-columns:1fr;gap:12px;margin-top:16px">
+          <div class="yi"><p><b>按钮写后果。</b>「退订」「删除划线」，不写「确定」；危险的那个放右边，但不设成默认焦点。</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="empty">
+    <div class="sec-head"><span class="sec-no">14</span><h2>空状态</h2><p>一幅小小的线描、一句宋体标题、一句为什么、一个去处。不写「暂无数据」。</p></div>
+    <div class="empties">
+      <div class="empty">
+        <div class="empty-art"><svg viewBox="0 0 96 72"><path class="s3" d="M48 18c-8-6-20-8-34-6v46c14-2 26 0 34 6 8-6 20-8 34-6V12c-14-2-26 0-34 6zM48 18v46"/><path class="s3" d="M22 26h16M22 34h16M22 42h10M58 26h16M58 34h12"/></svg></div>
+        <p class="empty-title">书架还是空的</p>
+        <p class="empty-text">读到喜欢的文章，点标题旁边的书签，它就会出现在这里。</p>
+        <a class="btn btn-secondary" href="#lists">去首页逛逛</a>
+      </div>
+      <div class="empty">
+        <div class="empty-art"><svg viewBox="0 0 96 72"><circle class="s3" cx="42" cy="32" r="18"/><path class="s3" d="m55 45 14 14M34 32h16"/></svg></div>
+        <p class="empty-title">没找到「夜班公交车站名」</p>
+        <p class="empty-text">试试短一点的词，比如「夜班公交」；或者换个话题看看。</p>
+        <div class="topics" style="margin-top:0;justify-content:center"><a class="topic" href="#lists">城市夜行</a><a class="topic" href="#lists">公共交通</a></div>
+      </div>
+      <div class="empty">
+        <div class="empty-art"><svg viewBox="0 0 96 72"><path class="s3" d="M28 52h42a14 14 0 0 0 0-28 20 20 0 0 0-38-4A16 16 0 0 0 28 52z"/><path class="s3" d="M20 16l56 44"/></svg></div>
+        <p class="empty-title">没有网络</p>
+        <p class="empty-text">你下载过 6 篇文章，离线也能读。连上网之后，评论和划线会自动同步。</p>
+        <a class="btn" href="#themes"><svg><use href="#i-down"/></svg>读已下载的</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="themes">
+    <div class="sec-head"><span class="sec-no">15</span><h2>三套主题</h2><p>同一套变量换三组值：纸（默认）、米黄（护眼）、夜读（暖黑底、米色字，不用纯黑纯白）。给 html 或某一块加 <span class="mono">data-theme</span>，组件不用改。</p></div>
+    <div class="phones">
+      <div class="phone-wrap">
+        <div class="phone" data-theme="light">
+          <div class="ph-status"><span>21:40</span><span class="bat"><i></i></span></div>
+          <div class="topbar"><button class="btn btn-ghost btn-icon" aria-label="返回"><svg><use href="#i-left"/></svg></button><span class="topbar-title">城市 · 特稿</span><button class="btn btn-ghost btn-icon" aria-label="更多"><svg><use href="#i-more"/></svg></button></div>
+          <div class="reading-progress" style="--progress:18%"><i></i></div>
+          <div class="ph-body">
+            <p class="kicker">城市<span class="sep"></span>特稿</p>
+            <h3>夜班公交上的四十七站</h3>
+            <p class="meta">林晚舟<span class="sep"></span>约 12 分钟</p>
+            <div class="prose prose-sm">
+              <p class="dropcap">晚上十点四十分，夜 47 路从城北总站发车。这是全城最后一班车，也是唯一一条要开到凌晨两点的线路。</p>
+              <p>司机老何开了九年，他说这条线上的乘客，他闭着眼睛都能认出一半。坐在第三排靠窗的，是在医院做夜班护工的周阿姨。</p>
+              <p>中途在纺织厂站上车的几个年轻人，刚下了晚班，总是一上车就睡着。</p>
+            </div>
+          </div>
+          <nav class="ph-tools" aria-label="阅读工具"><a href="#themes"><svg><use href="#i-toc"/></svg>目录</a><a href="#themes"><svg><use href="#i-reply"/></svg>评论 128</a><a href="#themes"><svg><use href="#i-listen"/></svg>听</a><a href="#themes"><svg><use href="#i-aa"/></svg>设置</a></nav>
+        </div>
+        <div class="phone-cap"><b>纸 · 默认</b><span>暖白纸、墨字 15.6 : 1</span></div>
+      </div>
+
+      <div class="phone-wrap">
+        <div class="phone" data-theme="sepia">
+          <div class="ph-status"><span>21:40</span><span class="bat"><i></i></span></div>
+          <div class="topbar"><button class="btn btn-ghost btn-icon" aria-label="返回"><svg><use href="#i-left"/></svg></button><span class="topbar-title">城市 · 特稿</span><button class="btn btn-ghost btn-icon" aria-label="更多"><svg><use href="#i-more"/></svg></button></div>
+          <div class="reading-progress" style="--progress:42%"><i></i></div>
+          <div class="ph-body">
+            <div class="prose prose-sm">
+              <h2 style="margin-top:0">末班车上的人</h2>
+              <p>坐在第三排靠窗的，是在医院做夜班护工的周阿姨；她每周有五个晚上搭这班车，从不迟到。</p>
+              <p>中途在纺织厂站上车的几个年轻人，刚下了晚班，总是一上车就睡着。</p>
+              <p>我们跟着这班车跑了整整一个星期，记下了四十七个站名。</p>
+            </div>
+          </div>
+          <div class="ph-scrim"></div>
+          <div class="reader-panel ph-sheet">
+            <span class="grab"></span>
+            <div class="reader-row"><span class="label">字号</span><div class="font-steps"><button class="btn btn-ghost btn-sm btn-icon" aria-label="小一号" style="font-size:13px">A</button><span class="step is-on"></span><span class="step is-on"></span><span class="step"></span><span class="step"></span><button class="btn btn-ghost btn-sm btn-icon" aria-label="大一号" style="font-size:19px">A</button></div></div>
+            <div class="reader-row"><span class="label">行距</span><div class="segmented" role="tablist"><button class="tab" role="tab">紧凑</button><button class="tab" role="tab" aria-selected="true">标准</button><button class="tab" role="tab">宽松</button></div></div>
+            <div class="reader-row"><span class="label">主题</span><div class="theme-swatches"><button class="theme-swatch" data-theme="light" aria-label="纸">纸</button><button class="theme-swatch" data-theme="sepia" aria-pressed="true" aria-label="米黄">米</button><button class="theme-swatch" data-theme="dark" aria-label="夜读">夜</button></div></div>
+            <label class="switch" style="font-size:14px"><input type="checkbox" role="switch" checked>晚上自动切到夜读</label>
+          </div>
+        </div>
+        <div class="phone-cap"><b>米黄 · <span class="mono">data-theme="sepia"</span></b><span>长时间阅读，纸色更暖、对比 12.5 : 1</span></div>
+      </div>
+
+      <div class="phone-wrap">
+        <div class="phone" data-theme="dark">
+          <div class="ph-status"><span>23:12</span><span class="bat"><i></i></span></div>
+          <div class="topbar"><button class="btn btn-ghost btn-icon" aria-label="返回"><svg><use href="#i-left"/></svg></button><span class="topbar-title">城市 · 特稿</span><button class="btn btn-ghost btn-icon" aria-label="更多"><svg><use href="#i-more"/></svg></button></div>
+          <div class="reading-progress" style="--progress:64%"><i></i></div>
+          <div class="ph-body">
+            <div class="prose prose-sm">
+              <figure class="figure"><svg viewBox="0 0 276 120" role="img" aria-label="插画：江边夜景"><rect class="f1" width="276" height="120"/><circle class="fa" cx="210" cy="34" r="14"/><path class="f2" d="M0 72 40 52l26 12 40-28 42 30 28-14 46 24 54-18v64H0z"/><rect class="f3" y="96" width="276" height="24"/><g transform="translate(92 82)"><rect class="f5" width="62" height="20" rx="2"/><rect class="fh" x="6" y="4" width="9" height="7"/><rect class="fh" x="18" y="4" width="9" height="7"/><rect class="fh" x="30" y="4" width="9" height="7"/><rect class="fh" x="50" y="4" width="7" height="11"/></g></svg></figure>
+              <p><mark>每一盏在车窗外慢慢熄灭的灯</mark>，都是有人到家了。我们跟着这班车跑了整整一个星期，记下了四十七个站名。</p>
+              <p>凌晨两点零五分，老何把车停回总站，熄火，关灯。车厢里很安静，只剩下仪表盘上的一点红光。<span class="endmark" aria-hidden="true"></span></p>
+            </div>
+            <div class="select-bar ph-sel" role="toolbar" aria-label="选中文字"><button class="is-accent"><svg><use href="#i-pen"/></svg>划线</button><button><svg><use href="#i-note"/></svg>想法</button><button><svg><use href="#i-copy"/></svg>复制</button><button><svg><use href="#i-share"/></svg>分享</button></div>
+            <div class="toast ph-toast" role="status"><svg><use href="#i-ok"/></svg>已划线，在「我的 · 笔记」里</div>
+          </div>
+          <nav class="ph-tools" aria-label="阅读工具"><a href="#themes"><svg><use href="#i-toc"/></svg>目录</a><a href="#themes"><svg><use href="#i-reply"/></svg>评论 128</a><a href="#themes"><svg><use href="#i-listen"/></svg>听</a><a href="#themes"><svg><use href="#i-aa"/></svg>设置</a></nav>
+        </div>
+        <div class="phone-cap"><b>夜读 · <span class="mono">data-theme="dark"</span></b><span>暖黑底、米色字 13.8 : 1；朱砂调亮一档</span></div>
+      </div>
+    </div>
+
+    <div class="dark-strip" data-theme="dark">
+      <div>
+        <p class="lab">夜读下的评论</p>
+        <div class="comment">
+          <span class="avatar">澄</span>
+          <div class="comment-main">
+            <div class="comment-head"><span class="comment-name">阿澄</span><span class="comment-time">昨天 23:48</span></div>
+            <p class="comment-quote">每一盏在车窗外慢慢熄灭的灯</p>
+            <p class="comment-body">读到这一句的时候正好在车上，窗外的灯真的在一盏一盏地灭。</p>
+            <div class="comment-actions"><button class="comment-action is-active"><svg><use href="#i-like"/></svg>236</button><button class="comment-action"><svg><use href="#i-reply"/></svg>回复</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="stack">
+        <p class="lab" style="margin:0">夜读下的按钮和标签</p>
+        <div class="row"><button class="btn">开始阅读</button><button class="btn btn-secondary">加入书架</button><button class="btn btn-accent">订阅</button></div>
+        <div class="row"><span class="tag">城市</span><span class="tag tag-accent">独家</span><span class="tag tag-success">已订阅</span><span class="tag tag-warning">草稿</span><span class="tag tag-danger">出错</span></div>
+        <span class="progress-chip"><span class="progress-ring" style="--p:64"></span>已读 64% · 还剩 4 分钟</span>
+      </div>
+      <div class="stack">
+        <p class="lab" style="margin:0">夜读下的表单和提示</p>
+        <div class="input-group"><input class="input" placeholder="hello@example.com" aria-label="邮箱"><button class="btn btn-accent" type="button">订阅</button></div>
+        <div class="notice notice-info"><svg><use href="#i-moon"/></svg><p class="notice-title">已切到夜读</p><p class="notice-text">早上 7 点自动换回纸。</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap colophon">
+  <hr class="rule-double">
+  <div class="colophon-grid">
+    <div><a class="brand" href="#top"><span class="seal">墨刻</span>墨刻 Inkwell</a><p style="margin-top:14px;color:var(--color-muted)">给新闻、杂志、博客和长文阅读产品的设计系统。本页用它自己排版。<span class="endmark" aria-hidden="true"></span></p></div>
+    <div><h4>文件</h4><ul><li><span class="mono">tokens.css</span> 设计变量</li><li><span class="mono">components.css</span> 组件</li><li><span class="mono">DESIGN.md</span> 用法</li></ul></div>
+    <div><h4>字体</h4><ul><li>宋体 · 标题和正文</li><li>黑体 · 界面</li><li>楷体 · 导语和题记</li></ul></div>
+    <div><h4>授权</h4><ul><li>CC0 · 随便用，不用署名</li><li>示例里的刊物、人名都是虚构的</li></ul></div>
+  </div>
+</footer>
+</body>
+</html>

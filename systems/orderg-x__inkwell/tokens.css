@@ -1,0 +1,212 @@
+/* 设计系统「墨刻 Inkwell」的设计变量：新闻、杂志、博客、长文阅读。
+   暖白的纸、近黑的墨、细线分隔、一点朱砂；宋体标题、无衬线界面、行高 1.9 的正文。
+   复制到设计目录，每屏 <link rel="stylesheet" href="tokens.css">，再 link components.css。
+   三套主题：默认「纸」（也可写 data-theme="light"，用来在深色里嵌一块浅色）；<html data-theme="sepia">「米黄」；<html data-theme="dark">「夜读」。 */
+:root,
+[data-theme="light"] {
+  /* 颜色：按角色定义（换主题只改这里） */
+  --color-bg: #F5F1E8;              /* 页面背景：暖白的纸 */
+  --color-surface: #FBF8F2;         /* 表面：输入框、弹窗、浮起的卡片 */
+  --color-surface-2: #ECE6D9;       /* 次表面：按语、代码、表头、分段控件槽 */
+  --color-text: #1B1915;            /* 正文 · 墨（对 bg 15.6:1） */
+  --color-muted: #67604F;           /* 次要 · 淡墨：署名、时间、图注（对 bg 5.5:1，别再浅） */
+  --color-line: #DCD4C3;            /* 细线：行间分隔、卡片边 */
+  --color-line-strong: #8F856F;     /* 控件边：输入框、勾选框（对 surface 3.4:1） */
+  --color-rule: #1B1915;            /* 粗线：栏目头、报头、表格顶线，和墨同色 */
+  --color-primary: #1B1915;         /* 主色就是墨：主按钮、选中、当前页 */
+  --color-primary-hover: #3A352D;
+  --color-primary-soft: #E9E3D5;    /* 墨的浅底：当前导航、选中的选项 */
+  --color-primary-ink: #FBF8F2;     /* 墨底上的字（16.6:1） */
+  --color-accent: #B3341C;          /* 点缀 · 朱砂：栏目名、首字、进度、订阅；一屏不超过三处（对 bg 5.4:1） */
+  --color-accent-hover: #93290F;
+  --color-accent-soft: #F4E2DA;
+  --color-accent-ink: #FBF8F2;      /* 朱砂底上的字（5.8:1） */
+  --color-highlight: #F2E3A6;       /* 划线高亮：读者标记的句子（墨字 13.6:1） */
+  --color-link: #1B1915;            /* 链接是墨字加朱砂下划线 */
+  --color-link-line: rgb(179 52 28 / 0.55);
+  --color-success: #2E6B4A;         /* 松绿：已订阅、已保存 */
+  --color-success-soft: #E3EDE3;
+  --color-warning: #8A5B10;         /* 赭石：草稿、待审 */
+  --color-warning-soft: #F4E9CF;
+  --color-warning-fill: #C99A3A;    /* 警告的点、进度条（不放字） */
+  --color-danger: #A0263F;          /* 胭脂：出错、删除；和朱砂不同色相，错误一定配图标 */
+  --color-danger-soft: #F5E1E3;
+  --color-danger-ink: #FBF8F2;
+  --color-info: #2F4F7A;            /* 靛青：一般通知、编者提示 */
+  --color-info-soft: #E2E8F0;
+  --color-inverse: #1B1915;         /* 反色底：轻提示、页脚 */
+  --color-inverse-ink: #F5F1E8;
+  --color-overlay: rgb(27 25 21 / 0.52);
+  --color-focus: #B3341C;           /* 焦点框：2px 朱砂描边，离开元素 2px */
+
+  /* 墨分五色：中性色阶，给插图、占位图、图表用（换主题会跟着反过来） */
+  --ink-1: #E4DDCF;                 /* 清 */
+  --ink-2: #C5BBA8;                 /* 淡 */
+  --ink-3: #8E8573;                 /* 重 */
+  --ink-4: #4A443A;                 /* 浓 */
+  --ink-5: #1B1915;                 /* 焦 */
+
+  /* 阴影：平时不用，只给浮在纸面上的东西（菜单、弹窗、轻提示） */
+  --shadow-sm: 0 1px 0 rgb(27 25 21 / 0.06);
+  --shadow-md: 0 1px 2px rgb(27 25 21 / 0.06), 0 10px 24px -12px rgb(27 25 21 / 0.28);
+  --shadow-lg: 0 2px 6px rgb(27 25 21 / 0.08), 0 28px 60px -24px rgb(27 25 21 / 0.42);
+}
+
+:root {
+  /* 字体：标题和正文用宋体（拉丁字母先走 Charter / Georgia），界面用系统黑体，题记和按语可用楷体 */
+  --font-serif: "Charter", "Iowan Old Style", Georgia, "Songti SC", "Noto Serif SC", "Noto Serif CJK SC", "Source Han Serif SC", STSong, SimSun, serif;
+  --font-sans: system-ui, -apple-system, "PingFang SC", "HarmonyOS Sans SC", "MiSans", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --font-kai: "Kaiti SC", STKaiti, KaiTi, "Noto Serif SC", serif;
+  --font-mono: "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --font-display: var(--font-serif);
+  --font-reading: var(--font-serif);   /* 正文字体；读者选「黑体」时换成 var(--font-sans) */
+  --numeric: tabular-nums;
+
+  /* 字号阶梯：大约 1.25 倍一档。界面 15，正文 17，标题从 20 一路到 64 */
+  --text-xs: 12px;
+  --text-sm: 13px;
+  --text-md: 15px;    /* 界面正文、按钮 */
+  --text-lg: 17px;    /* 阅读正文 */
+  --text-xl: 20px;    /* 导语、小标题 */
+  --text-2xl: 24px;
+  --text-3xl: 30px;
+  --text-4xl: 38px;   /* 文章标题 */
+  --text-5xl: 48px;
+  --text-6xl: 64px;   /* 封面大标题 */
+  --text-reading: var(--text-lg);  /* 读者调字号时只改这一个：15 / 17 / 19 / 21 */
+
+  /* 字重：宋体用 400 / 700 / 900 三档（900 是宋体 Black，只给封面标题和文章标题；没有 Black 的系统会落回粗体） */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-heavy: 900;
+
+  /* 行高：中文正文要松 */
+  --leading-tight: 1.25;    /* 大标题 */
+  --leading-snug: 1.4;      /* 小标题、界面 */
+  --leading-normal: 1.65;   /* 说明、评论 */
+  --leading-reading: 1.9;   /* 阅读正文 */
+
+  /* 字距 */
+  --tracking-body: 0.02em;  /* 中文正文略放一点 */
+  --tracking-title: 0.01em;
+  --tracking-kicker: 0.12em;
+
+  /* 版心：中文一行 30–38 字最好读 */
+  --measure: 36em;
+  --measure-wide: 46em;
+
+  /* 间距：4px 起步，阅读页的大段留白用 7–9 */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  /* 线：细线分内容，粗线开栏目 */
+  --rule-thin: 1px;
+  --rule-mid: 2px;
+  --rule-thick: 3px;
+
+  /* 控件高度 */
+  --control-sm: 32px;
+  --control-md: 40px;
+  --control-lg: 48px;
+
+  /* 圆角：几乎是方的，像铅字和纸边 */
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-full: 999px;     /* 只给头像、开关、角标 */
+
+  /* 动效：安静，不弹 */
+  --ease: cubic-bezier(.25, .7, .25, 1);
+  --dur: 180ms;
+  --dur-slow: 320ms;
+}
+
+/* 米黄：长时间阅读的护眼纸色。<html data-theme="sepia">（或给某一块加） */
+[data-theme="sepia"] {
+  --color-bg: #EFE4CC;
+  --color-surface: #F6EDD9;
+  --color-surface-2: #E5D7B9;
+  --color-text: #2B2117;
+  --color-muted: #67573F;
+  --color-line: #D8C8A6;
+  --color-line-strong: #8C7856;
+  --color-rule: #2B2117;
+  --color-primary: #2B2117;
+  --color-primary-hover: #4A3B2A;
+  --color-primary-soft: #E2D3B2;
+  --color-primary-ink: #F6EDD9;
+  --color-accent: #A3311B;
+  --color-accent-hover: #842611;
+  --color-accent-soft: #EBD3BE;
+  --color-accent-ink: #F6EDD9;
+  --color-highlight: #E8CF86;
+  --color-link: #2B2117;
+  --color-link-line: rgb(163 49 27 / 0.55);
+  --color-inverse: #2B2117;
+  --color-inverse-ink: #EFE4CC;
+  --color-focus: #A3311B;
+  --ink-1: #E2D3B2;
+  --ink-2: #C7B48E;
+  --ink-3: #94805F;
+  --ink-4: #54442F;
+  --ink-5: #2B2117;
+}
+
+/* 夜读：暖黑底、米色字，不用纯黑纯白。<html data-theme="dark">。
+   网页要跟随系统时，把选择器换成 @media (prefers-color-scheme: dark) { :root { … } } */
+[data-theme="dark"] {
+  --color-bg: #141310;
+  --color-surface: #1C1A16;
+  --color-surface-2: #26231D;
+  --color-text: #E4DDCF;
+  --color-muted: #A39A8B;
+  --color-line: #34302A;
+  --color-line-strong: #766E60;
+  --color-rule: #CFC7B8;
+  --color-primary: #E4DDCF;
+  --color-primary-hover: #F3EDE2;
+  --color-primary-soft: #2C2922;
+  --color-primary-ink: #141310;
+  --color-accent: #E57A5F;
+  --color-accent-hover: #EE927A;
+  --color-accent-soft: #3A2119;
+  --color-accent-ink: #141310;
+  --color-highlight: #4B4225;
+  --color-link: #E4DDCF;
+  --color-link-line: rgb(229 122 95 / 0.6);
+  --color-success: #86C29E;
+  --color-success-soft: #1B2A20;
+  --color-warning: #E0B25A;
+  --color-warning-soft: #2E2614;
+  --color-warning-fill: #D3A445;
+  --color-danger: #EE8095;
+  --color-danger-soft: #331A1F;
+  --color-danger-ink: #141310;
+  --color-info: #8FB0DA;
+  --color-info-soft: #1A2230;
+  --color-inverse: #E4DDCF;
+  --color-inverse-ink: #1B1915;
+  --color-overlay: rgb(0 0 0 / 0.62);
+  --color-focus: #E57A5F;
+  --ink-1: #2C2922;
+  --ink-2: #4A453B;
+  --ink-3: #7D7566;
+  --ink-4: #B4AB9B;
+  --ink-5: #E4DDCF;
+  --shadow-sm: 0 1px 0 rgb(0 0 0 / 0.4);
+  --shadow-md: 0 1px 2px rgb(0 0 0 / 0.4), 0 10px 24px -10px rgb(0 0 0 / 0.6);
+  --shadow-lg: 0 2px 6px rgb(0 0 0 / 0.4), 0 28px 60px -20px rgb(0 0 0 / 0.7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --dur: 0ms; --dur-slow: 0ms; }
+}

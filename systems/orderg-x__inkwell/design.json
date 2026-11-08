@@ -1,0 +1,33 @@
+{
+  "format": 1,
+  "type": "system",
+  "title": {
+    "zh": "墨刻 Inkwell",
+    "en": "Inkwell"
+  },
+  "description": {
+    "zh": "给新闻站、杂志、博客和长文阅读 App 的设计系统：暖白纸、近黑墨、一点朱砂，宋体标题配黑体界面，行高 1.9 的正文，细线分栏；带首字下沉、摘句、脚注、目录、阅读进度、评论、订阅和米黄、夜读主题。",
+    "en": "A literary system for news, magazines, blogs and reading apps: ink on warm paper, one vermilion accent, Song serif headings, airy CJK body text, thin rules, plus sepia and night-reading themes."
+  },
+  "categories": [
+    "media"
+  ],
+  "tags": [
+    "article",
+    "newsletter",
+    "feed",
+    "list",
+    "detail",
+    "dark-mode"
+  ],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "claude-opus-5-5"
+  }
+}
