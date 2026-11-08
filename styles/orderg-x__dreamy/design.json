@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "柔焦梦境",
+    "en": "Dreamy"
+  },
+  "description": {
+    "zh": "粉雾光晕、留白很多、轻得像在云里",
+    "en": "Hazy pink glows, lots of air, light as a cloud"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "claude-opus-5-5"
+  }
+}
