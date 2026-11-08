@@ -1,0 +1,20 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": { "zh": "慢生活周报", "en": "Slow Living Weekly" },
+  "description": {
+    "zh": "生活方式周报的一期邮件：米色原木配色、细线分隔，带期号刊头、编者的话、本期目录、三篇配手绘插画的短文（时令菜谱、家居角落、枕边书）、读者小调查和退订页脚",
+    "en": "A lifestyle newsletter issue in oat and wood tones: masthead with issue number, editor's note, contents, three illustrated features (recipe, home corner, book), reader poll and footer"
+  },
+  "kind": "email",
+  "screens": [
+    { "file": "email.html", "title": { "zh": "第 47 期周报", "en": "Issue 47" } }
+  ],
+  "style": "japandi",
+  "categories": ["home", "media"],
+  "tags": ["newsletter", "article", "illustration"],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": { "login": "orderg-x", "id": 271418316 },
+  "ai": { "generated": true, "tool": "claude-opus-5-5" }
+}
