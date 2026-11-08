@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="dsh-design" content="app">
+<title>动态 · 书友会</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="app.css">
+<style>
+  .appbar { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; }
+  .brand-mark { width: 40px; height: 40px; }
+  .brand .head { font-size: 26px; line-height: 1.25; letter-spacing: .04em; }
+  .appbar-actions { display: flex; gap: var(--space-3); }
+
+  .seg { display: flex; align-items: flex-end; gap: 24px; height: 44px; border-bottom: 2px solid var(--line); }
+  .seg a { position: relative; display: inline-flex; align-items: flex-end; justify-content: center; min-width: 44px; min-height: 44px; padding-bottom: 9px; font-weight: 600; color: var(--muted); }
+  .seg a.on { font-family: var(--font-head); font-weight: 900; font-size: 20px; line-height: 1.2; padding-bottom: 8px; color: var(--ink); }
+  .seg a.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 6px; background: var(--stripes); }
+
+  .stories { display: flex; justify-content: space-between; padding: 22px 4px 2px; }
+  .story { width: 62px; display: flex; flex-direction: column; align-items: center; gap: 9px; font-size: var(--fs-meta); font-weight: 600; line-height: 1.2; }
+  .story-av { position: relative; }
+  .story .av { width: 56px; height: 56px; font-size: 20px; box-shadow: 0 0 0 3px var(--bg), 0 0 0 5.5px var(--primary); }
+  .story.seen .av { box-shadow: 0 0 0 3px var(--bg), 0 0 0 5.5px var(--line); }
+  .story.me .av { border-style: dashed; background: var(--surface); box-shadow: none; }
+  .story.me .av .ico { width: 22px; height: 22px; stroke-width: 2.4; }
+  .story.me span:last-child { color: var(--muted); }
+  .story-av .cover { position: absolute; right: -8px; bottom: -5px; }
+
+  .post { padding: 22px 0 6px; }
+  .post + .post { border-top: 2px dashed var(--line); }
+  .stories + .post { margin-top: 10px; border-top: 2px dashed var(--line); }
+  .post-head { display: flex; align-items: center; gap: var(--space-3); }
+  .who { flex: 1; min-width: 0; line-height: 1.35; }
+  .who b { font-weight: 700; }
+  .who .chip { margin-left: 6px; vertical-align: 1px; }
+  .who .meta { display: block; margin-top: 1px; }
+  .icon-btn { flex: 0 0 44px; height: 44px; margin-right: -10px; display: grid; place-items: center; color: var(--muted); }
+
+  .quote-card { position: relative; margin-top: 14px; padding: 50px 18px 18px; background: var(--accent); border: var(--bd); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .q-mark { position: absolute; left: 18px; top: 16px; width: 40px; height: 28px; color: var(--primary); }
+  .quote-card blockquote { position: relative; font-family: var(--font-head); font-weight: 900; font-size: 20px; line-height: 1.6; color: var(--ink); }
+  .q-src { position: relative; display: flex; align-items: center; gap: 10px; margin-top: 16px; font-size: var(--fs-meta); line-height: 1.35; }
+  .q-src b { display: block; font-family: var(--font-head); font-weight: 900; font-size: 15px; }
+  .q-arcs { position: absolute; right: -2px; bottom: -2px; width: 92px; height: 92px; }
+  .q-src .chip { margin-left: 4px; }
+
+  .post-txt { margin-top: 14px; }
+  .note-title { margin-top: 14px; font-size: var(--fs-h3); line-height: 1.45; }
+  .note-title + .post-txt { margin-top: 6px; color: var(--text); }
+  .clamp { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .read-more { color: var(--link); font-weight: 600; }
+
+  .actions { display: flex; align-items: center; margin: 6px -10px 0; }
+  .act { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-width: 44px; min-height: 44px; padding: 0 10px; font-size: var(--fs-meta); font-weight: 600; color: var(--muted); }
+  .act .ico { width: 22px; height: 22px; }
+  .act.on { color: var(--primary); }
+  .act.on .ico { fill: var(--primary); }
+  .act.end { margin-left: auto; }
+
+  .book-card { display: flex; align-items: center; gap: 14px; margin-top: 16px; padding: 12px 14px 12px 12px; }
+  .bc-info { flex: 1; min-width: 0; line-height: 1.4; }
+  .bc-info b { display: block; font-family: var(--font-head); font-weight: 900; font-size: var(--fs-h3); }
+  .bc-rate { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+  .bc-rate .num { font-size: 15px; }
+  .want { flex: 0 0 auto; min-height: 40px; padding: 0 14px; font-size: var(--fs-meta); }
+
+  .club-share { position: relative; display: flex; align-items: center; gap: 14px; margin-top: 16px; padding: 16px 16px 22px; background: var(--link); color: var(--on); border: var(--bd); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .club-share::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 9px; background: linear-gradient(var(--primary) 0 3px, var(--accent) 3px 6px, var(--on) 6px 9px); }
+  .cs-date { flex: 0 0 56px; height: 62px; display: grid; place-items: center; align-content: center; border-radius: var(--radius-sm); background: var(--surface); color: var(--ink); border: var(--bd); line-height: 1.1; }
+  .cs-date small { font-size: var(--fs-micro); font-weight: 700; }
+  .cs-date .num { font-size: 26px; }
+  .cs-txt { flex: 1; min-width: 0; line-height: 1.4; }
+  .cs-txt b { display: block; font-family: var(--font-head); font-weight: 900; font-size: var(--fs-h3); }
+  .cs-txt span { font-size: var(--fs-meta); color: #E8DCC4; }
+</style>
+</head>
+<body>
+<svg class="sprite" aria-hidden="true">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.3"/><path d="m15.6 15.6 4.4 4.4"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M12 4.2a5.3 5.3 0 0 0-5.3 5.3v3.2L5 16.3h14l-1.7-3.6V9.5A5.3 5.3 0 0 0 12 4.2z"/><path d="M10 19a2 2 0 0 0 4 0"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.7" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.7" fill="currentColor" stroke="none"/><circle cx="18.5" cy="12" r="1.7" fill="currentColor" stroke="none"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 19.5s-7.5-4.5-7.5-10a4.2 4.2 0 0 1 7.5-2.6 4.2 4.2 0 0 1 7.5 2.6c0 5.5-7.5 10-7.5 10z"/></symbol>
+  <symbol id="i-comment" viewBox="0 0 24 24"><path d="M19.5 11.5c0 3.9-3.4 6.9-7.5 6.9-1 0-2-.2-2.9-.5L5 19.3l1.1-3.4a6.4 6.4 0 0 1-1.6-4.4c0-3.9 3.4-6.9 7.5-6.9s7.5 3 7.5 6.9z"/></symbol>
+  <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="M7 4.5h10v15.2l-5-3.6-5 3.6z"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><path d="M12 14.5V4.5M8 8.2l4-3.7 4 3.7"/><path d="M5.5 12.5v6a1.5 1.5 0 0 0 1.5 1.5h10a1.5 1.5 0 0 0 1.5-1.5v-6"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5.5v13M5.5 12h13"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="m9.5 6 6 6-6 6"/></symbol>
+  <symbol id="i-feed" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M7 4.5h10M8 13h8M8 16.5h5"/></symbol>
+  <symbol id="i-shelf" viewBox="0 0 24 24"><rect x="4" y="5" width="4.4" height="14" rx="1"/><rect x="9.8" y="7.5" width="4.4" height="11.5" rx="1"/><path d="m15.7 8.6 3.6-1 2.9 10.6-3.6 1z"/><path d="M3 20.5h18"/></symbol>
+  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M5 19.2 6 14.7 15.4 5.3a2.1 2.1 0 0 1 3 3L9 17.7z"/><path d="m13.6 7.1 3 3"/></symbol>
+  <symbol id="i-club" viewBox="0 0 24 24"><circle cx="9" cy="8.6" r="3.1"/><path d="M3.4 19.2c.8-3.2 3-5 5.6-5s4.8 1.8 5.6 5"/><circle cx="16.6" cy="9.4" r="2.5"/><path d="M15.8 14.2c2.6-.2 4.5 1.5 5.1 4.3"/></symbol>
+  <symbol id="i-me" viewBox="0 0 24 24"><circle cx="12" cy="8.5" r="3.6"/><path d="M5 20c1.3-3.6 4-5.4 7-5.4s5.7 1.8 7 5.4"/></symbol>
+  <symbol id="s-full" viewBox="0 0 24 24"><path d="M12 3.4l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.7l-5.3 2.9 1.1-5.9-4.3-4.1 5.9-.8z" fill="#E0A526" stroke="#2E1F14" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="s-half" viewBox="0 0 24 24"><clipPath id="s-left"><rect width="12" height="24"/></clipPath><path d="M12 3.4l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.7l-5.3 2.9 1.1-5.9-4.3-4.1 5.9-.8z" fill="#FBF2E2"/><path d="M12 3.4l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.7l-5.3 2.9 1.1-5.9-4.3-4.1 5.9-.8z" fill="#E0A526" clip-path="url(#s-left)"/><path d="M12 3.4l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9L12 16.7l-5.3 2.9 1.1-5.9-4.3-4.1 5.9-.8z" fill="none" stroke="#2E1F14" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+  <symbol id="cv-fog" viewBox="0 0 120 172"><rect width="120" height="172" fill="#B5471D"/><path d="M14 80h36M66 72h40M8 90h22M84 86h26" stroke="#FFF6E8" stroke-width="4" stroke-linecap="round" opacity=".3"/><circle cx="60" cy="112" r="34" fill="#E0A526"/><path d="M20 96h80" stroke="#B5471D" stroke-width="2"/><path d="M20 102.5h80" stroke="#B5471D" stroke-width="3"/><path d="M20 109h80" stroke="#B5471D" stroke-width="4"/><rect y="112" width="120" height="60" fill="#2F5D50"/><path d="M48 121h24M52 130h16M56 139h8" stroke="#E0A526" stroke-width="3" stroke-linecap="round"/><path d="M8 126h26M86 126h24M14 146h30M78 150h28M30 160h60" stroke="#F3E6CF" stroke-width="2.4" stroke-linecap="round" opacity=".55"/><path d="M78 112h22l-4 6H82z" fill="#2E1F14"/><path d="M89 112V91" stroke="#2E1F14" stroke-width="1.8"/><path d="M90.5 93.5 98 109h-7.5z" fill="#FFF6E8"/><text x="60" y="38" text-anchor="middle" font-family="Songti SC, Noto Serif SC, serif" font-weight="900" font-size="21" fill="#FFF6E8">雾港来信</text><text x="60" y="56" text-anchor="middle" font-family="PingFang SC, sans-serif" font-size="8" letter-spacing="2" fill="#F5E0AA">林岫 著</text></symbol>
+  <symbol id="cv-drawer" viewBox="0 0 120 172"><rect width="120" height="172" fill="#E0A526"/><text x="60" y="35" text-anchor="middle" font-family="Songti SC, Noto Serif SC, serif" font-weight="900" font-size="17" fill="#2E1F14">第七只抽屉</text><text x="60" y="52" text-anchor="middle" font-family="PingFang SC, sans-serif" font-size="8" letter-spacing="2" fill="#2E1F14">苏迟 著</text><rect x="16" y="64" width="88" height="94" rx="3" fill="#2E1F14"/><g fill="#F3E6CF"><rect x="21" y="69" width="24" height="25" rx="1.5"/><rect x="48" y="69" width="24" height="25" rx="1.5"/><rect x="75" y="69" width="24" height="25" rx="1.5"/><rect x="21" y="98" width="24" height="25" rx="1.5"/><rect x="48" y="98" width="24" height="25" rx="1.5"/><rect x="75" y="98" width="24" height="25" rx="1.5"/><rect x="48" y="127" width="24" height="25" rx="1.5"/><rect x="75" y="127" width="24" height="25" rx="1.5"/></g><g fill="#2E1F14"><circle cx="33" cy="84" r="2"/><circle cx="60" cy="84" r="2"/><circle cx="87" cy="84" r="2"/><circle cx="33" cy="113" r="2"/><circle cx="60" cy="113" r="2"/><circle cx="87" cy="113" r="2"/><circle cx="60" cy="142" r="2"/><circle cx="87" cy="142" r="2"/></g><rect x="21" y="127" width="24" height="25" fill="#7A2C0E"/><rect x="12" y="132" width="32" height="26" rx="1.5" fill="#B5471D" stroke="#2E1F14" stroke-width="2"/><circle cx="28" cy="147" r="2.2" fill="#FFF6E8"/><path d="M30 113l1.6 4.4 4.4 1.6-4.4 1.6-1.6 4.4-1.6-4.4-4.4-1.6 4.4-1.6z" fill="#FFF6E8"/></symbol>
+  <symbol id="cv-light" viewBox="0 0 120 172"><rect width="120" height="172" fill="#2F5D50"/><path d="M60 78 0 58v34zM60 78l60-20v34z" fill="#E0A526" opacity=".32"/><text x="60" y="36" text-anchor="middle" font-family="Songti SC, Noto Serif SC, serif" font-weight="900" font-size="20" fill="#FFF6E8">橘子灯塔</text><text x="60" y="52" text-anchor="middle" font-family="PingFang SC, sans-serif" font-size="8" letter-spacing="2" fill="#F5E0AA">何溪 著</text><path d="M50 142 54 88h12l4 54z" fill="#FFF6E8"/><path d="M53.3 98h13.4l.6 8H52.7zM51.9 116h16.2l.6 8H51.3zM50.6 134h18.8l.6 8H50z" fill="#B5471D"/><rect x="48" y="85" width="24" height="4" rx="1" fill="#2E1F14"/><circle cx="60" cy="77" r="7" fill="#E0A526" stroke="#2E1F14" stroke-width="2"/><path d="M60 70c1-3 4-4 6-3-1 2.6-3.4 3.6-6 3z" fill="#9CC2A4"/><path d="M0 142h120v30H0z" fill="#22463C"/><path d="M10 152h22M44 150h30M86 154h24M24 162h40M78 164h20" stroke="#F3E6CF" stroke-width="2.4" stroke-linecap="round" opacity=".5"/></symbol>
+  <symbol id="cv-city" viewBox="0 0 120 172"><rect width="120" height="172" fill="#FBF2E2"/><text x="60" y="36" text-anchor="middle" font-family="Songti SC, Noto Serif SC, serif" font-weight="900" font-size="17" fill="#2E1F14">绕远路的城</text><text x="60" y="52" text-anchor="middle" font-family="PingFang SC, sans-serif" font-size="8" letter-spacing="2" fill="#6A5240">温以舟 著</text><circle cx="88" cy="80" r="8" fill="#B5471D"/><path d="M26 82l4 3 4-3M38 74l3 2.4 3-2.4" fill="none" stroke="#2E1F14" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="60" cy="172" r="64" fill="#B5471D"/><circle cx="60" cy="172" r="52" fill="#E0A526"/><circle cx="60" cy="172" r="40" fill="#2F5D50"/><circle cx="60" cy="172" r="28" fill="#FBF2E2"/></symbol>
+  <symbol id="brand" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18.5" fill="#E0A526" stroke="#2E1F14" stroke-width="2"/><path d="M14.5 16a5.5 5.5 0 0 1 11 0z" fill="#B5471D" stroke="#2E1F14" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 18.6c3.6-1.4 7.4-1.2 11 .8 3.6-2 7.4-2.2 11-.8v10c-3.6-1.4-7.4-1.2-11 .8-3.6-2-7.4-2.2-11-.8z" fill="#FBF2E2" stroke="#2E1F14" stroke-width="1.8" stroke-linejoin="round"/><path d="M20 19.4v10" stroke="#2E1F14" stroke-width="1.8"/></symbol>
+</svg>
+
+<header class="status" aria-hidden="true">
+  <span class="status-time">9:41</span>
+  <span class="status-icons">
+    <svg width="18" height="12" viewBox="0 0 18 12" fill="currentColor"><rect x="0" y="8" width="3" height="4" rx=".8"/><rect x="5" y="5.5" width="3" height="6.5" rx=".8"/><rect x="10" y="3" width="3" height="9" rx=".8"/><rect x="15" y="0" width="3" height="12" rx=".8"/></svg>
+    <svg width="16" height="12" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1.5 4.3a9.5 9.5 0 0 1 13 0"/><path d="M4 7.1a6 6 0 0 1 8 0"/><circle cx="8" cy="10" r="1.3" fill="currentColor" stroke="none"/></svg>
+    <svg width="27" height="12" viewBox="0 0 27 12"><rect x=".5" y=".5" width="23" height="11" rx="3.2" fill="none" stroke="currentColor" stroke-opacity=".4"/><rect x="2" y="2" width="17" height="8" rx="1.8" fill="currentColor"/><path d="M25 4v4c.8-.3 1.4-1.1 1.4-2s-.6-1.7-1.4-2z" fill="currentColor" fill-opacity=".4"/></svg>
+  </span>
+</header>
+
+<main class="page">
+  <div class="appbar">
+    <a class="brand" href="feed.html"><svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true"><use href="#brand"/></svg><span class="head">书友会</span></a>
+    <div class="appbar-actions">
+      <span class="round-btn" role="button" aria-label="搜索"><svg class="ico"><use href="#i-search"/></svg></span>
+      <span class="round-btn" role="button" aria-label="消息"><svg class="ico"><use href="#i-bell"/></svg><i class="dot"></i></span>
+    </div>
+  </div>
+
+  <nav class="seg" aria-label="动态分类">
+    <a class="on" href="feed.html" aria-current="page">关注</a>
+    <a href="#">推荐</a>
+    <a href="#">摘抄</a>
+    <a href="club.html">读书会</a>
+  </nav>
+
+  <div class="stories" aria-label="书友正在读">
+    <span class="story me"><span class="story-av"><span class="av"><svg class="ico"><use href="#i-plus"/></svg></span></span><span>记一笔</span></span>
+    <a class="story" href="book.html"><span class="story-av"><span class="av">满</span><span class="cover xs"><svg viewBox="0 0 120 172"><use href="#cv-fog"/></svg></span></span><span>小满</span></a>
+    <span class="story"><span class="story-av"><span class="av t">桥</span><span class="cover xs"><svg viewBox="0 0 120 172"><use href="#cv-drawer"/></svg></span></span><span>阿桥</span></span>
+    <span class="story"><span class="story-av"><span class="av o">苏</span><span class="cover xs"><svg viewBox="0 0 120 172"><use href="#cv-light"/></svg></span></span><span>苏打</span></span>
+    <span class="story seen"><span class="story-av"><span class="av g">林</span><span class="cover xs"><svg viewBox="0 0 120 172"><use href="#cv-city"/></svg></span></span><span>林间</span></span>
+  </div>
+
+  <article class="post">
+    <header class="post-head">
+      <span class="av">满</span>
+      <div class="who"><b>小满</b><span class="chip">读到 69%</span><span class="meta">2 小时前 · 划线摘抄</span></div>
+      <span class="icon-btn" role="button" aria-label="更多"><svg class="ico"><use href="#i-more"/></svg></span>
+    </header>
+    <figure class="quote-card">
+      <svg class="q-mark" viewBox="0 0 40 28" aria-hidden="true"><g fill="currentColor"><circle cx="8.5" cy="19.5" r="7.5"/><path d="M1.2 18.2C1.6 10 5.4 4.2 12.6 1.4l1.4 3C9.6 6.6 8 10 8 13.6z"/><circle cx="29.5" cy="19.5" r="7.5"/><path d="M22.2 18.2C22.6 10 26.4 4.2 33.6 1.4l1.4 3C30.6 6.6 29 10 29 13.6z"/></g></svg>
+      <svg class="q-arcs" viewBox="0 0 92 92" aria-hidden="true"><circle cx="92" cy="92" r="80" fill="none" stroke="#B5471D" stroke-width="12"/><circle cx="92" cy="92" r="66" fill="none" stroke="#FBF2E2" stroke-width="12"/><circle cx="92" cy="92" r="52" fill="none" stroke="#2F5D50" stroke-width="12"/></svg>
+      <blockquote>雾散得很慢，像有人在港口那头，一页一页翻一封写了很久的信。</blockquote>
+      <figcaption class="q-src">
+        <span class="cover s"><svg viewBox="0 0 120 172"><use href="#cv-fog"/></svg></span>
+        <span><b>雾港来信</b>林岫 · 第 214 页</span>
+      </figcaption>
+    </figure>
+    <p class="post-txt">读到这里停了很久。窗外今天也起了雾，像是书里的天气漏出来了。</p>
+    <footer class="actions">
+      <span class="act on" role="button"><svg class="ico"><use href="#i-heart"/></svg>128</span>
+      <span class="act" role="button"><svg class="ico"><use href="#i-comment"/></svg>23</span>
+      <span class="act" role="button"><svg class="ico"><use href="#i-bookmark"/></svg>46</span>
+      <span class="act end" role="button" aria-label="分享"><svg class="ico"><use href="#i-share"/></svg></span>
+    </footer>
+  </article>
+
+  <article class="post">
+    <header class="post-head">
+      <span class="av t">桥</span>
+      <div class="who"><b>阿桥</b><span class="chip m">读完了</span><span class="meta">昨天 21:40 · 写了一篇笔记</span></div>
+      <span class="icon-btn" role="button" aria-label="更多"><svg class="ico"><use href="#i-more"/></svg></span>
+    </header>
+    <h3 class="note-title head">冬天适合读一本慢书：《第七只抽屉》</h3>
+    <p class="post-txt clamp">苏迟把一个人的童年拆成九只抽屉，每章打开一只。第七只一直锁着，直到最后三十页才打开。我在地铁上读完最后一章，坐过了两站，一点也不后悔。<span class="read-more">全文</span></p>
+    <a class="card book-card" href="#">
+      <span class="cover m"><svg viewBox="0 0 120 172"><use href="#cv-drawer"/></svg></span>
+      <span class="bc-info">
+        <b>第七只抽屉</b>
+        <span class="meta">苏迟 著 · 散文集</span>
+        <span class="bc-rate"><span class="stars" aria-label="4 星"><svg><use href="#s-full"/></svg><svg><use href="#s-full"/></svg><svg><use href="#s-full"/></svg><svg><use href="#s-full"/></svg><svg><use href="#s-half"/></svg></span><span class="num">8.4</span></span>
+      </span>
+      <span class="btn m want"><svg class="ico"><use href="#i-plus"/></svg>想读</span>
+    </a>
+    <footer class="actions">
+      <span class="act" role="button"><svg class="ico"><use href="#i-heart"/></svg>86</span>
+      <span class="act" role="button"><svg class="ico"><use href="#i-comment"/></svg>12</span>
+      <span class="act" role="button"><svg class="ico"><use href="#i-bookmark"/></svg>31</span>
+      <span class="act end" role="button" aria-label="分享"><svg class="ico"><use href="#i-share"/></svg></span>
+    </footer>
+  </article>
+
+  <article class="post">
+    <header class="post-head">
+      <span class="av s">周</span>
+      <div class="who"><b>老周</b><span class="chip t">会长</span><span class="meta">今天 08:12 · 发起了读书会</span></div>
+      <span class="icon-btn" role="button" aria-label="更多"><svg class="ico"><use href="#i-more"/></svg></span>
+    </header>
+    <p class="post-txt">这周四聊第 4–6 章，还有 6 个位子。没读完也来，听听别人怎么读的。</p>
+    <a class="club-share" href="club.html">
+      <span class="cs-date"><small>11 月</small><span class="num">12</span></span>
+      <span class="cs-txt"><b>周四慢读会 · 第 23 期</b><span>周四 19:30 · 城西灯塔咖啡二楼</span></span>
+      <svg class="ico"><use href="#i-right"/></svg>
+    </a>
+    <footer class="actions">
+      <span class="act" role="button"><svg class="ico"><use href="#i-heart"/></svg>54</span>
+      <span class="act" role="button"><svg class="ico"><use href="#i-comment"/></svg>9</span>
+      <span class="act" role="button"><svg class="ico"><use href="#i-bookmark"/></svg>17</span>
+      <span class="act end" role="button" aria-label="分享"><svg class="ico"><use href="#i-share"/></svg></span>
+    </footer>
+  </article>
+</main>
+
+<nav class="tabbar" aria-label="主导航">
+  <a class="tab is-on" href="feed.html" aria-current="page"><span class="tab-ico"><svg class="ico"><use href="#i-feed"/></svg></span>动态</a>
+  <a class="tab" href="book.html"><span class="tab-ico"><svg class="ico"><use href="#i-shelf"/></svg></span>书架</a>
+  <span class="fab" role="button" aria-label="写笔记"><svg class="ico"><use href="#i-pen"/></svg></span>
+  <a class="tab" href="club.html"><span class="tab-ico"><svg class="ico"><use href="#i-club"/></svg></span>读书会</a>
+  <span class="tab"><span class="tab-ico"><svg class="ico"><use href="#i-me"/></svg></span>我的</span>
+</nav>
+</body>
+</html>

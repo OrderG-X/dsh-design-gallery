@@ -1,0 +1,58 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": {
+    "zh": "书友会",
+    "en": "Book Club"
+  },
+  "description": {
+    "zh": "复古三色粗衬线的读书社区 App：书友摘抄动态、一本书的书页（进度、划线、书评）和读书会主页（下次见面、成员、讨论区）三屏",
+    "en": "A retro, fat-serif reading community app: a feed of friends' notes and quotes, a book page with progress, highlights and reviews, and a club page with the next meetup, members and discussion"
+  },
+  "kind": "app",
+  "screens": [
+    {
+      "file": "feed.html",
+      "title": {
+        "zh": "动态",
+        "en": "Feed"
+      }
+    },
+    {
+      "file": "book.html",
+      "title": {
+        "zh": "书页",
+        "en": "Book"
+      }
+    },
+    {
+      "file": "club.html",
+      "title": {
+        "zh": "读书会",
+        "en": "Club"
+      }
+    }
+  ],
+  "style": "retro",
+  "categories": [
+    "social",
+    "media"
+  ],
+  "tags": [
+    "feed",
+    "detail",
+    "chat",
+    "profile",
+    "illustration"
+  ],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "claude-opus-5-5"
+  }
+}
