@@ -1,0 +1,1171 @@
+<!doctype html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="dsh-design" content="web">
+<title>组件 · 晴天 Sunny</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<style>
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+  .sym { position: absolute; width: 0; height: 0; overflow: hidden; }
+  :where(.icon) { width: 24px; height: 24px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+
+  .topnav { position: sticky; top: var(--space-4); z-index: 5; display: flex; align-items: center; gap: 2px; width: max-content; max-width: calc(100% - 32px); margin: var(--space-4) auto 0; padding: 6px 6px 6px var(--space-4); background: var(--color-surface); border: var(--stroke) solid var(--color-outline); border-radius: var(--radius-full); box-shadow: var(--shadow-md); }
+  .mark { display: inline-flex; align-items: center; gap: 8px; margin-right: var(--space-3); color: var(--color-text); text-decoration: none; font: var(--weight-black) var(--text-md)/1 var(--font-display); white-space: nowrap; }
+  .mark svg { width: 38px; height: 38px; }
+  .topnav a.toc { display: inline-flex; align-items: center; min-height: var(--tap-min); padding: 0 11px; border-radius: var(--radius-full); color: var(--color-muted); text-decoration: none; font: var(--weight-bold) var(--text-xs)/1 var(--font-sans); white-space: nowrap; }
+  .topnav a.toc:hover { background: var(--color-surface-2); color: var(--color-text); }
+  .topnav .btn { margin-left: var(--space-2); }
+
+  .wrap { max-width: 1168px; margin: 0 auto; padding: 0 56px; }
+  .hero { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) 600px; gap: var(--space-6); align-items: center; padding: var(--space-7) 0 var(--space-8); }
+  .hero .tag { margin-bottom: var(--space-5); }
+  .hero .display { font-size: 104px; line-height: 0.98; }
+  .hero .display .en { display: inline-block; margin-top: 6px; padding: 0 10px; background: linear-gradient(transparent 58%, var(--sun) 58%, var(--sun) 92%, transparent 92%); }
+  .hero .lead { max-width: 24em; margin-top: var(--space-5); }
+  .hero-cta { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-6); }
+  .specs { display: flex; gap: var(--space-3); margin-top: var(--space-6); }
+  .spec { display: grid; gap: 6px; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--color-surface); border: var(--stroke-sm) solid var(--color-line); }
+  .spec small { font: var(--weight-bold) var(--text-xs)/1 var(--font-sans); color: var(--color-muted); }
+  .spec b { font: var(--weight-black) var(--text-md)/1.2 var(--font-display); font-variant-numeric: tabular-nums; }
+  .crayons { display: flex; gap: 10px; margin-top: var(--space-5); }
+  .crayons i { width: 30px; height: 30px; border-radius: 50%; border: var(--stroke) solid var(--ink); }
+  .cloud { position: absolute; z-index: 0; fill: var(--paper); stroke: var(--color-line); stroke-width: 3; }
+  .hero > * { position: relative; z-index: 1; }
+
+  .hero-art { position: relative; height: 580px; }
+  .tablet { position: absolute; right: 0; top: 24px; box-sizing: border-box; width: 600px; height: 480px; padding: 14px; border-radius: 44px; background: var(--ink); box-shadow: var(--shadow-lg); }
+  .tablet .screen { box-sizing: border-box; display: grid; gap: var(--space-4); align-content: start; height: 100%; padding: var(--space-5); border-radius: 32px; background: var(--color-bg); overflow: hidden; }
+  .tablet .bubble { display: flex; align-items: center; gap: var(--space-4); padding-right: var(--space-3); }
+  .tablet .options { gap: var(--space-3); }
+  .tablet .option-pic .option-text { font-size: var(--text-md); }
+  .tablet .feedback { padding: var(--space-3) var(--space-4) var(--space-3) var(--space-3); }
+  .tablet .feedback .btn { padding: 0 var(--space-5); }
+  .float { position: absolute; z-index: 2; }
+  .f1 { left: -24px; top: 4px; }
+  .f2 { right: -20px; top: 446px; }
+  .f3 { left: -44px; top: 474px; }
+  .f2.card { grid-template-columns: auto auto; align-items: center; gap: var(--space-2) var(--space-3); padding: var(--space-3) var(--space-5) var(--space-3) var(--space-3); box-shadow: var(--shadow-md); }
+  .f2 .medal { width: 72px; }
+  .f2 .medal-art { width: 64px; height: 75px; }
+  .f2 .medal-icon { top: 27px; width: 24px; height: 24px; }
+
+  .sec { padding: var(--space-8) 0 0; scroll-margin-top: 96px; }
+  .sec-head { display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 440px); gap: var(--space-5); align-items: center; margin-bottom: var(--space-5); }
+  .lesson-no { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 18px 0 12px; border: var(--stroke) solid var(--ink); border-radius: var(--radius-full); background: var(--sun); color: var(--ink); font: var(--weight-black) var(--text-sm)/1 var(--font-display); white-space: nowrap; box-shadow: var(--shade-sm); }
+  .lesson-no svg { width: 22px; height: 22px; }
+  .lesson-no.sky { background: var(--sky); }
+  .lesson-no.leaf { background: var(--leaf); }
+  .lesson-no.coral { background: var(--coral); }
+  .lesson-no.orange { background: var(--orange); }
+  .sec-head p { margin: 0; color: var(--color-muted); font: var(--weight-medium) var(--text-sm)/1.6 var(--font-sans); }
+  .panel { box-sizing: border-box; padding: var(--space-6); border-radius: var(--radius-xl); background: var(--color-surface); border: var(--stroke-sm) solid var(--color-line); box-shadow: var(--shadow-sm); }
+  .sec > .sec-head ~ * + * { margin-top: var(--space-5); }
+  .grid-2.eq { align-items: stretch; }
+  .sub { display: flex; align-items: center; gap: var(--space-2); margin: var(--space-6) 0 var(--space-4); font: var(--weight-black) var(--text-xs)/1 var(--font-sans); letter-spacing: 0.06em; color: var(--color-muted); }
+  .sub::before { content: ""; width: 14px; height: 14px; border-radius: 4px; background: var(--sun); border: var(--stroke-sm) solid var(--ink); }
+  .sub:first-child { margin-top: 0; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); align-items: start; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-5); align-items: start; }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); }
+  .stack { display: grid; gap: var(--space-4); align-content: start; }
+  code.v { font: var(--weight-medium) 12px/1.4 var(--font-mono); color: var(--color-muted); }
+  .note { display: grid; justify-items: center; gap: var(--space-2); font: var(--weight-bold) var(--text-xs)/1.3 var(--font-sans); color: var(--color-muted); text-align: center; }
+
+  .swatches { display: grid; grid-template-columns: 1.5fr 1.5fr 1fr 1fr 1fr 1fr; gap: var(--space-4); }
+  .sw { box-sizing: border-box; display: grid; align-content: space-between; gap: var(--space-5); min-height: 200px; padding: var(--space-4); border: var(--stroke) solid var(--ink); border-radius: var(--radius-lg); color: var(--ink); box-shadow: var(--shade); }
+  .sw b { font: var(--weight-black) var(--text-xl)/1.15 var(--font-display); }
+  .sw div { display: grid; gap: 3px; font: var(--weight-bold) var(--text-xs)/1.35 var(--font-sans); }
+  .sw code { font: var(--weight-medium) 12px/1.3 var(--font-mono); }
+  .sw em { justify-self: start; margin-top: 4px; padding: 3px 8px; border-radius: var(--radius-full); background: var(--color-shine); font: var(--weight-black) 12px/1.2 var(--font-sans); font-style: normal; }
+  .sw.dark { color: var(--paper); }
+  .sw.dark em { background: rgb(255 255 255 / 0.16); }
+  .neutrals { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: var(--space-3); }
+  .chipcolor { display: grid; gap: 6px; font: var(--weight-bold) var(--text-xs)/1.3 var(--font-sans); }
+  .chipcolor i { display: block; height: 64px; border-radius: var(--radius-md); border: var(--stroke-sm) solid var(--color-line); }
+  .chipcolor code { font: var(--weight-medium) 12px/1.3 var(--font-mono); color: var(--color-muted); }
+  .pairs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--space-3); }
+  .pair { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); min-height: 56px; padding: 0 var(--space-4); border-radius: var(--radius-md); font: var(--weight-black) var(--text-sm)/1.3 var(--font-sans); }
+  .pair code { font: var(--weight-bold) 12px/1 var(--font-mono); }
+
+  .type-split { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: var(--space-6); }
+  .type-big { margin: 0 0 var(--space-4); font: var(--weight-black) 72px/1.05 var(--font-display); letter-spacing: -0.01em; }
+  .scale-row { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: var(--space-4); align-items: baseline; padding: 10px 0; border-bottom: var(--stroke-sm) dashed var(--color-line); }
+  .scale-row:last-child { border-bottom: 0; }
+  .scale-row code { font: var(--weight-medium) 12px/1.4 var(--font-mono); color: var(--color-muted); }
+  .scale-row span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.25; font-family: var(--font-display); font-weight: var(--weight-black); }
+  .scale-row span.t { font-family: var(--font-sans); font-weight: var(--weight-regular); }
+  .grown-scale { margin-top: var(--space-4); padding: var(--space-4) var(--space-5); border-radius: var(--radius-lg); background: var(--color-bg); }
+  .grown-scale .scale-row { grid-template-columns: 80px minmax(0, 1fr); padding: 7px 0; border-bottom-width: 1px; }
+  .hz-row { display: flex; gap: var(--space-3); }
+  .hz { display: grid; justify-items: center; gap: 6px; }
+  .hz span { font: var(--weight-bold) var(--text-md)/1 var(--font-sans); color: var(--color-accent-text); }
+  .digits { margin: var(--space-4) 0 0; font: var(--weight-black) 52px/1 var(--font-display); letter-spacing: 0.04em; font-variant-numeric: tabular-nums; }
+  .weights { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-3); margin-top: var(--space-4); }
+  .weights div { display: grid; gap: var(--space-2); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); background: var(--color-surface-2); }
+  .weights b { font: var(--text-2xl)/1 var(--font-display); }
+  .weights small { font: var(--weight-bold) var(--text-xs)/1 var(--font-sans); color: var(--color-muted); }
+
+  .spaces { display: grid; gap: 10px; }
+  .space { display: grid; grid-template-columns: 72px 36px 1fr; align-items: center; gap: var(--space-3); font: var(--weight-bold) var(--text-sm)/1 var(--font-sans); }
+  .space i { display: block; height: 18px; border-radius: var(--radius-full); background: var(--sky); border: var(--stroke-sm) solid var(--ink); box-sizing: border-box; }
+  .space code { font: var(--weight-medium) 12px/1 var(--font-mono); color: var(--color-muted); }
+  .radii { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--space-3); }
+  .radii i { display: block; width: 76px; height: 76px; background: var(--color-primary-soft); border: var(--stroke) solid var(--ink); box-sizing: border-box; }
+  .strokes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); }
+  .strokes div { display: grid; place-items: center; height: 92px; border-radius: var(--radius-lg); background: var(--color-surface); font: var(--weight-bold) var(--text-xs)/1.35 var(--font-sans); color: var(--color-muted); text-align: center; }
+  .tapdemo { display: flex; align-items: center; gap: var(--space-6); }
+  .hit { position: relative; display: grid; place-items: center; width: 76px; height: 76px; border-radius: 18px; outline: var(--stroke-sm) dashed var(--coral); outline-offset: 0; background: color-mix(in oklab, var(--coral) 10%, transparent); }
+  .hit::after { content: "48"; position: absolute; top: -10px; right: -12px; padding: 2px 6px; border-radius: var(--radius-full); background: var(--coral); color: var(--ink); font: var(--weight-black) 11px/1.2 var(--font-sans); }
+  .shade-demo { display: flex; gap: var(--space-5); align-items: center; }
+
+  .btn-grid { display: grid; grid-template-columns: 120px repeat(3, minmax(0, 1fr)); gap: var(--space-4) var(--space-4); align-items: center; }
+  .btn-grid > small { font: var(--weight-black) var(--text-xs)/1.3 var(--font-sans); color: var(--color-muted); }
+  .btn-grid > small.col { text-align: left; }
+  .btn-grid .btn { justify-self: start; }
+
+  .opt-panel .options { margin-top: var(--space-2); }
+  .mono-demo { filter: grayscale(1); }
+  .state-col { display: grid; gap: var(--space-5); }
+  .state-col .note { justify-items: start; text-align: left; }
+  .q { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-4); }
+  .q b { font: var(--weight-black) var(--text-2xl)/1.2 var(--font-display); font-variant-numeric: tabular-nums; }
+
+  .map-scene { position: relative; height: 400px; border: var(--stroke) solid var(--ink); border-radius: var(--radius-lg); overflow: hidden; background: linear-gradient(to bottom, var(--color-accent-soft) 0 46%, var(--color-success-soft) 46%); }
+  .map-scene .map { position: absolute; inset: 0; }
+  .map .level.is-current { transform: translate(-50%, -48px); }
+  .road-edge { fill: none; stroke: var(--ink); stroke-width: 34; stroke-linecap: round; }
+  .road { fill: none; stroke: var(--paper); stroke-width: 28; stroke-linecap: round; }
+  .road-dash { fill: none; stroke: var(--color-line-strong); stroke-width: 3; stroke-dasharray: 2 14; stroke-linecap: round; }
+  .road-done { fill: none; stroke: var(--sun); stroke-width: 6; stroke-dasharray: 2 14; stroke-linecap: round; }
+  .deco { position: absolute; pointer-events: none; }
+  .map-mascot { position: absolute; left: 41%; top: 60px; }
+  .map-unit { position: absolute; left: var(--space-5); top: var(--space-5); display: grid; gap: 2px; padding: var(--space-3) var(--space-4); border: var(--stroke) solid var(--ink); border-radius: var(--radius-md); background: var(--color-surface); }
+  .map-unit b { font: var(--weight-black) var(--text-md)/1.2 var(--font-display); }
+  .map-unit small { font: var(--weight-bold) var(--text-xs)/1.2 var(--font-sans); color: var(--color-muted); }
+
+  .medals { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-2); justify-items: center; }
+  .medals .medal { width: 100%; }
+  .overlay { position: relative; overflow: hidden; border-radius: var(--radius-lg); }
+  .ghost-page { display: grid; gap: var(--space-3); padding: var(--space-5); background: var(--color-bg); }
+  .ghost-page i { display: block; height: 64px; border-radius: var(--radius-lg); background: var(--color-surface); border: var(--stroke) solid var(--color-line); }
+  .ghost-page i:first-child { height: 40px; width: 60%; border: 0; background: var(--color-line); }
+  .overlay .modal-scrim { position: absolute; inset: 0; }
+  .reward .modal-art { margin-top: -86px; }
+  .reward .counter { background: var(--color-primary-soft); }
+
+  .mascots { display: flex; align-items: flex-end; gap: var(--space-6); }
+  .mascots .note { gap: var(--space-3); }
+
+  .timers { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
+  .audios { display: flex; align-items: center; justify-content: space-around; gap: var(--space-4); padding: var(--space-5) 0 var(--space-2); }
+  .words { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-5); align-items: stretch; }
+  .words .word-card { width: auto; }
+  .word-card-back { align-content: start; }
+  .sentence { margin: var(--space-2) 0 0; font: var(--weight-bold) var(--text-lg)/1.6 var(--font-sans); text-align: left; }
+  .sentence mark { padding: 0 2px; border-radius: 4px; background: var(--sun); color: var(--ink); }
+
+  .fishes { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-3); max-width: 480px; padding: var(--space-4); border-radius: var(--radius-lg); background: var(--color-accent-soft); }
+  .fishes svg { width: 44px; height: 35px; }
+  .fishes .new { --fish: var(--orange); }
+  .fishes hr { flex-basis: 100%; height: 0; margin: 0; border: 0; }
+
+  .form-card { display: grid; gap: var(--space-5); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+  .chips { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+  .controls { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2) var(--space-5); }
+
+  .lesson-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-5); }
+  .lesson-cards .card-footer .stars .star { width: 26px; height: 26px; }
+  .tag-row { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+
+  .phone-strip { box-sizing: border-box; overflow: hidden; width: 100%; border: var(--stroke-sm) solid var(--color-line); border-radius: var(--radius-lg); background: var(--color-bg); }
+  .phone-strip .ghost-page i { height: 48px; }
+
+  .parent { display: grid; grid-template-columns: 228px minmax(0, 1fr); overflow: hidden; border: 1px solid var(--color-line); border-radius: var(--radius-xl); background: var(--color-bg); box-shadow: var(--shadow-lg); }
+  .p-side { display: grid; align-content: start; gap: var(--space-2); padding: var(--space-5) var(--space-3); border-right: 1px solid var(--color-line); background: var(--color-surface); }
+  .p-brand { display: flex; align-items: center; gap: var(--space-2); padding: 0 var(--space-3) var(--space-3); font: var(--weight-black) var(--text-md)/1 var(--font-display); }
+  .p-brand svg { width: 32px; height: 32px; }
+  .p-brand small { margin-left: auto; padding: 3px 8px; border-radius: var(--radius-full); background: var(--color-surface-2); font: var(--weight-medium) var(--text-xs)/1.2 var(--font-sans); color: var(--color-muted); }
+  .p-kid { display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-5); padding: var(--space-3); border: 1px solid var(--color-line); border-radius: var(--radius-md); }
+  .p-kid b { display: block; font-size: var(--text-sm); }
+  .p-kid small { display: block; font-size: var(--text-xs); color: var(--color-muted); }
+  .p-main { display: grid; gap: var(--space-5); padding: var(--space-6); }
+  .p-head { display: flex; align-items: flex-end; gap: var(--space-4); }
+  .p-head > div:first-child { flex: 1; }
+  .p-head .h2 { margin: 4px 0; }
+  .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-4); }
+  .p-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: var(--space-4); align-items: stretch; }
+  .subj { display: grid; gap: var(--space-4); }
+  .subj-row { display: grid; gap: 8px; }
+  .subj-row div { display: flex; align-items: center; gap: var(--space-2); font: var(--weight-medium) var(--text-sm)/1.2 var(--font-sans); }
+  .subj-row div b { margin-left: auto; font-variant-numeric: tabular-nums; }
+  .subj-row div small { color: var(--color-muted); font-size: var(--text-xs); }
+
+  .foot { margin-top: var(--space-8); padding: var(--space-7) 0; background: var(--ink); color: var(--paper); }
+  .foot .wrap { display: flex; align-items: center; justify-content: space-between; gap: var(--space-5); }
+  .foot b { display: inline-flex; align-items: center; gap: 12px; font: var(--weight-black) var(--text-xl)/1 var(--font-display); }
+  .foot b svg { width: 44px; height: 44px; }
+  .foot p { margin: 0; font: var(--weight-medium) var(--text-sm)/1.6 var(--font-sans); color: color-mix(in oklab, var(--paper) 80%, var(--ink)); }
+</style>
+</head>
+<body>
+
+<svg class="sym" aria-hidden="true">
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11"/></symbol>
+  <symbol id="i-retry" viewBox="0 0 24 24"><path d="M4.5 12a7.5 7.5 0 1 0 2.4-5.5M4.5 4v4.5H9"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><path d="M7.5 11V8.5a4.5 4.5 0 0 1 9 0V11M5.5 11h13v9.5h-13zM12 14.5v2.5"/></symbol>
+  <symbol id="i-sound" viewBox="0 0 24 24"><path d="M3.5 9.5h3.5l4.5-4v13l-4.5-4H3.5zM15 9a4 4 0 0 1 0 6M17.8 6.3a8 8 0 0 1 0 11.4"/></symbol>
+  <symbol id="i-turtle" viewBox="0 0 24 24"><path d="M3 15.5h14a7 7 0 0 0-14 0zM17 13.5c.4-1.8 4.5-2.2 4.5 0 0 1.5-1.8 2-3.6 2M6 15.5V18.5M14 15.5V18.5M7.5 11l2.5 1.8 2.5-1.8"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7.5V12l3 2"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/></symbol>
+  <symbol id="i-math" viewBox="0 0 24 24"><path d="M7.5 4.5v6M4.5 7.5h6M13.5 7.5h6M5 14l5 5M10 14l-5 5M13.5 15h6M13.5 18.5h6"/></symbol>
+  <symbol id="i-abc" viewBox="0 0 24 24"><path d="M3 18.5L7.5 6l4.5 12.5M4.7 14h5.6M20.5 12.2v6.3M20.5 15.5a2.8 2.8 0 1 1-5.6 0 2.8 2.8 0 0 1 5.6 0z"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19c0-8.5 5-13.5 14.5-14.5C19.5 14 14 19 5 19zM5 19l7.5-7.5"/></symbol>
+  <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M15.5 4.5l4 4L9 19H5v-4zM13.5 6.5l4 4"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v8.5a1.5 1.5 0 0 1-1.5 1.5H15v-6H9v6H5.5A1.5 1.5 0 0 1 4 19.5z"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4.5l-5 2v13l5-2 6 2 5-2v-13l-5 2zM9 4.5v13M15 6.5v13"/></symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H4a3 3 0 0 0 3 4M17 6h3a3 3 0 0 1-3 4M12 14v4M8 21h8M9.5 18h5"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM4.5 21a7.5 7.5 0 0 1 15 0"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5.5L8.5 12l6.5 6.5"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><path d="M9 5.5l6.5 6.5L9 18.5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-del" viewBox="0 0 24 24"><path d="M9 5.5h10.5A1.5 1.5 0 0 1 21 7v10a1.5 1.5 0 0 1-1.5 1.5H9L3 12zM11.5 9.5l5 5M16.5 9.5l-5 5"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></symbol>
+  <symbol id="i-parent" viewBox="0 0 24 24"><path d="M8.5 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM3 20.5v-2a5.5 5.5 0 0 1 11 0v2M17 12a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5zM14.5 20.5V19a3.5 3.5 0 0 1 7 0v1.5"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M5 20v-8M12 20V5M19 20v-5"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M17 7h3M4 17h3M11 17h9M15 5v4M9 15v4"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><path d="M5 6.5h14v13H5zM5 10.5h14M9 4v4M15 4v4"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V6M6.5 11.5L12 6l5.5 5.5"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v13M6.5 12.5L12 18l5.5-5.5"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><path d="M12 16.5a4.5 4.5 0 1 0 0-9 4.5 4.5 0 0 0 0 9zM12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><path d="M12 11v6.5M12 6.8v.4"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 6v8M12 17.8v.4"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M6 21V4.5M6 5h11l-2.5 4L17 13H6"/></symbol>
+  <symbol id="i-gift" viewBox="0 0 24 24"><path d="M4.5 10.5h15V20h-15zM3.5 7h17v3.5h-17zM12 7v13M12 7c-1.5-3-5.5-3.6-5.5-1.4S10 7 12 7zm0 0c1.5-3 5.5-3.6 5.5-1.4S14 7 12 7z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM20 20l-4-4"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 6.5v11M15 6.5v11"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></symbol>
+  <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5.5l10-2V16M9 18a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0zM19 16a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0z"/></symbol>
+  <symbol id="i-export" viewBox="0 0 24 24"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 19.5h14"/></symbol>
+  <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20.5s-8-4.9-8-10.6A4.4 4.4 0 0 1 12 7.4a4.4 4.4 0 0 1 8 2.5c0 5.7-8 10.6-8 10.6z"/></symbol>
+  <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M3.5 12s3-6 8.5-6 8.5 6 8.5 6-3 6-8.5 6-8.5-6-8.5-6zM12 14.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/></symbol>
+
+  <symbol id="star" viewBox="0 0 24 24"><path d="M12 2.6l2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 16.9l-5.6 2.9 1.1-6.2L3 9.2l6.2-.9z"/></symbol>
+  <symbol id="heart" viewBox="0 0 24 24"><path d="M12 20.5s-8-4.9-8-10.6A4.4 4.4 0 0 1 12 7.4a4.4 4.4 0 0 1 8 2.5c0 5.7-8 10.6-8 10.6z" fill="var(--coral)" stroke="var(--ink)" stroke-width="2.4" stroke-linejoin="round"/></symbol>
+  <symbol id="sun-dot" viewBox="0 0 24 24"><path d="M12 4.2v-1.4M12 21.2v-1.4M4.2 12H2.8M21.2 12h-1.4M6.5 6.5l-1-1M18.5 18.5l-1-1M6.5 17.5l-1 1M18.5 5.5l-1 1" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="12" r="5.6" fill="var(--sun)" stroke="var(--ink)" stroke-width="2.4"/></symbol>
+
+  <symbol id="sun-body" viewBox="0 0 64 64"><path d="M32 9V3.5M48.3 15.7l3.9-3.9M55 32h5.5M48.3 48.3l3.9 3.9M32 55v5.5M15.7 48.3l-3.9 3.9M9 32H3.5M15.7 15.7l-3.9-3.9" stroke="var(--ink)" stroke-width="8" stroke-linecap="round"/><path d="M32 9V3.5M48.3 15.7l3.9-3.9M55 32h5.5M48.3 48.3l3.9 3.9M32 55v5.5M15.7 48.3l-3.9 3.9M9 32H3.5M15.7 15.7l-3.9-3.9" stroke="var(--sun)" stroke-width="3" stroke-linecap="round"/><circle cx="32" cy="32" r="19.5" fill="var(--sun)" stroke="var(--ink)" stroke-width="2.6"/><path d="M19.5 26.5a14 14 0 0 1 8-9" fill="none" stroke="var(--paper)" stroke-width="2.6" stroke-linecap="round" opacity=".8"/><circle cx="22.5" cy="37" r="3" fill="var(--coral)" opacity=".55"/><circle cx="41.5" cy="37" r="3" fill="var(--coral)" opacity=".55"/></symbol>
+  <symbol id="sun-happy" viewBox="0 0 64 64"><use href="#sun-body"/><ellipse cx="26" cy="30.5" rx="2.1" ry="2.8" fill="var(--ink)"/><ellipse cx="38" cy="30.5" rx="2.1" ry="2.8" fill="var(--ink)"/><path d="M27.5 37.5q4.5 4.6 9 0" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/></symbol>
+  <symbol id="sun-cheer" viewBox="0 0 64 64"><use href="#sun-body"/><path d="M23.2 31q2.8-3.4 5.6 0M35.2 31q2.8-3.4 5.6 0" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/><path d="M26.5 35.5h11a5.5 5.5 0 0 1-11 0z" fill="var(--ink)" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"/><path d="M29 39.6a3.6 2.4 0 0 1 6 0" fill="var(--coral)"/></symbol>
+  <symbol id="sun-think" viewBox="0 0 64 64"><use href="#sun-body"/><ellipse cx="27" cy="29" rx="2.1" ry="2.8" fill="var(--ink)"/><ellipse cx="39" cy="29" rx="2.1" ry="2.8" fill="var(--ink)"/><path d="M23.5 23.5l5-1.2M35.5 22.3l5 1.8" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round"/><path d="M28.5 39h6.5" fill="none" stroke="var(--ink)" stroke-width="2.4" stroke-linecap="round"/></symbol>
+
+  <symbol id="f-ping" viewBox="0 0 80 64"><path d="M40 20c-6-4.5-19-4-21 9-2 13 8 30 16 30 2.6 0 3.4-1.8 5-1.8s2.4 1.8 5 1.8c8 0 18-17 16-30-2-13-15-13.5-21-9z" fill="var(--coral)" stroke="var(--ink)" stroke-width="2.6" stroke-linejoin="round"/><path d="M25.5 30c.8-4 3.2-6.4 6.2-7.2" fill="none" stroke="var(--paper)" stroke-width="2.6" stroke-linecap="round" opacity=".8"/><path d="M40 20c0-4.5 1.2-8 4-11" fill="none" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round"/><path d="M43 13.5c3.5-5.5 10.5-6 13-3-3 5-9.5 6-13 3z" fill="var(--leaf)" stroke="var(--ink)" stroke-width="2.4" stroke-linejoin="round"/></symbol>
+  <symbol id="f-banana" viewBox="0 0 80 64"><path d="M15 23c4 19 34 30 53 12 2.4-2.3 1-6.2-2.3-5.4C50 34 31 30 23 17.5c-2.2-3.4-8.8-.8-8 5.5z" fill="var(--sun)" stroke="var(--ink)" stroke-width="2.6" stroke-linejoin="round"/><path d="M23 30c8 8 20 11 32 9" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round" opacity=".35"/><path d="M15.6 19.5l-3.6-5.5" fill="none" stroke="var(--ink)" stroke-width="3.4" stroke-linecap="round"/><path d="M67.5 30.5l3.5-2.5" fill="none" stroke="var(--ink)" stroke-width="3.4" stroke-linecap="round"/></symbol>
+  <symbol id="f-melon" viewBox="0 0 80 64"><path d="M8 18h64a32 32 0 0 1-64 0z" fill="var(--leaf)" stroke="var(--ink)" stroke-width="2.6" stroke-linejoin="round"/><path d="M14 18h52a26 26 0 0 1-52 0z" fill="var(--paper)"/><path d="M17.5 18h45a22.5 22.5 0 0 1-45 0z" fill="var(--coral)" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round"/><path d="M30 25.5l-1 2.4M40 29l-.6 2.6M50 25.5l1 2.4M35 36l-.4 2.4M45 36l.4 2.4" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round"/></symbol>
+  <symbol id="f-orange" viewBox="0 0 80 64"><circle cx="40" cy="36" r="21" fill="var(--orange)" stroke="var(--ink)" stroke-width="2.6"/><path d="M27.5 31a13 13 0 0 1 7.5-8" fill="none" stroke="var(--paper)" stroke-width="2.6" stroke-linecap="round" opacity=".75"/><path d="M38.5 15.5c-1-3-3.6-5-6.8-5.2.4 3.4 3.4 5.6 6.8 5.2z" fill="var(--leaf)" stroke="var(--ink)" stroke-width="2.2" stroke-linejoin="round"/><path d="M40 15v5" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round"/><path d="M47 40h.01M43 46h.01M50 34h.01" stroke="var(--ink)" stroke-width="2.6" stroke-linecap="round" opacity=".4"/></symbol>
+  <symbol id="f-fish" viewBox="0 0 80 64"><path d="M60 32l13-10v20z" fill="var(--fish, var(--sky))" stroke="var(--ink)" stroke-width="2.6" stroke-linejoin="round"/><path d="M10 32c9-14 34-17 50 0-16 17-41 14-50 0z" fill="var(--fish, var(--sky))" stroke="var(--ink)" stroke-width="2.6" stroke-linejoin="round"/><path d="M34 22c4 6 4 14 0 20" fill="none" stroke="var(--ink)" stroke-width="2.2" stroke-linecap="round" opacity=".5"/><circle cx="21" cy="29.5" r="2.6" fill="var(--ink)"/><path d="M14.5 36q3 2 6 1" fill="none" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/></symbol>
+
+  <symbol id="medal" viewBox="0 0 96 112"><path d="M30 62L19 104l12-7 7 11 10-40z" fill="var(--coral)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><path d="M66 62l11 42-12-7-7 11-10-40z" fill="var(--sky)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><circle cx="48" cy="40" r="35" fill="var(--medal, var(--sun))" stroke="var(--ink)" stroke-width="3"/><circle cx="48" cy="40" r="26" fill="var(--paper)" fill-opacity=".38" stroke="var(--paper)" stroke-width="2.5" stroke-dasharray="3 5" stroke-linecap="round"/></symbol>
+
+  <symbol id="cloud" viewBox="0 0 120 60"><path d="M22 50h76a16 16 0 0 0 0-32 24 24 0 0 0-44-6 18 18 0 0 0-30 12A13 13 0 0 0 22 50z"/></symbol>
+  <symbol id="tree" viewBox="0 0 48 64"><path d="M24 62V40" stroke="var(--ink)" stroke-width="5" stroke-linecap="round"/><circle cx="24" cy="26" r="18" fill="var(--leaf)" stroke="var(--ink)" stroke-width="3"/><path d="M15 22a10 10 0 0 1 7-7" fill="none" stroke="var(--paper)" stroke-width="3" stroke-linecap="round" opacity=".6"/></symbol>
+</svg>
+
+<nav class="topnav" aria-label="组件目录">
+  <a class="mark" href="#top"><svg viewBox="0 0 64 64"><use href="#sun-happy"/></svg>晴天 Sunny</a>
+  <a class="toc" href="#color">颜色</a>
+  <a class="toc" href="#type">文字</a>
+  <a class="toc" href="#space">尺寸</a>
+  <a class="toc" href="#button">按钮</a>
+  <a class="toc" href="#quiz">答题</a>
+  <a class="toc" href="#map">关卡</a>
+  <a class="toc" href="#reward">奖励</a>
+  <a class="toc" href="#buddy">角色</a>
+  <a class="toc" href="#word">字卡</a>
+  <a class="toc" href="#form">表单</a>
+  <a class="toc" href="#nav">导航</a>
+  <a class="toc" href="#dialog">弹窗</a>
+  <a class="btn btn-sm btn-sky" href="#grown">大人模式</a>
+</nav>
+
+<main class="wrap" id="top">
+
+  <section class="hero">
+    <svg class="cloud" viewBox="0 0 120 60" style="width:150px; height:75px; left:-24px; top:6px"><use href="#cloud"/></svg>
+    <svg class="cloud" viewBox="0 0 120 60" style="width:96px; height:48px; left:440px; top:-2px"><use href="#cloud"/></svg>
+    <div>
+      <span class="tag tag-sun"><svg class="icon"><use href="#i-sun"/></svg>设计系统 · v1 · 5–10 岁</span>
+      <h1 class="display">晴天<br><span class="en">Sunny</span></h1>
+      <p class="lead">给孩子的学习 App 和课堂小工具。太阳黄、天空蓝、叶子绿，加一圈墨蓝粗描边；字是圆的，按钮够大，对错不只看颜色。大人那边换成安静的「大人模式」。</p>
+      <div class="hero-cta">
+        <a class="btn btn-lg" href="#quiz"><svg class="icon"><use href="#i-play"/></svg>开始上课</a>
+        <a class="btn btn-lg btn-secondary" href="#color">看全部组件</a>
+      </div>
+      <div class="specs">
+        <div class="spec"><small>点击区</small><b>≥ 48px</b></div>
+        <div class="spec"><small>描边</small><b>3px 墨蓝</b></div>
+        <div class="spec"><small>正文</small><b>18px 圆体</b></div>
+        <div class="spec"><small>正文对比</small><b>14 : 1</b></div>
+      </div>
+      <div class="crayons" aria-label="蜡笔盒"><i style="background:var(--sun)"></i><i style="background:var(--sky)"></i><i style="background:var(--leaf)"></i><i style="background:var(--coral)"></i><i style="background:var(--orange)"></i><i style="background:var(--ink)"></i></div>
+    </div>
+
+    <div class="hero-art">
+      <div class="tablet">
+        <div class="screen">
+          <div class="lessonbar">
+            <button class="btn btn-secondary btn-icon btn-sm" aria-label="关掉这一课"><svg class="icon"><use href="#i-close"/></svg></button>
+            <div class="progress progress-sky" style="--value: 62%"><i></i></div>
+            <span class="counter"><svg class="star"><use href="#star"/></svg>128</span>
+          </div>
+          <div class="speech">
+            <svg class="mascot mascot-sm" viewBox="0 0 64 64"><use href="#sun-happy"/></svg>
+            <div class="bubble">哪个是「西瓜」？<button class="audio audio-sm" aria-label="再听一遍"><svg><use href="#i-sound"/></svg></button></div>
+          </div>
+          <div class="options options-4">
+            <button class="option option-pic is-dim"><span class="option-key">1</span><span class="option-art"><svg viewBox="0 0 80 64"><use href="#f-ping"/></svg></span><span class="option-text">苹果</span></button>
+            <button class="option option-pic is-dim"><span class="option-key">2</span><span class="option-art"><svg viewBox="0 0 80 64"><use href="#f-banana"/></svg></span><span class="option-text">香蕉</span></button>
+            <button class="option option-pic is-correct"><span class="option-key"><svg><use href="#i-check"/></svg></span><span class="option-flag"><svg><use href="#i-check"/></svg>对</span><span class="option-art"><svg viewBox="0 0 80 64"><use href="#f-melon"/></svg></span><span class="option-text">西瓜</span></button>
+            <button class="option option-pic is-dim"><span class="option-key">4</span><span class="option-art"><svg viewBox="0 0 80 64"><use href="#f-orange"/></svg></span><span class="option-text">橘子</span></button>
+          </div>
+          <div class="feedback feedback-correct">
+            <span class="feedback-icon"><svg><use href="#i-check"/></svg></span>
+            <div><p class="feedback-title">答对了！</p><p class="feedback-text">绿皮红瓤，+3 颗星星</p></div>
+            <button class="btn btn-go">继续<svg class="icon"><use href="#i-chev"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <span class="counter float f1"><svg class="icon" style="color:var(--color-primary-text)"><use href="#i-sun"/></svg>连续 6 天</span>
+      <div class="toast toast-star float f3"><span class="toast-icon"><svg viewBox="0 0 24 24" class="star" style="width:26px;height:26px"><use href="#star"/></svg></span>连对 5 题，太厉害了！</div>
+      <div class="card float f2">
+        <div class="medal" style="--medal: var(--leaf)"><div class="medal-art"><svg viewBox="0 0 96 112"><use href="#medal"/></svg><svg class="medal-icon"><use href="#i-math"/></svg></div></div>
+        <div><span class="tag tag-coral">新徽章</span><p class="card-title" style="margin-top:6px">口算小能手</p><p class="card-meta">连续 3 天口算全对</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="color">
+    <header class="sec-head">
+      <span class="lesson-no"><svg class="icon"><use href="#i-pencil"/></svg>第 1 课</span>
+      <h2 class="h1">颜色</h2>
+      <p>晴天三色负责「去哪里点、选了什么、对没对」；墨蓝是字和描边。所有亮色块上都放墨蓝字，不放白字。</p>
+    </header>
+    <div class="panel">
+      <div class="swatches">
+        <div class="sw" style="background:var(--sun)"><b>太阳黄</b><div><span>主按钮、星星、当前关卡</span><code>--sun</code><code>#FFC531</code><em>墨蓝字 8.9 : 1</em></div></div>
+        <div class="sw" style="background:var(--sky)"><b>天空蓝</b><div><span>选中、读音、进度、信息</span><code>--sky</code><code>#4AA8FF</code><em>墨蓝字 5.6 : 1</em></div></div>
+        <div class="sw" style="background:var(--leaf)"><b>叶子绿</b><div><span>答对、完成</span><code>--leaf</code><code>#4CC870</code><em>墨蓝字 6.6 : 1</em></div></div>
+        <div class="sw" style="background:var(--coral)"><b>珊瑚红</b><div><span>答错、退出</span><code>--coral</code><code>#FF6F61</code><em>墨蓝字 5.1 : 1</em></div></div>
+        <div class="sw" style="background:var(--orange)"><b>橘子橙</b><div><span>再试、时间快到</span><code>--orange</code><code>#FF9A3C</code><em>墨蓝字 6.6 : 1</em></div></div>
+        <div class="sw dark" style="background:var(--ink)"><b>墨蓝</b><div><span>正文、描边</span><code>--ink</code><code>#1C2B4B</code><em>对白 14 : 1</em></div></div>
+      </div>
+      <p class="sub">中性色</p>
+      <div class="neutrals">
+        <div class="chipcolor"><i style="background:var(--color-bg)"></i>背景 · 浅天空<code>bg #EDF6FF</code></div>
+        <div class="chipcolor"><i style="background:var(--color-surface)"></i>表面<code>surface #FFFFFF</code></div>
+        <div class="chipcolor"><i style="background:var(--color-surface-2)"></i>次表面<code>surface-2 #F3F9FF</code></div>
+        <div class="chipcolor"><i style="background:var(--color-line)"></i>分隔线<code>line #C9DDF0</code></div>
+        <div class="chipcolor"><i style="background:var(--color-line-strong)"></i>不可用、空星<code>line-strong #9DB2CC</code></div>
+        <div class="chipcolor"><i style="background:var(--color-muted)"></i>次要字<code>muted #4A5B7C</code></div>
+        <div class="chipcolor"><i style="background:var(--ink)"></i>正文 · 描边<code>ink #1C2B4B</code></div>
+      </div>
+      <p class="sub">状态：浅底 + 同色深字（对比都在 4.5 : 1 以上）</p>
+      <div class="pairs">
+        <div class="pair" style="background:var(--color-success-soft); color:var(--color-success)">答对了<code>5.8 : 1</code></div>
+        <div class="pair" style="background:var(--color-danger-soft); color:var(--color-danger)">再想想<code>5.7 : 1</code></div>
+        <div class="pair" style="background:var(--color-warning-soft); color:var(--color-warning)">再试一次<code>5.7 : 1</code></div>
+        <div class="pair" style="background:var(--color-accent-soft); color:var(--color-accent-text)">选中 · 信息<code>5.8 : 1</code></div>
+        <div class="pair" style="background:var(--color-primary-soft); color:var(--color-primary-text)">提示 · 阳光<code>5.8 : 1</code></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="type">
+    <header class="sec-head">
+      <span class="lesson-no sky"><svg class="icon"><use href="#i-abc"/></svg>第 2 课</span>
+      <h2 class="h1">文字</h2>
+      <p>圆体，标题 800、正文 500。孩子模式正文 18px，题目 26–32px；识字卡的汉字用楷体，和课本一样。</p>
+    </header>
+    <div class="panel type-split">
+      <div>
+        <p class="type-big">一起数到 100！</p>
+        <div class="scale-row"><code>4xl · 56</code><span style="font-size:var(--text-4xl)">第 3 关：认钟表</span></div>
+        <div class="scale-row"><code>3xl · 40</code><span style="font-size:var(--text-3xl)">今天认识了 12 个字</span></div>
+        <div class="scale-row"><code>2xl · 32</code><span style="font-size:var(--text-2xl)">8 + 5 = ?（题目）</span></div>
+        <div class="scale-row"><code>xl · 26</code><span style="font-size:var(--text-xl)">答对了，真棒！（选项、反馈）</span></div>
+        <div class="scale-row"><code>lg · 22</code><span style="font-size:var(--text-lg)">按一下小喇叭，听一听（按钮）</span></div>
+        <div class="scale-row"><code>md · 18</code><span class="t" style="font-size:var(--text-md)">正文：把苹果放进篮子里，数一数一共有几个。</span></div>
+        <div class="scale-row"><code>sm · 16</code><span class="t" style="font-size:var(--text-sm)">说明：每天学 15 分钟就够了，剩下的时间去玩吧</span></div>
+        <div class="scale-row"><code>xs · 14</code><span class="t" style="font-size:var(--text-xs); font-weight:var(--weight-bold)">小字：第 2 单元 · 第 3 / 8 题</span></div>
+        <div class="weights">
+          <div><b style="font-weight:500">晴 Aa</b><small>500 正文</small></div>
+          <div><b style="font-weight:600">晴 Aa</b><small>600 说明</small></div>
+          <div><b style="font-weight:700">晴 Aa</b><small>700 小标题</small></div>
+          <div><b style="font-weight:800">晴 Aa</b><small>800 标题、按钮</small></div>
+        </div>
+      </div>
+      <div>
+        <p class="sub">识字：楷体 + 拼音 + 田字格</p>
+        <div class="hz-row">
+          <div class="hz"><span>qíng</span><div class="tianzige">晴</div></div>
+          <div class="hz"><span>tiān</span><div class="tianzige">天</div></div>
+          <div class="hz"><span>tiān</span><div class="tianzige is-trace">天</div></div>
+        </div>
+        <p class="caption" style="margin-top:var(--space-3)">第三格是描红：字用 line-strong，孩子照着写。</p>
+        <p class="sub">数字：圆体等宽，1 和 7 一眼分得开</p>
+        <p class="digits">0123456789</p>
+        <div class="grown-scale" data-view="grown">
+          <p class="sub" style="margin-bottom:var(--space-2)">大人模式字号（正文 15，系统黑体）</p>
+          <div class="scale-row"><code>3xl · 30</code><span style="font-size:var(--text-3xl)">3 小时 20 分</span></div>
+          <div class="scale-row"><code>xl · 20</code><span style="font-size:var(--text-xl)">朵朵的这一周</span></div>
+          <div class="scale-row"><code>md · 15</code><span class="t" style="font-size:var(--text-md)">本周答对率比上周高 4%</span></div>
+          <div class="scale-row"><code>xs · 12</code><span class="t" style="font-size:var(--text-xs)">数据每天 21:00 更新</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="space">
+    <header class="sec-head">
+      <span class="lesson-no leaf"><svg class="icon"><use href="#i-sliders"/></svg>第 3 课</span>
+      <h2 class="h1">尺寸、描边、点击区</h2>
+      <p>4 / 8 的倍数；能点的东西最小 48，主操作 60–76。东西描墨边，区域只用浅线。</p>
+    </header>
+    <div class="grid-2">
+      <div class="panel">
+        <p class="sub">间距</p>
+        <div class="spaces">
+          <div class="space"><code>space-1</code><span>4</span><i style="width:4px"></i></div>
+          <div class="space"><code>space-2</code><span>8</span><i style="width:8px"></i></div>
+          <div class="space"><code>space-3</code><span>12</span><i style="width:12px"></i></div>
+          <div class="space"><code>space-4</code><span>16</span><i style="width:16px"></i></div>
+          <div class="space"><code>space-5</code><span>24</span><i style="width:24px"></i></div>
+          <div class="space"><code>space-6</code><span>32</span><i style="width:32px"></i></div>
+          <div class="space"><code>space-7</code><span>48</span><i style="width:48px"></i></div>
+          <div class="space"><code>space-8</code><span>64</span><i style="width:64px"></i></div>
+        </div>
+        <p class="sub">圆角</p>
+        <div class="radii">
+          <div class="note"><i style="border-radius:var(--radius-sm)"></i>sm 12<br>图标块</div>
+          <div class="note"><i style="border-radius:var(--radius-md)"></i>md 18<br>输入、按键</div>
+          <div class="note"><i style="border-radius:var(--radius-lg)"></i>lg 26<br>卡片、选项</div>
+          <div class="note"><i style="border-radius:var(--radius-xl)"></i>xl 36<br>弹窗</div>
+          <div class="note"><i style="border-radius:var(--radius-full)"></i>full<br>按钮、标签</div>
+        </div>
+      </div>
+      <div class="panel">
+        <p class="sub">描边</p>
+        <div class="strokes">
+          <div style="border:3px solid var(--ink)">3px 墨蓝<br>按钮、卡片、选项</div>
+          <div style="border:2px solid var(--ink)">2px 墨蓝<br>标签、选项键</div>
+          <div style="border:2px solid var(--color-line)">2px 浅线<br>大区块、面板</div>
+        </div>
+        <p class="sub">点击区：看到的可以小，能点的不小于 48</p>
+        <div class="tapdemo">
+          <div class="hit"><label class="check" style="min-height:0"><input type="checkbox" checked aria-label="示例"></label></div>
+          <div class="hit"><button class="btn btn-sm btn-secondary btn-icon" aria-label="返回"><svg class="icon"><use href="#i-back"/></svg></button></div>
+          <p class="caption" style="max-width:15em">勾选框 32 看得见、48 点得到；手指之间至少留 12。</p>
+        </div>
+        <p class="sub">立体感：描边里面一道高光、一道内阴影</p>
+        <div class="shade-demo">
+          <div class="note"><span class="btn">平时</span>内阴影在下</div>
+          <div class="note"><span class="btn is-pressed">按下</span>翻到上面</div>
+          <div class="note"><span class="key" style="width:72px">7</span>按键</div>
+          <div class="note"><span class="level-node" style="width:60px;height:60px;font-size:var(--text-xl)">3</span>关卡</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="button">
+    <header class="sec-head">
+      <span class="lesson-no coral"><svg class="icon"><use href="#i-plus"/></svg>第 4 课</span>
+      <h2 class="h1">按钮</h2>
+      <p>一律胶囊、3px 墨蓝描边。黄色是「这一屏要做的事」，绿色是「对了、继续」，红色只给退出和删除。</p>
+    </header>
+    <div class="panel">
+      <div class="btn-grid">
+        <small></small><small class="col">平时</small><small class="col">按下</small><small class="col">不可用</small>
+        <small>主按钮 · 太阳黄</small><span><button class="btn">检查答案</button></span><span><button class="btn is-pressed">检查答案</button></span><span><button class="btn" disabled>先选一个</button></span>
+        <small>继续 · 叶子绿</small><span><button class="btn btn-go">继续<svg class="icon"><use href="#i-chev"/></svg></button></span><span><button class="btn btn-go is-pressed">继续<svg class="icon"><use href="#i-chev"/></svg></button></span><span><button class="btn btn-go" disabled>继续</button></span>
+        <small>天空蓝 · 听、看</small><span><button class="btn btn-sky"><svg class="icon"><use href="#i-sound"/></svg>听一遍</button></span><span><button class="btn btn-sky is-pressed"><svg class="icon"><use href="#i-sound"/></svg>听一遍</button></span><span><button class="btn btn-sky" disabled>听一遍</button></span>
+        <small>白按钮 · 次要</small><span><button class="btn btn-secondary"><svg class="icon"><use href="#i-bulb"/></svg>给点提示</button></span><span><button class="btn btn-secondary is-pressed"><svg class="icon"><use href="#i-bulb"/></svg>给点提示</button></span><span><button class="btn btn-secondary" disabled>提示用完了</button></span>
+        <small>珊瑚红 · 退出</small><span><button class="btn btn-danger">退出这一课</button></span><span><button class="btn btn-danger is-pressed">退出这一课</button></span><span><button class="btn btn-danger" disabled>退出这一课</button></span>
+        <small>文字按钮</small><span><button class="btn btn-ghost">跳过这题</button></span><span><button class="btn btn-ghost is-hover">跳过这题</button></span><span><button class="btn btn-ghost" disabled>跳过这题</button></span>
+      </div>
+      <p class="sub">尺寸</p>
+      <div class="row" style="align-items:flex-end">
+        <div class="note"><button class="btn btn-sm">再来一次</button>sm 48</div>
+        <div class="note"><button class="btn">再来一次</button>md 60（默认）</div>
+        <div class="note"><button class="btn btn-lg">再来一次</button>lg 76 · 开始、检查</div>
+        <div class="note"><button class="btn btn-secondary btn-icon btn-sm" aria-label="关掉"><svg class="icon"><use href="#i-close"/></svg></button>图标 48</div>
+        <div class="note"><button class="btn btn-sky btn-icon" aria-label="听"><svg class="icon"><use href="#i-sound"/></svg></button>图标 60</div>
+        <div class="note"><button class="btn btn-icon btn-lg" aria-label="开始"><svg class="icon"><use href="#i-play"/></svg></button>图标 76</div>
+      </div>
+      <p class="sub">整行（手机、平板底部的「检查」）</p>
+      <button class="btn btn-lg btn-block" style="max-width:520px">检查答案</button>
+    </div>
+  </section>
+
+  <section class="sec" id="quiz">
+    <header class="sec-head">
+      <span class="lesson-no orange"><svg class="icon"><use href="#i-check"/></svg>第 5 课</span>
+      <h2 class="h1">答题选项与反馈</h2>
+      <p>整张卡都能点。选中加一圈天空蓝；答对：实线 + 勾 + 「对」；答错：虚线 + 叉 + 「再想想」；没选的变淡。去掉颜色也分得清。</p>
+    </header>
+    <div class="grid-2">
+      <div class="panel opt-panel">
+        <div class="q"><b>3 + 4 = ?</b><span class="tag tag-muted">选好了，还没检查</span></div>
+        <div class="options">
+          <button class="option"><span class="option-key">A</span><span class="option-text">6</span></button>
+          <button class="option" aria-pressed="true"><span class="option-key">B</span><span class="option-text">7</span></button>
+          <button class="option"><span class="option-key">C</span><span class="option-text">8</span></button>
+          <button class="option is-hover"><span class="option-key">D</span><span class="option-text">9</span></button>
+        </div>
+        <div class="q" style="margin-top:var(--space-6)"><b>5 + 4 = ?</b><span class="tag tag-muted">检查以后</span></div>
+        <div class="options">
+          <button class="option is-wrong"><span class="option-key"><svg><use href="#i-close"/></svg></span><span class="option-flag"><svg><use href="#i-close"/></svg>再想想</span><span class="option-text">8</span></button>
+          <button class="option is-correct"><span class="option-key"><svg><use href="#i-check"/></svg></span><span class="option-flag"><svg><use href="#i-check"/></svg>对</span><span class="option-text">9</span></button>
+          <button class="option is-dim"><span class="option-key">C</span><span class="option-text">10</span></button>
+          <button class="option is-dim"><span class="option-key">D</span><span class="option-text">11</span></button>
+        </div>
+      </div>
+      <div class="panel">
+        <p class="sub">去掉颜色（色弱的孩子、黑白打印）也认得出</p>
+        <div class="state-col mono-demo">
+          <div class="options">
+            <button class="option"><span class="option-key">A</span><span class="option-text">平时</span></button>
+            <button class="option is-selected"><span class="option-key">B</span><span class="option-text">选中</span></button>
+            <button class="option is-correct"><span class="option-key"><svg><use href="#i-check"/></svg></span><span class="option-flag"><svg><use href="#i-check"/></svg>对</span><span class="option-text">答对</span></button>
+            <button class="option is-wrong"><span class="option-key"><svg><use href="#i-close"/></svg></span><span class="option-flag"><svg><use href="#i-close"/></svg>再想想</span><span class="option-text">答错</span></button>
+          </div>
+        </div>
+        <ul class="list" style="margin-top:var(--space-5)">
+          <li class="caption">· 选中：外圈加粗、选项键填色</li>
+          <li class="caption">· 答对：勾 + 「对」字标签 + 实线</li>
+          <li class="caption">· 答错：叉 + 「再想想」+ 虚线，不用红色闪屏</li>
+          <li class="caption">· 读屏：选项写 aria-pressed，结果写进反馈条的文字</li>
+        </ul>
+      </div>
+    </div>
+    <div class="panel">
+      <p class="sub">看图选（.option-pic）：图 4 : 3，字在下</p>
+      <div class="options options-4">
+        <button class="option option-pic"><span class="option-key">1</span><span class="option-art"><svg viewBox="0 0 80 64"><use href="#f-ping"/></svg></span><span class="option-text">苹果</span></button>
+        <button class="option option-pic" aria-pressed="true"><span class="option-key">2</span><span class="option-art"><svg viewBox="0 0 80 64"><use href="#f-banana"/></svg></span><span class="option-text">香蕉</span></button>
+        <button class="option option-pic is-wrong"><span class="option-key"><svg><use href="#i-close"/></svg></span><span class="option-flag"><svg><use href="#i-close"/></svg>再想想</span><span class="option-art"><svg viewBox="0 0 80 64"><use href="#f-orange"/></svg></span><span class="option-text">橘子</span></button>
+        <button class="option option-pic is-correct"><span class="option-key"><svg><use href="#i-check"/></svg></span><span class="option-flag"><svg><use href="#i-check"/></svg>对</span><span class="option-art"><svg viewBox="0 0 80 64"><use href="#f-melon"/></svg></span><span class="option-text">西瓜</span></button>
+      </div>
+      <p class="sub">反馈条：答完从屏幕底部升起</p>
+      <div class="stack">
+        <div class="feedback feedback-correct">
+          <span class="feedback-icon"><svg><use href="#i-check"/></svg></span>
+          <div><p class="feedback-title">答对了！</p><p class="feedback-text">5 + 4 = 9，+3 颗星星。</p></div>
+          <button class="btn btn-go">继续<svg class="icon"><use href="#i-chev"/></svg></button>
+        </div>
+        <div class="feedback feedback-wrong">
+          <span class="feedback-icon"><svg><use href="#i-close"/></svg></span>
+          <div><p class="feedback-title">差一点点</p><p class="feedback-text">正确答案是 9。先数 5，再往后数 4 个：6、7、8、9。</p></div>
+          <button class="btn btn-secondary">知道了</button>
+        </div>
+        <div class="feedback feedback-retry">
+          <span class="feedback-icon"><svg><use href="#i-retry"/></svg></span>
+          <div><p class="feedback-title">再试一次</p><p class="feedback-text">还有 1 次机会。小提示：可以掰着手指数。</p></div>
+          <button class="btn">再试一次</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="map">
+    <header class="sec-head">
+      <span class="lesson-no"><svg class="icon"><use href="#i-map"/></svg>第 6 课</span>
+      <h2 class="h1">进度与关卡地图</h2>
+      <p>上课时顶上一条：关掉 · 进度 · 星星。地图上做完的是绿圈带星，现在这关是更大的黄圈，没开的是虚线圈加锁。</p>
+    </header>
+    <div class="panel">
+      <div class="grid-2" style="gap:var(--space-6)">
+        <div class="stack">
+          <p class="sub">上课顶栏（.lessonbar）</p>
+          <div class="lessonbar">
+            <button class="btn btn-secondary btn-icon btn-sm" aria-label="关掉这一课"><svg class="icon"><use href="#i-close"/></svg></button>
+            <div class="progress" style="--value: 45%"><i></i></div>
+            <span class="counter"><svg viewBox="0 0 24 24"><use href="#heart"/></svg>3</span>
+          </div>
+          <p class="sub">第几题（.steps）：对的绿、错的红带斜纹、现在这题黄</p>
+          <div class="steps"><i class="is-done"></i><i class="is-done"></i><i class="is-miss"></i><i class="is-done"></i><i class="is-now"></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="stack">
+          <p class="sub">进度条</p>
+          <div class="progress" style="--value: 80%"><i></i></div>
+          <div class="progress progress-sky" style="--value: 55%"><i></i></div>
+          <div class="progress progress-sun progress-sm" style="--value: 30%"><i></i></div>
+          <div class="timer-bar"><svg class="icon"><use href="#i-clock"/></svg><div class="progress progress-coral progress-sm" style="--value: 18%"><i></i></div><span>0:05</span></div>
+        </div>
+      </div>
+      <p class="sub">关卡地图（.map）</p>
+      <div class="map-scene">
+        <svg class="deco" viewBox="0 0 120 60" style="left:24%; top:16px; width:120px; height:60px"><use href="#cloud" style="fill:var(--paper); stroke:var(--color-line); stroke-width:3"/></svg>
+        <svg class="deco" viewBox="0 0 120 60" style="left:68%; top:40px; width:90px; height:45px"><use href="#cloud" style="fill:var(--paper); stroke:var(--color-line); stroke-width:3"/></svg>
+        <svg class="deco" viewBox="0 0 48 64" style="left:12%; top:318px; width:40px; height:54px"><use href="#tree"/></svg>
+        <svg class="deco" viewBox="0 0 48 64" style="left:28.5%; top:296px; width:48px; height:64px"><use href="#tree"/></svg>
+        <svg class="deco" viewBox="0 0 48 64" style="left:45%; top:322px; width:36px; height:48px"><use href="#tree"/></svg>
+        <svg class="deco" viewBox="0 0 48 64" style="left:57%; top:316px; width:40px; height:54px"><use href="#tree"/></svg>
+        <svg class="deco" viewBox="0 0 48 64" style="left:74%; top:290px; width:46px; height:62px"><use href="#tree"/></svg>
+        <svg class="deco" viewBox="0 0 48 64" style="left:87%; top:330px; width:34px; height:46px"><use href="#tree"/></svg>
+        <div class="map-unit"><small>第 2 单元</small><b>20 以内加减法</b><small>3 / 7 关 · <span class="num">8</span> 颗星</small></div>
+        <div class="map">
+          <svg class="map-road" viewBox="0 0 1000 400" preserveAspectRatio="none" aria-hidden="true">
+            <path class="road-edge" vector-effect="non-scaling-stroke" d="M60 300 C140 300 140 190 220 190 S320 270 380 270 S440 160 510 160 S600 250 660 250 S740 150 810 150 S880 230 940 230"/>
+            <path class="road" vector-effect="non-scaling-stroke" d="M60 300 C140 300 140 190 220 190 S320 270 380 270 S440 160 510 160 S600 250 660 250 S740 150 810 150 S880 230 940 230"/>
+            <path class="road-done" vector-effect="non-scaling-stroke" d="M60 300 C140 300 140 190 220 190 S320 270 380 270 S440 160 510 160"/>
+            <path class="road-dash" vector-effect="non-scaling-stroke" d="M510 160 S600 250 660 250 S740 150 810 150 S880 230 940 230"/>
+          </svg>
+          <a class="level is-done" href="#map" style="--x:6%; --y:75%"><span class="level-node">1</span><span class="level-stars"><svg class="star"><use href="#star"/></svg><svg class="star"><use href="#star"/></svg><svg class="star"><use href="#star"/></svg></span><span class="level-label">数到 20</span></a>
+          <a class="level is-done" href="#map" style="--x:22%; --y:47.5%"><span class="level-node">2</span><span class="level-stars"><svg class="star"><use href="#star"/></svg><svg class="star"><use href="#star"/></svg><svg class="star is-empty"><use href="#star"/></svg></span><span class="level-label">比大小</span></a>
+          <a class="level is-done" href="#map" style="--x:38%; --y:67.5%"><span class="level-node">3</span><span class="level-stars"><svg class="star"><use href="#star"/></svg><svg class="star"><use href="#star"/></svg><svg class="star"><use href="#star"/></svg></span><span class="level-label">凑十</span></a>
+          <a class="level is-current" href="#map" style="--x:51%; --y:40%"><span class="level-node">4</span><span class="level-label">开始 · 进位加</span></a>
+          <span class="level is-locked" style="--x:66%; --y:62.5%"><span class="level-node"><svg><use href="#i-lock"/></svg></span><span class="level-label">退位减</span></span>
+          <span class="level is-chest" style="--x:81%; --y:37.5%"><span class="level-node"><svg><use href="#i-gift"/></svg></span><span class="level-label">宝箱</span></span>
+          <span class="level is-locked" style="--x:94%; --y:57.5%"><span class="level-node"><svg><use href="#i-trophy"/></svg></span><span class="level-label">单元小测</span></span>
+        </div>
+        <svg class="mascot mascot-sm map-mascot" viewBox="0 0 64 64" style="left:56%; top:72px"><use href="#sun-cheer"/></svg>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="reward">
+    <header class="sec-head">
+      <span class="lesson-no sky"><svg class="icon"><use href="#i-trophy"/></svg>第 7 课</span>
+      <h2 class="h1">星星与徽章</h2>
+      <p>星星是每一课的分数（最多 3 颗），徽章是长期的小目标。奖励只夸努力和进步，不排名、不催付费。</p>
+    </header>
+    <div class="grid-2 eq">
+      <div class="panel">
+        <p class="sub">星星（.stars）：空星是虚线，不是灰色实心</p>
+        <div class="row" style="gap:var(--space-6)">
+          <div class="note"><span class="stars"><svg class="star"><use href="#star"/></svg><svg class="star"><use href="#star"/></svg><svg class="star"><use href="#star"/></svg></span>3 颗 · 全对</div>
+          <div class="note"><span class="stars"><svg class="star"><use href="#star"/></svg><svg class="star"><use href="#star"/></svg><svg class="star is-empty"><use href="#star"/></svg></span>2 颗</div>
+          <div class="note"><span class="stars"><svg class="star"><use href="#star"/></svg><svg class="star is-empty"><use href="#star"/></svg><svg class="star is-empty"><use href="#star"/></svg></span>1 颗</div>
+        </div>
+        <p class="sub">计数胶囊（.counter）</p>
+        <div class="row">
+          <span class="counter"><svg class="star"><use href="#star"/></svg>128</span>
+          <span class="counter"><svg viewBox="0 0 24 24"><use href="#heart"/></svg>3</span>
+          <span class="counter"><svg viewBox="0 0 24 24"><use href="#sun-dot"/></svg>连续 6 天</span>
+          <span class="counter"><svg class="icon" style="color:var(--color-accent-text)"><use href="#i-book"/></svg>认识 86 个字</span>
+        </div>
+        <p class="sub">徽章（.medal）：颜色用 --medal 换</p>
+        <div class="medals">
+          <div class="medal" style="--medal: var(--sky)"><div class="medal-art"><svg viewBox="0 0 96 112"><use href="#medal"/></svg><svg class="medal-icon"><use href="#i-book"/></svg></div><span class="medal-name">读书小达人</span><span class="medal-meta">读完 10 本绘本</span></div>
+          <div class="medal" style="--medal: var(--leaf)"><div class="medal-art"><svg viewBox="0 0 96 112"><use href="#medal"/></svg><svg class="medal-icon"><use href="#i-math"/></svg></div><span class="medal-name">口算小能手</span><span class="medal-meta">口算连续 3 天全对</span></div>
+          <div class="medal"><div class="medal-art"><svg viewBox="0 0 96 112"><use href="#medal"/></svg><svg class="medal-icon"><use href="#i-sun"/></svg></div><span class="medal-name">早起小太阳</span><span class="medal-meta">连续 7 天学习</span></div>
+          <div class="medal is-locked"><div class="medal-art"><svg viewBox="0 0 96 112"><use href="#medal"/></svg><svg class="medal-icon"><use href="#i-lock"/></svg></div><span class="medal-name">英语小耳朵</span><span class="medal-meta">还差 12 个单词</span></div>
+        </div>
+        <p class="caption" style="margin-top:var(--space-5)">规则写在明处：全对 3 颗，错 1–2 题 2 颗，做完就有 1 颗；星星只加不扣。</p>
+      </div>
+      <div class="overlay">
+        <div class="ghost-page" style="height:100%; min-height:600px; box-sizing:border-box"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="modal-scrim">
+          <div class="modal reward">
+            <div class="modal-art"><span class="stars stars-lg"><svg class="star"><use href="#star"/></svg><svg class="star"><use href="#star"/></svg><svg class="star"><use href="#star"/></svg></span></div>
+            <svg class="mascot" viewBox="0 0 64 64"><use href="#sun-cheer"/></svg>
+            <h3 class="modal-title">这一课完成啦！</h3>
+            <p class="modal-body">10 题答对 9 题，用了 4 分 12 秒。</p>
+            <span class="counter"><svg class="star"><use href="#star"/></svg>+30 颗星星</span>
+            <div class="modal-footer">
+              <button class="btn btn-lg btn-block">收下星星</button>
+              <button class="btn btn-ghost btn-block">再玩一次</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="buddy">
+    <header class="sec-head">
+      <span class="lesson-no leaf"><svg class="icon"><use href="#i-sun"/></svg>第 8 课</span>
+      <h2 class="h1">角色与对话气泡</h2>
+      <p>小太阳「晴晴」负责出题、提示和夸奖。气泡描墨边、尾巴指向说话的人；提示用浅阳光底，想一想用虚线。</p>
+    </header>
+    <div class="grid-2">
+      <div class="panel">
+        <p class="sub">晴晴的三种表情（.mascot）</p>
+        <div class="mascots">
+          <div class="note"><svg class="mascot mascot-lg" viewBox="0 0 64 64"><use href="#sun-happy"/></svg>开心 · 出题</div>
+          <div class="note"><svg class="mascot mascot-lg" viewBox="0 0 64 64"><use href="#sun-cheer"/></svg>欢呼 · 答对、完成</div>
+          <div class="note"><svg class="mascot mascot-lg" viewBox="0 0 64 64"><use href="#sun-think"/></svg>想一想 · 答错、空状态</div>
+        </div>
+        <p class="caption" style="margin-top:var(--space-5)">答错时晴晴不皱眉、不哭，只是「想一想」。尺寸：sm 64 · 默认 96 · lg 140。</p>
+      </div>
+      <div class="panel stack" style="gap:var(--space-5)">
+        <div class="speech">
+          <svg class="mascot" viewBox="0 0 64 64"><use href="#sun-happy"/></svg>
+          <div class="bubble" style="display:flex; align-items:center; gap:var(--space-3)"><span>小鱼有几条尾巴？<small>按喇叭再听一遍</small></span><button class="audio audio-sm" aria-label="再听一遍"><svg><use href="#i-sound"/></svg></button></div>
+        </div>
+        <div class="speech speech-right">
+          <span class="avatar avatar-lg avatar-coral">朵</span>
+          <div class="bubble bubble-think">嗯……一条！</div>
+        </div>
+        <div class="speech">
+          <svg class="mascot" viewBox="0 0 64 64"><use href="#sun-think"/></svg>
+          <div class="bubble bubble-sun"><span style="display:inline-flex; gap:8px; align-items:center"><svg class="icon" style="color:var(--color-primary-text)"><use href="#i-bulb"/></svg>提示：先找到小鱼的头，再看另一头。</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="word">
+    <header class="sec-head">
+      <span class="lesson-no coral"><svg class="icon"><use href="#i-sound"/></svg>第 9 课</span>
+      <h2 class="h1">计时、读音、字卡</h2>
+      <p>计时环快到时变珊瑚红并写出「快一点」；读音按钮永远是天空蓝圆钮，正在读时变黄、外面一圈声波。</p>
+    </header>
+    <div class="grid-2">
+      <div class="panel">
+        <p class="sub">计时（.timer）</p>
+        <div class="timers">
+          <div class="note"><div class="timer" style="--left: 60"><svg class="timer-ring" viewBox="0 0 104 104"><circle class="track" cx="52" cy="52" r="42"/><circle class="left" cx="52" cy="52" r="42" pathLength="100"/><circle class="edge" cx="52" cy="52" r="50"/><circle class="edge" cx="52" cy="52" r="34"/></svg><div class="timer-face"><b>18</b><small>秒</small></div></div>还剩 18 秒</div>
+          <div class="note"><div class="timer is-low" style="--left: 17"><svg class="timer-ring" viewBox="0 0 104 104"><circle class="track" cx="52" cy="52" r="42"/><circle class="left" cx="52" cy="52" r="42" pathLength="100"/><circle class="edge" cx="52" cy="52" r="50"/><circle class="edge" cx="52" cy="52" r="34"/></svg><div class="timer-face"><b>5</b><small>秒</small></div></div><span class="tag tag-danger"><svg><use href="#i-clock"/></svg>快一点</span></div>
+          <div class="note"><div class="timer is-paused" style="--left: 40"><svg class="timer-ring" viewBox="0 0 104 104"><circle class="track" cx="52" cy="52" r="42"/><circle class="left" cx="52" cy="52" r="42" pathLength="100"/><circle class="edge" cx="52" cy="52" r="50"/><circle class="edge" cx="52" cy="52" r="34"/></svg><div class="timer-face"><svg class="icon" style="width:32px;height:32px"><use href="#i-pause"/></svg><small>暂停</small></div></div>暂停了</div>
+        </div>
+        <p class="caption" style="margin-top:var(--space-4)">计时只用在「口算挑战」这类游戏里；普通练习不计时。</p>
+      </div>
+      <div class="panel">
+        <p class="sub">读音按钮（.audio）</p>
+        <div class="audios">
+          <div class="note"><button class="audio audio-sm" aria-label="听"><svg><use href="#i-sound"/></svg></button>sm 48</div>
+          <div class="note"><button class="audio" aria-label="听"><svg><use href="#i-sound"/></svg></button>默认 72</div>
+          <div class="note"><button class="audio is-playing" aria-label="正在读"><svg><use href="#i-sound"/></svg></button>正在读</div>
+          <div class="note"><button class="audio audio-slow" aria-label="慢慢读"><svg><use href="#i-turtle"/></svg></button>慢慢读</div>
+          <div class="note"><button class="audio audio-lg" aria-label="听题目"><svg><use href="#i-sound"/></svg></button>lg 112 · 听题</div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <p class="sub">字卡（.word-card）：图 + 楷体字 + 拼音 + 读音；背面是例句和描红</p>
+      <div class="words">
+        <div class="word-card">
+          <div class="word-pic"><svg viewBox="0 0 80 64"><use href="#f-melon"/></svg></div>
+          <button class="audio audio-sm" aria-label="读一读"><svg><use href="#i-sound"/></svg></button>
+          <p class="word"><ruby>西<rt>xī</rt>瓜<rt>guā</rt></ruby></p>
+          <p class="word-sub">水果 · 第 12 个</p>
+        </div>
+        <div class="word-card">
+          <div class="word-pic" style="background:var(--color-accent-soft)"><svg viewBox="0 0 80 64"><use href="#f-fish"/></svg></div>
+          <button class="audio audio-sm" aria-label="读一读"><svg><use href="#i-sound"/></svg></button>
+          <p class="word-en">fish</p>
+          <p class="word-sub">/fɪʃ/ · 鱼</p>
+        </div>
+        <div class="word-card word-card-back">
+          <span class="tag tag-sun" style="justify-self:start">背面 · 用一用</span>
+          <p class="sentence">夏天到了，我和奶奶一起吃<mark>西瓜</mark>。</p>
+          <div class="hz-row" style="justify-self:start">
+            <div class="tianzige" style="width:96px;height:96px;font-size:68px">瓜</div>
+            <div class="tianzige is-trace" style="width:96px;height:96px;font-size:68px">瓜</div>
+          </div>
+        </div>
+        <div class="word-card" style="background:var(--color-surface-2); border-style:dashed; border-color:var(--color-line-strong); box-shadow:none">
+          <div class="empty" style="padding:var(--space-5) 0">
+            <svg class="mascot" viewBox="0 0 64 64"><use href="#sun-think"/></svg>
+            <p class="empty-title" style="font-size:var(--text-lg)">翻过来看看</p>
+            <p class="empty-text">字卡点一下翻面；长按收进「我的字卡本」。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="keypad">
+    <header class="sec-head">
+      <span class="lesson-no orange"><svg class="icon"><use href="#i-math"/></svg>第 10 课</span>
+      <h2 class="h1">小键盘</h2>
+      <p>口算、填数字用自己的大键盘，不叫系统键盘。按键 76 × 64，删除是浅红，确定是叶子绿。</p>
+    </header>
+    <div class="panel grid-2" style="align-items:center">
+      <div class="stack" style="gap:var(--space-5)">
+        <div class="speech">
+          <svg class="mascot mascot-sm" viewBox="0 0 64 64"><use href="#sun-happy"/></svg>
+          <div class="bubble">8 条小鱼，又游来 5 条，一共几条？</div>
+        </div>
+        <div class="fishes">
+          <svg viewBox="0 0 80 64"><use href="#f-fish"/></svg><svg viewBox="0 0 80 64"><use href="#f-fish"/></svg><svg viewBox="0 0 80 64"><use href="#f-fish"/></svg><svg viewBox="0 0 80 64"><use href="#f-fish"/></svg><svg viewBox="0 0 80 64"><use href="#f-fish"/></svg><svg viewBox="0 0 80 64"><use href="#f-fish"/></svg><svg viewBox="0 0 80 64"><use href="#f-fish"/></svg><svg viewBox="0 0 80 64"><use href="#f-fish"/></svg><hr><svg class="new" viewBox="0 0 80 64"><use href="#f-fish"/></svg><svg class="new" viewBox="0 0 80 64"><use href="#f-fish"/></svg><svg class="new" viewBox="0 0 80 64"><use href="#f-fish"/></svg><svg class="new" viewBox="0 0 80 64"><use href="#f-fish"/></svg><svg class="new" viewBox="0 0 80 64"><use href="#f-fish"/></svg>
+        </div>
+        <div class="equation"><span>8 + 5 =</span><span class="slots"><span class="slot is-filled">1</span><span class="slot is-active"></span></span></div>
+        <p class="caption">填数格（.slot）：没填是虚线，正在填的外面一圈天空蓝和光标。</p>
+      </div>
+      <div style="justify-self:center">
+        <div class="keypad">
+          <button class="key">1</button><button class="key">2</button><button class="key is-pressed">3</button>
+          <button class="key">4</button><button class="key">5</button><button class="key">6</button>
+          <button class="key">7</button><button class="key">8</button><button class="key">9</button>
+          <button class="key key-del" aria-label="删掉一个"><svg><use href="#i-del"/></svg></button><button class="key">0</button><button class="key key-ok" aria-label="好了"><svg><use href="#i-check"/></svg></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="form">
+    <header class="sec-head">
+      <span class="lesson-no sky"><svg class="icon"><use href="#i-pencil"/></svg>第 11 课</span>
+      <h2 class="h1">表单</h2>
+      <p>孩子能填的只有名字、头像、喜好这几样；60 高、3px 墨边，聚焦外面一圈天空蓝。出错是虚线 + 一句话说怎么改。</p>
+    </header>
+    <div class="grid-2">
+      <div class="panel form-card">
+        <h3 class="h3">做一张自己的小卡片</h3>
+        <div class="field">
+          <label class="label" for="nm">叫我什么</label>
+          <input class="input is-focus" id="nm" value="朵朵">
+        </div>
+        <div class="form-row">
+          <div class="field">
+            <label class="label" for="gr">上几年级</label>
+            <select class="select" id="gr"><option>二年级</option></select>
+          </div>
+          <div class="field">
+            <label class="label" for="bd">几岁啦</label>
+            <input class="input" id="bd" value="0" aria-invalid="true">
+            <p class="hint is-error"><svg><use href="#i-alert"/></svg>写 5 到 10 之间的数</p>
+          </div>
+        </div>
+        <div class="field">
+          <span class="label">选一个头像</span>
+          <div class="avatar-pick">
+            <button class="avatar avatar-lg avatar-coral" aria-pressed="true">朵</button>
+            <button class="avatar avatar-lg avatar-sun"><svg class="icon" style="width:36px;height:36px"><use href="#i-sun"/></svg></button>
+            <button class="avatar avatar-lg avatar-leaf"><svg class="icon" style="width:34px;height:34px"><use href="#i-leaf"/></svg></button>
+            <button class="avatar avatar-lg"><svg class="icon" style="width:34px;height:34px"><use href="#i-heart"/></svg></button>
+            <button class="avatar avatar-lg avatar-orange"><svg class="icon" style="width:34px;height:34px"><use href="#i-music"/></svg></button>
+          </div>
+        </div>
+        <div class="field">
+          <span class="label">我最喜欢 <span class="opt">可以选好几个</span></span>
+          <div class="chips">
+            <button class="chip" aria-pressed="true"><svg><use href="#i-check"/></svg>数学</button>
+            <button class="chip">识字</button>
+            <button class="chip" aria-pressed="true"><svg><use href="#i-check"/></svg>英语</button>
+            <button class="chip">画画</button>
+          </div>
+        </div>
+        <button class="btn btn-lg btn-block">好了，出发！</button>
+      </div>
+      <div class="stack" style="gap:var(--space-5)">
+        <div class="panel">
+          <p class="sub">搜索</p>
+          <div class="input-wrap"><svg><use href="#i-search"/></svg><input class="input" placeholder="找一课、找一个字"></div>
+          <p class="sub">勾选与单选（框 32，点击区 48）</p>
+          <div class="controls">
+            <label class="check"><input type="checkbox" checked>每天提醒我</label>
+            <label class="radio"><input type="radio" name="sp" checked>正常速度</label>
+            <label class="check"><input type="checkbox">周末也提醒</label>
+            <label class="radio"><input type="radio" name="sp">慢一点读</label>
+            <label class="check"><input type="checkbox" disabled>夜里免打扰</label>
+            <label class="radio"><input type="radio" name="sp" disabled>自动读题</label>
+          </div>
+          <p class="sub">开关（灰掉的两项由大人在家长中心设置）</p>
+          <div class="controls">
+            <label class="switch"><input type="checkbox" checked>音效</label>
+            <label class="switch"><input type="checkbox">背景音乐</label>
+            <label class="switch"><input type="checkbox" checked disabled>护眼提醒</label>
+          </div>
+        </div>
+        <div class="panel">
+          <p class="sub">多行与不可用</p>
+          <div class="stack">
+            <textarea class="textarea" aria-label="想对老师说">今天的西瓜题好好玩！</textarea>
+            <input class="input" value="二年级 3 班（老师来改）" disabled aria-label="班级">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="misc">
+    <header class="sec-head">
+      <span class="lesson-no leaf"><svg class="icon"><use href="#i-book"/></svg>第 12 课</span>
+      <h2 class="h1">卡片、列表、标签、提示</h2>
+      <p>课程卡顶上一条科目色带画；列表整行能点，锁住的是虚线。提示条说清「怎么了 + 下一步」。</p>
+    </header>
+    <div class="lesson-cards">
+      <article class="card card-band" style="--band: var(--color-success-soft)">
+        <div class="band"><svg viewBox="0 0 80 64"><use href="#f-fish"/></svg></div>
+        <div class="card-header"><span class="tag tag-leaf"><svg><use href="#i-abc"/></svg>英语</span><span class="caption num">10 个单词</span></div>
+        <h3 class="card-title">海里的小动物</h3>
+        <div class="progress progress-sm" style="--value: 60%"><i></i></div>
+        <div class="card-footer"><span class="stars"><svg class="star"><use href="#star"/></svg><svg class="star"><use href="#star"/></svg><svg class="star is-empty"><use href="#star"/></svg></span><button class="btn btn-sm">接着学</button></div>
+      </article>
+      <article class="card card-band" style="--band: var(--color-danger-soft)">
+        <div class="band"><svg viewBox="0 0 80 64"><use href="#f-melon"/></svg></div>
+        <div class="card-header"><span class="tag tag-coral"><svg><use href="#i-book"/></svg>语文</span><span class="caption num">认 6 个字</span></div>
+        <h3 class="card-title">夏天的水果</h3>
+        <div class="progress progress-coral progress-sm" style="--value: 100%"><i></i></div>
+        <div class="card-footer"><span class="stars"><svg class="star"><use href="#star"/></svg><svg class="star"><use href="#star"/></svg><svg class="star"><use href="#star"/></svg></span><button class="btn btn-sm btn-secondary">再玩一次</button></div>
+      </article>
+      <article class="card card-band" style="--band: var(--color-accent-soft)">
+        <div class="band"><svg viewBox="0 0 80 64"><use href="#f-orange"/></svg></div>
+        <div class="card-header"><span class="tag tag-sky"><svg><use href="#i-math"/></svg>数学</span><span class="caption num">8 题</span></div>
+        <h3 class="card-title">分橘子：平均分</h3>
+        <div class="progress progress-sky progress-sm" style="--value: 6%"><i></i></div>
+        <div class="card-footer"><span class="caption">新的一课</span><button class="btn btn-sm">开始</button></div>
+      </article>
+    </div>
+    <div class="grid-2">
+      <div class="panel">
+        <p class="sub">列表（.list-item）</p>
+        <ul class="list">
+          <li><a class="list-item" href="#misc"><span class="icon-tile"><svg><use href="#i-clock"/></svg></span><span><b>认识钟表</b><small>数学 · 第 5 关 · 8 题</small></span><span class="stars"><svg class="star" style="width:24px;height:24px"><use href="#star"/></svg><svg class="star" style="width:24px;height:24px"><use href="#star"/></svg><svg class="star is-empty" style="width:24px;height:24px"><use href="#star"/></svg></span></a></li>
+          <li><a class="list-item" href="#misc"><span class="icon-tile" style="--tile: var(--coral)"><svg><use href="#i-home"/></svg></span><span><b>小动物的家</b><small>语文 · 识字 6 个 · 约 8 分钟</small></span><svg><use href="#i-chev"/></svg></a></li>
+          <li><a class="list-item" href="#misc"><span class="icon-tile" style="--tile: var(--leaf)"><svg><use href="#i-music"/></svg></span><span><b>一起唱字母歌</b><small>英语 · 听一听 · 3 分钟</small></span><svg><use href="#i-chev"/></svg></a></li>
+          <li><span class="list-item is-locked"><span class="icon-tile" style="--tile: var(--color-surface-2); border-color: var(--color-line-strong); color: var(--color-muted)"><svg><use href="#i-lock"/></svg></span><span><b>颜色单词</b><small>做完「一起唱字母歌」就能打开</small></span><span></span></span></li>
+        </ul>
+      </div>
+      <div class="panel">
+        <p class="sub">标签（.tag）· 角标（.count）· 状态点（.dot）</p>
+        <div class="stack" style="gap:var(--space-3)">
+          <div class="tag-row"><span class="tag tag-sun">新课</span><span class="tag tag-sky">数学</span><span class="tag tag-coral">语文</span><span class="tag tag-leaf"><svg><use href="#i-check"/></svg>学完了</span><span class="tag">默认</span><span class="caption">实心：科目、醒目的状态</span></div>
+          <div class="tag-row"><span class="tag tag-soft">二年级</span><span class="tag tag-success">进步了</span><span class="tag tag-warning">还差 2 题</span><span class="tag tag-danger">错了 3 次</span><span class="tag tag-muted">没开始</span><span class="caption">浅底：说明</span></div>
+          <div class="tag-row"><span class="count">3</span><span class="count">12</span><span class="caption" style="margin-right:var(--space-3)">角标</span><span class="dot dot-leaf"></span><span class="dot dot-sun"></span><span class="dot dot-sky"></span><span class="dot dot-coral"></span><span class="caption">状态点、科目点</span></div>
+        </div>
+        <p class="sub">提示条（.alert）</p>
+        <div class="stack" style="gap:var(--space-3)">
+          <div class="alert"><span class="alert-icon"><svg><use href="#i-info"/></svg></span><div><p class="alert-title">新的一单元来啦</p><p class="alert-text">「20 以内加减法」一共 7 关。</p></div><button class="btn btn-sm btn-secondary">看看</button></div>
+          <div class="alert alert-success"><span class="alert-icon"><svg><use href="#i-check"/></svg></span><div><p class="alert-title">今天的 15 分钟完成了</p><p class="alert-text">去玩一会儿吧，明天见！</p></div><span></span></div>
+          <div class="alert alert-warning"><span class="alert-icon"><svg><use href="#i-clock"/></svg></span><div><p class="alert-title">已经学了 25 分钟</p><p class="alert-text">让眼睛休息一下，看看远处的树。</p></div><span></span></div>
+          <div class="alert alert-danger"><span class="alert-icon"><svg><use href="#i-alert"/></svg></span><div><p class="alert-title">声音没打开</p><p class="alert-text">请大人帮忙把音量调大，才能听题。</p></div><button class="btn btn-sm btn-secondary">再试试</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="nav">
+    <header class="sec-head">
+      <span class="lesson-no coral"><svg class="icon"><use href="#i-map"/></svg>第 13 课</span>
+      <h2 class="h1">导航与轻提示</h2>
+      <p>标签页像作业本的分隔页签；分段切换选中是黄色胶囊；手机底部 3–5 个大图标。轻提示是墨蓝胶囊，2–3 秒自己走。</p>
+    </header>
+    <div class="grid-2">
+      <div class="panel">
+        <p class="sub">标签页（.tabs）</p>
+        <div class="tabs" role="tablist">
+          <a class="tab" role="tab" aria-selected="true" href="#nav">全部<span class="count">12</span></a>
+          <a class="tab" role="tab" href="#nav">语文</a>
+          <a class="tab" role="tab" href="#nav">数学</a>
+          <a class="tab" role="tab" href="#nav">英语</a>
+        </div>
+        <div class="tab-panel">
+          <p class="body">今天还有 <b>2</b> 课没学：认识钟表、小动物的家。</p>
+        </div>
+        <p class="sub">分段切换（.segmented）</p>
+        <div class="row">
+          <div class="segmented"><button aria-pressed="true">今天</button><button>这周</button><button>全部</button></div>
+          <div class="segmented"><button aria-pressed="true"><svg class="icon" style="width:20px;height:20px"><use href="#i-sound"/></svg>听</button><button><svg class="icon" style="width:20px;height:20px"><use href="#i-pencil"/></svg>写</button></div>
+        </div>
+        <p class="sub">分页（.pagination）</p>
+        <div class="pagination"><a href="#nav" aria-label="上一页"><svg><use href="#i-back"/></svg></a><a href="#nav">1</a><a href="#nav" aria-current="page">2</a><a href="#nav">3</a><a href="#nav">4</a><a href="#nav" aria-label="下一页"><svg><use href="#i-chev"/></svg></a></div>
+      </div>
+      <div class="stack" style="gap:var(--space-5)">
+        <div class="panel">
+          <p class="sub">底部主导航（.tabbar）</p>
+          <div class="phone-strip">
+            <div class="ghost-page" style="padding-bottom:var(--space-4)"><i></i><i></i></div>
+            <nav class="tabbar">
+              <a class="tabbar-item" aria-current="page" href="#nav"><i><svg><use href="#i-book"/></svg></i>学习</a>
+              <a class="tabbar-item" href="#nav"><i><svg><use href="#i-map"/></svg></i>关卡</a>
+              <a class="tabbar-item" href="#nav"><i><svg><use href="#i-trophy"/></svg></i>奖励</a>
+              <a class="tabbar-item" href="#nav"><i><svg><use href="#i-user"/></svg></i>我的</a>
+            </nav>
+          </div>
+        </div>
+        <div class="panel">
+          <p class="sub">轻提示（.toast）</p>
+          <div class="stack" style="gap:var(--space-3); justify-items:start">
+            <div class="toast"><span class="toast-icon"><svg><use href="#i-check"/></svg></span>已放进「我的字卡本」<button class="toast-action">撤销</button></div>
+            <div class="toast toast-star"><span class="toast-icon"><svg class="star" viewBox="0 0 24 24" style="width:26px;height:26px"><use href="#star"/></svg></span>+3 颗星星，连对 5 题！</div>
+            <div class="toast toast-danger"><span class="toast-icon"><svg><use href="#i-alert"/></svg></span>网断了，进度先存在这台平板上</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="dialog">
+    <header class="sec-head">
+      <span class="lesson-no"><svg class="icon"><use href="#i-parent"/></svg>第 14 课</span>
+      <h2 class="h1">弹窗与家长门</h2>
+      <p>要离开学习、要花钱、要改设置的地方，先过「家长门」：一道孩子还不会的题，随机换题，答错换一道。</p>
+    </header>
+    <div class="grid-2">
+      <div class="overlay">
+        <div class="ghost-page" style="height:600px"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="modal-scrim">
+          <div class="modal">
+            <button class="btn btn-secondary btn-icon btn-sm modal-close" aria-label="关上"><svg class="icon"><use href="#i-close"/></svg></button>
+            <span class="gate-icon"><svg><use href="#i-parent"/></svg></span>
+            <h3 class="modal-title">请大人来帮个忙</h3>
+            <p class="modal-body">答对这道题，就能进入家长中心。</p>
+            <div class="gate-question">7 × 8 = ?</div>
+            <div class="gate-options">
+              <button class="btn btn-secondary">48</button>
+              <button class="btn btn-secondary">54</button>
+              <button class="btn btn-secondary">56</button>
+              <button class="btn btn-secondary">63</button>
+            </div>
+            <button class="btn btn-ghost btn-sm">我是小朋友，回去学习</button>
+          </div>
+        </div>
+      </div>
+      <div class="overlay">
+        <div class="ghost-page" style="height:600px"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="modal-scrim">
+          <div class="modal">
+            <div class="modal-art"><svg class="mascot mascot-lg" viewBox="0 0 64 64"><use href="#sun-think"/></svg></div>
+            <h3 class="modal-title">现在就休息吗？</h3>
+            <p class="modal-body">这一课还差 3 题，晴晴会帮你记住做到哪里。</p>
+            <div class="steps" style="width:100%"><i class="is-done"></i><i class="is-done"></i><i class="is-done"></i><i class="is-done"></i><i class="is-done"></i><i class="is-now"></i><i></i><i></i></div>
+            <div class="modal-footer">
+              <button class="btn btn-lg btn-go btn-block">接着学</button>
+              <button class="btn btn-secondary btn-block">先休息</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="grown">
+    <header class="sec-head">
+      <span class="lesson-no sky"><svg class="icon"><use href="#i-chart"/></svg>第 15 课</span>
+      <h2 class="h1">大人模式</h2>
+      <p>家长中心、老师后台：外层加 data-view="grown"。同一套类名，描边变成 1px 浅线、字号小一档、主色换成沉稳的蓝；星星和科目色不变。</p>
+    </header>
+    <div class="parent" data-view="grown">
+      <aside class="p-side">
+        <div class="p-brand"><svg viewBox="0 0 64 64"><use href="#sun-happy"/></svg>晴天<small>家长</small></div>
+        <nav class="nav">
+          <a class="nav-item" aria-current="page" href="#grown"><svg><use href="#i-chart"/></svg>这一周</a>
+          <a class="nav-item" href="#grown"><svg><use href="#i-book"/></svg>学习记录</a>
+          <a class="nav-item" href="#grown"><svg><use href="#i-clock"/></svg>每天时长<span class="count">1</span></a>
+          <a class="nav-item" href="#grown"><svg><use href="#i-trophy"/></svg>星星与徽章</a>
+          <p class="nav-title">设置</p>
+          <a class="nav-item" href="#grown"><svg><use href="#i-sliders"/></svg>学习计划</a>
+          <a class="nav-item" href="#grown"><svg><use href="#i-eye-off"/></svg>护眼与休息</a>
+        </nav>
+        <div class="p-kid"><span class="avatar avatar-sm avatar-coral">朵</span><div><b>林朵朵</b><small>二年级 · 7 岁</small></div></div>
+      </aside>
+      <div class="p-main">
+        <div class="p-head">
+          <div><p class="caption">11 月 2 日 – 11 月 8 日</p><h3 class="h2">朵朵的这一周</h3><p class="caption">比上周多学了 25 分钟，数学进步最大。</p></div>
+          <div class="segmented"><button aria-pressed="true">本周</button><button>本月</button></div>
+          <button class="btn btn-secondary btn-sm"><svg class="icon" style="width:18px;height:18px"><use href="#i-export"/></svg>导出周报</button>
+        </div>
+        <div class="stats">
+          <div class="stat-card"><span class="stat-label"><i><svg><use href="#i-clock"/></svg></i>学习时长</span><span class="stat-value">3<small>小时</small>20<small>分</small></span><span class="delta up"><svg><use href="#i-up"/></svg><b>25 分</b>比上周</span></div>
+          <div class="stat-card"><span class="stat-label"><i style="--tile: var(--color-success-soft)"><svg><use href="#i-check"/></svg></i>答对率</span><span class="stat-value">86<small>%</small></span><span class="delta up"><svg><use href="#i-up"/></svg><b>4%</b>比上周</span></div>
+          <div class="stat-card"><span class="stat-label"><i style="--tile: var(--color-primary-soft)"><svg><use href="#i-cal"/></svg></i>连续学习</span><span class="stat-value">6<small>天</small></span><span class="delta">目标每周 5 天</span></div>
+          <div class="stat-card"><span class="stat-label"><i style="--tile: var(--color-warning-soft)"><svg class="star" viewBox="0 0 24 24" style="stroke-width:2"><use href="#star"/></svg></i>得到星星</span><span class="stat-value">128</span><span class="delta down"><svg><use href="#i-down"/></svg><b>6 颗</b>比上周</span></div>
+        </div>
+        <div class="p-grid">
+          <div class="card">
+            <div class="card-header"><div><p class="card-title">每天学了多久</p><p class="card-meta">单位：分钟 · 虚线是每天 25 分钟的目标</p></div><div class="legend"><span><i></i>达标</span><span><i style="--c: var(--color-accent-soft)"></i>没到</span><span><i style="--c: var(--sun)"></i>今天</span></div></div>
+            <div class="chart-week" style="--goal-n: 0.5">
+              <span class="goal">目标 25</span>
+              <div class="bar is-met" style="--h:50%"><i><b>25</b></i><span>一</span></div>
+              <div class="bar is-met" style="--h:64%"><i><b>32</b></i><span>二</span></div>
+              <div class="bar" style="--h:36%"><i><b>18</b></i><span>三</span></div>
+              <div class="bar is-met" style="--h:80%"><i><b>40</b></i><span>四</span></div>
+              <div class="bar is-met" style="--h:56%"><i><b>28</b></i><span>五</span></div>
+              <div class="bar is-met" style="--h:90%"><i><b>45</b></i><span>六</span></div>
+              <div class="bar is-today" style="--h:24%"><i><b>12</b></i><span>今天</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><p class="card-title">各科进度</p><a class="link" href="#grown" style="font-size:var(--text-sm)">全部</a></div>
+            <div class="subj">
+              <div class="subj-row"><div><span class="dot dot-sky"></span>数学<small>20 以内加减法</small><b>72%</b></div><div class="meter" style="--value:72%"><i></i></div></div>
+              <div class="subj-row"><div><span class="dot dot-coral"></span>语文<small>识字 120 / 300</small><b>40%</b></div><div class="meter" style="--value:40%; --bar: var(--coral)"><i></i></div></div>
+              <div class="subj-row"><div><span class="dot dot-leaf"></span>英语<small>海里的小动物</small><b>60%</b></div><div class="meter" style="--value:60%; --bar: var(--leaf)"><i></i></div></div>
+              <div class="subj-row"><div><span class="dot dot-sun"></span>科学<small>天气和季节</small><b>25%</b></div><div class="meter" style="--value:25%; --bar: var(--sun)"><i></i></div></div>
+            </div>
+            <div class="alert alert-success" style="margin-top:var(--space-2)"><span class="alert-icon"><svg><use href="#i-check"/></svg></span><div><p class="alert-title">凑十法已经熟练</p><p class="alert-text">下周可以开始进位加。</p></div><span></span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div><p class="card-title">老师看：二年级 3 班 · 第 2 小组</p><p class="card-meta">本周布置 5 课 · 数据截至 11 月 8 日 21:00</p></div><div class="row" style="gap:var(--space-2)"><button class="btn btn-ghost btn-sm">提醒没完成的</button><button class="btn btn-sm">布置新课</button></div></div>
+          <div class="table-wrap">
+            <table class="table">
+              <thead><tr><th>学生</th><th class="num">完成</th><th class="num">答对率</th><th class="num">时长</th><th class="num">星星</th><th>这周</th></tr></thead>
+              <tbody>
+                <tr class="is-selected"><td><span class="who"><span class="avatar avatar-sm avatar-coral">朵</span>林朵朵</span></td><td class="num">5 / 5</td><td class="num">86%</td><td class="num">200 分</td><td class="num">128</td><td><span class="tag tag-success">进步了</span></td></tr>
+                <tr><td><span class="who"><span class="avatar avatar-sm avatar-sun">米</span>周小米</span></td><td class="num">5 / 5</td><td class="num">92%</td><td class="num">165 分</td><td class="num">141</td><td><span class="tag tag-soft">按计划</span></td></tr>
+                <tr><td><span class="who"><span class="avatar avatar-sm avatar-leaf">乐</span>陈乐乐</span></td><td class="num">4 / 5</td><td class="num">78%</td><td class="num">142 分</td><td class="num">96</td><td><span class="tag tag-soft">按计划</span></td></tr>
+                <tr><td><span class="who"><span class="avatar avatar-sm">豆</span>王豆豆</span></td><td class="num">2 / 5</td><td class="num">64%</td><td class="num">58 分</td><td class="num">41</td><td><span class="tag tag-warning">需要鼓励</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="grid-2 eq">
+      <div class="card" data-view="grown">
+        <div class="card-header"><div><p class="card-title">学习计划</p><p class="card-meta">大人模式里的表单：44 高、1px 边、系统黑体</p></div><span class="tag tag-success">进步了</span></div>
+        <div class="form-row">
+          <div class="field"><label class="label" for="pl">每天学多久</label><input class="input" id="pl" value="25 分钟"><p class="hint">一二年级建议 15–25 分钟</p></div>
+          <div class="field"><label class="label" for="pt">提醒时间</label><select class="select" id="pt"><option>每天 19:00</option></select></div>
+        </div>
+        <label class="switch"><input type="checkbox" checked>到时间自动休息，并请晴晴说晚安</label>
+        <div class="card-footer"><button class="btn btn-ghost btn-sm">恢复默认</button><span class="row" style="gap:var(--space-2)"><button class="btn btn-secondary btn-sm">取消</button><button class="btn btn-sm">保存计划</button></span></div>
+      </div>
+      <div class="card" data-view="grown" style="padding:0; align-content:center">
+        <div class="empty">
+          <span class="gate-icon" style="width:56px;height:56px"><svg style="width:28px;height:28px"><use href="#i-chart"/></svg></span>
+          <p class="empty-title">这周还没有学习记录</p>
+          <p class="empty-text">做完第一课后，这里会出现时长和答对率。</p>
+          <button class="btn btn-secondary btn-sm">设置每天提醒</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="empty">
+    <header class="sec-head">
+      <span class="lesson-no leaf"><svg class="icon"><use href="#i-gift"/></svg>第 16 课</span>
+      <h2 class="h1">空状态</h2>
+      <p>想一想的晴晴 + 一句听得懂的话 + 一个去处。</p>
+    </header>
+    <div class="grid-2 eq">
+      <div class="panel">
+        <div class="empty">
+          <div class="empty-art"><svg class="mascot mascot-lg" viewBox="0 0 64 64"><use href="#sun-think"/></svg></div>
+          <p class="empty-title">还没有徽章哦</p>
+          <p class="empty-text">做完第一课，就能拿到第一枚徽章。</p>
+          <button class="btn"><svg class="icon"><use href="#i-play"/></svg>去上第一课</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="empty">
+          <div class="empty-art"><span class="stars stars-lg"><svg class="star is-empty"><use href="#star"/></svg><svg class="star is-empty"><use href="#star"/></svg><svg class="star is-empty"><use href="#star"/></svg></span></div>
+          <p class="empty-title">字卡本还是空的</p>
+          <p class="empty-text">学字时长按字卡就能收进来，睡前翻一翻。</p>
+          <button class="btn btn-secondary"><svg class="icon"><use href="#i-book"/></svg>去学几个字</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <b><svg viewBox="0 0 64 64"><use href="#sun-happy"/></svg>晴天 Sunny</b>
+    <p>给 5–10 岁孩子的学习 App 和课堂小工具 · CC0 · 样张里的名字、班级、课程和数字都是虚构的</p>
+  </div>
+</footer>
+
+</body>
+</html>

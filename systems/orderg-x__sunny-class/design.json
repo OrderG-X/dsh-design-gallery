@@ -1,0 +1,35 @@
+{
+  "format": 1,
+  "type": "system",
+  "title": {
+    "zh": "晴天 Sunny",
+    "en": "Sunny"
+  },
+  "description": {
+    "zh": "给 5–10 岁孩子的学习 App 和课堂小工具的设计系统：太阳黄、天空蓝、叶子绿配墨蓝粗描边，圆体字、大点击区；带对错不只靠颜色的答题选项、关卡地图、星星徽章、字卡、小键盘、家长门和安静的大人模式。",
+    "en": "For kids' learning apps (ages 5–10): sun, sky and leaf colors with thick navy outlines, big tap targets, answer cards, a level map, rewards, word cards, a parent gate and a calm grown-up view."
+  },
+  "categories": [
+    "kids",
+    "education"
+  ],
+  "tags": [
+    "illustration",
+    "dashboard",
+    "chart",
+    "form",
+    "list",
+    "empty-state",
+    "bilingual"
+  ],
+  "lang": "zh",
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "claude-opus-5-5"
+  }
+}
