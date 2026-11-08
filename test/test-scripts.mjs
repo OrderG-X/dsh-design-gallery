@@ -808,6 +808,7 @@ test('维护者命令：解析、改规矩文件', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-pol-'))
   fs.cpSync(path.join(REAL, 'policy'), path.join(root, 'policy'), { recursive: true })
   fs.writeFileSync(path.join(root, 'policy/featured.json'), '[]') // 真的精选单子有内容，这里从空的开始
+  fs.writeFileSync(path.join(root, 'policy/denylist.json'), '[]') // 真的下架单子也可能有记录（比如审核流程测试那条）
   const now = new Date('2026-11-06T00:00:00Z')
   assert.equal(applyPolicy({ action: 'takedown', id: 'a__bcd', reason: 'policy' }, { root, now }), 'policy/denylist.json')
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(root, 'policy/denylist.json'))), [{ id: 'a__bcd', at: '2026-11-06T00:00:00.000Z', reason: 'policy' }])
