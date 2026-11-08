@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "几何剪纸",
+    "en": "Paper Cut"
+  },
+  "description": {
+    "zh": "圆、拱、三角拼成的剪纸插画，纯色叠层",
+    "en": "Paper-cut illustrations of circles, arches and triangles in flat layers"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "claude-opus-5-5"
+  }
+}
