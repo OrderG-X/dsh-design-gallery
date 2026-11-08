@@ -1,0 +1,33 @@
+:root {
+  --color-bg: #F5F2EC;
+  --color-surface: #FBF9F5;
+  --color-text: #1E1E1C;
+  --color-muted: #5F5B54;
+  --color-line: #DAD4C8;
+  --color-primary: #2F3B37;
+  --color-accent: #8C2F2B;
+  --color-on: #F5F2EC;
+  --color-link: #8C2F2B;
+
+  --font-head: "Songti SC", "Noto Serif SC", "Source Han Serif SC", "STSong", serif;
+  --font-sans: "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  --weight-title: 300;
+  --weight-head: 500;
+
+  --text-sm: 24px;
+  --text-md: 28px;
+  --text-lg: 34px;
+  --text-xl: 52px;
+  --text-title: 260px;
+
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --safe: 80px;
+
+  --radius: 4px;
+  --hair: 1px solid var(--color-line);
+}
