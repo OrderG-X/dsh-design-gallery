@@ -138,17 +138,20 @@ export function decide(res, { login = '', createdAt = '', priorMerged = 0, strik
   labels.add(`lane: ${lane}`)
   const automerge = lane === 'A' && !failed && !held
   const conclusion = failed ? 'failure' : held || lane !== 'A' ? 'neutral' : 'success'
-  return { conclusion, lane, labels: [...labels].slice(0, 12), automerge, held, tier, comment: card(res, { login, lane, tier, held, failed, blocked, pending, today, partial, shotsBase }) }
+  return { conclusion, lane, labels: [...labels].slice(0, 12), automerge, held, tier, comment: card(res, { login, lane, tier, held, failed, blocked, pending, today, partial, shotsBase, age }) }
 }
 
 /** 审核卡（中英文）：结论、问题清单、截图、维护者能回的命令 */
-export function card(res, { login, lane, tier, held, failed, blocked = false, pending = 0, today = 0, partial = false, shotsBase }) {
+export function card(res, { login, lane, tier, held, failed, blocked = false, pending = 0, today = 0, partial = false, shotsBase, age = 0 }) {
   const L = []
   L.push('<!-- dsh-gallery-gate -->')
   if (blocked) L.push(`### ✗ 这个账号不再收稿 / This account can no longer submit`, '', '这个账号已经有两次违规记录（见 POLICY.md）。有疑问请开 issue 找维护者。 / This account has two strikes (see POLICY.md). Open an issue if you think this is a mistake.')
   else if (failed) L.push(`### ✗ 没过检查 / Checks failed`)
-  else if (held === 'limit') L.push(`### ⏸ 先排队：一次交太多了 / On hold: too many at once`, '', `每人同时最多 ${LIMIT.pending} 个在等审核、24 小时内最多交 ${LIMIT.daily} 套（现在：在等 ${pending} 个，24 小时内 ${today} 套）。前面的处理完会自动重查。 / Up to ${LIMIT.pending} open submissions and ${LIMIT.daily} per 24 hours per person (now: ${pending} open, ${today} in 24 hours). This will be re-checked automatically.`)
-  else if (held) L.push(`### ⏸ 先挂起：账号太新 / On hold: account too new`)
+  else if (held === 'limit') L.push(`### ⏸ 先排队：一次交太多了 / On hold: too many at once`, '', `每人同时最多 ${LIMIT.pending} 个在等审核、24 小时内最多交 ${LIMIT.daily} 套（现在：在等 ${pending} 个，24 小时内 ${today} 套）。每 6 小时自动重查一次，数量回到上限以内就接着往下走，不用重新提交。 / Up to ${LIMIT.pending} open submissions and ${LIMIT.daily} per 24 hours per person (now: ${pending} open, ${today} in 24 hours). Re-checked every 6 hours; it continues once you are back under the limits. No need to resubmit.`)
+  else if (held === 'author') {
+    const d = Math.max(0, Math.floor(age))
+    L.push(`### ⏸ 先挂起：账号太新 / On hold: account too new`, '', `GitHub 账号注册不满 7 天的投稿先挂起（这个账号现在 ${d} 天）。每 6 小时自动重查一次，满 7 天就接着往下走，不用重新提交。 / Submissions from GitHub accounts younger than 7 days are held (this one is ${d} days old). Re-checked every 6 hours; it continues once the account is 7 days old. No need to resubmit.`)
+  }
   else if (lane === 'A') L.push(`### ✓ 全过，自动合并 / All green, auto-merging`)
   else L.push(`### ✓ 检查都过了，等维护者看一眼 / Checks passed, waiting for a maintainer`)
   L.push('')
@@ -165,7 +168,6 @@ export function card(res, { login, lane, tier, held, failed, blocked = false, pe
     L.push('')
   }
   if (res.deleted.length) L.push(`删掉的 / Removed: ${res.deleted.join(', ')}`)
-  if (held) L.push('账号满 7 天后会自动重查，不用重新提交。 / This will be re-checked automatically once the account is 7 days old.')
   if (failed && !blocked) L.push('照上面改好后推送（或在 issue 里重新上传），会自动重查。 / Fix the items above and push (or re-upload in the issue); checks re-run automatically.')
   if (!failed && partial) L.push('· 24 小时投稿数没数全（这段时间 PR 太多），这次不自动合并。 / Could not count all submissions from the last 24 hours, so this will not auto-merge.')
   if (!failed && lane !== 'A') L.push(`维护者：回复 \`/approve\` 合并，\`/hold <原因>\` 挂起，\`/reject <原因>\` 关闭。（作者 @${login || '?'}，等级 ${tier}，车道 ${lane}）`)

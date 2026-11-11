@@ -586,6 +586,9 @@ test('闸门：严格读结果、车道、挂起、审核卡', () => {
   assert.equal(fresh.held, 'author')
   assert.equal(fresh.automerge, false)
   assert.ok(fresh.labels.includes('held: author'))
+  assert.match(fresh.comment, /账号太新/)
+  assert.match(fresh.comment, /现在 3 天/)
+  assert.match(fresh.comment, /满 7 天就接着往下走/)
   const tpl = readResults(JSON.stringify({ entries: [{ id: 'alice-1__matcha', type: 'template', ok: true, errors: [], flags: [{ code: 'password', msg: '有密码框', msgEn: 'password' }], shots: ['shots/alice-1__matcha/home.jpg'] }] }))
   const b = decide(tpl, { login: 'alice-1', createdAt: old, shotsBase: 'https://raw.githubusercontent.com/o/r/review-shots/3/9', now })
   assert.equal(b.lane, 'B')
@@ -915,6 +918,10 @@ test('治理：违规两次不收、手动信任按 id、待审和每天上限�
   assert.equal(limit.held, 'limit')
   assert.equal(limit.automerge, false)
   assert.ok(limit.labels.includes('held: limit'))
+  // 排队卡只讲数量，不提账号年龄（之前误写了「满 7 天后会自动重查」）
+  assert.match(limit.comment, /一次交太多了/)
+  assert.match(limit.comment, /在等 4 个/)
+  assert.doesNotMatch(limit.comment, /7 天|7 days/)
   assert.equal(decide(style, { login: 'alice-1', createdAt: old, today: 4, now }).held, 'limit')
   assert.equal(decide(style, { login: 'alice-1', createdAt: old, pending: 3, today: 3, now }).automerge, true)
   // /trust 过的新账号不挂起；/untrust（T0）的风格卡也不自动合并
