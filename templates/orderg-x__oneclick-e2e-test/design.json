@@ -1,0 +1,29 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": {
+    "zh": "青苔茶铺（一键投稿测试）"
+  },
+  "description": {
+    "zh": "一键投稿真机测试，测完关掉"
+  },
+  "kind": "app",
+  "screens": [
+    {
+      "file": "home.html",
+      "title": {
+        "zh": "首页"
+      }
+    }
+  ],
+  "license": "CC0-1.0",
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.18.0"
+  },
+  "shareHash": "e2e0000000000000000001a1cb41818a",
+  "author": {
+    "login": "OrderG-X",
+    "id": 271418316
+  }
+}
