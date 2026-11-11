@@ -22,6 +22,9 @@ jobs:
     if: github.event.workflow_run.event == 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    outputs:
+      number: ${{ steps.pr.outputs.number }}
+      ping: ${{ steps.post.outputs.ping }}
     steps:
       - id: app
         uses: actions/create-github-app-token@v1
@@ -151,10 +154,12 @@ jobs:
           TODAY: ${{ steps.pr.outputs.today }}
           COUNT_PARTIAL: ${{ steps.pr.outputs.partial }}
           SHOTS_BASE: ${{ steps.shots.outputs.base }}
+          MAINTAINER: ${{ github.repository_owner }}
         run: node scripts/gate.mjs artifact/results.json --trusted trusted/results.json --out gate.json
 
       - name: 写检查、贴卡、打标签、（A 车道）合并
         if: steps.pr.outputs.skip != 'true'
+        id: post
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           N: ${{ steps.pr.outputs.number }}
@@ -170,6 +175,7 @@ jobs:
           # 同一张卡反复更新，不刷屏
           cid=$(gh api "repos/$GITHUB_REPOSITORY/issues/$N/comments" --paginate --jq ".[] | select(.user.login == \"${APP_SLUG}[bot]\" and (.body | startswith(\"<!-- dsh-gallery-gate -->\"))) | .id" | tail -1)
           if [ -n "$cid" ]; then gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$cid" -F body=@card.md >/dev/null; else gh pr comment "$N" --body-file card.md >/dev/null; fi
+          { echo 'ping<<EOF_DSH_PING'; jq -r '.ping // ""' gate.json; echo 'EOF_DSH_PING'; } >> "$GITHUB_OUTPUT"
           # 标签：先去掉闸门自己上次打的（checks / lane / flag / held: author|limit / blocked），再加新的；维护者的 held: maintainer 不动
           gh api "repos/$GITHUB_REPOSITORY/issues/$N/labels" --jq '.[].name' > labels.txt
           for l in $(jq -Rr 'select(test("^(checks|lane|flag|blocked): |^held: (author|limit)$")) | @uri' labels.txt); do gh api -X DELETE "repos/$GITHUB_REPOSITORY/issues/$N/labels/$l" >/dev/null || true; done
@@ -178,3 +184,40 @@ jobs:
           if [ "$(jq -r .automerge gate.json)" = "true" ] && ! grep -qx 'held: maintainer' labels.txt; then
             gh pr merge "$N" --squash --body "Submission: $SUBMISSION" --match-head-commit "$SHA"
           fi
+
+  # 别人的投稿等人看：单独 @ 维护者一次（审核卡是反复改的那条，改出来的 @ 不会提醒；被 @ 过就订阅了这个 PR，之后的动静 GitHub 自己会提醒）
+  # 同一个 PR 的几次闸门（不同提交）可能同时跑：提醒这一步按 PR 排队，轮到了再查一遍「提醒过没有、现在还该不该提醒」
+  ping:
+    needs: gate
+    if: needs.gate.outputs.ping != ''
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    concurrency:
+      group: pr-gate-ping-${{ needs.gate.outputs.number }}
+      cancel-in-progress: false
+    steps:
+      - id: app
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.GALLERY_APP_ID }}
+          private-key: ${{ secrets.GALLERY_APP_PRIVATE_KEY }}
+      - name: '@ 维护者（每个 PR 一次；检查没过、挂起了、维护者 /hold 过的不提醒）'
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          N: ${{ needs.gate.outputs.number }}
+          PING: ${{ needs.gate.outputs.ping }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+          APP_SLUG: ${{ steps.app.outputs.app-slug }}
+        run: |
+          set -euo pipefail
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$N" > pr.json
+          [ "$(jq -r .state pr.json)" = open ] || { echo "PR 不开着了"; exit 0; }
+          # 排队的时候作者又推了新提交：这次的结果（和标签）说的是旧提交，等新提交那次闸门再定
+          [ "$(jq -r .head.sha pr.json)" = "$SHA" ] || { echo "PR 已经有新提交，这次不提醒"; exit 0; }
+          gh api "repos/$GITHUB_REPOSITORY/issues/$N/labels" --jq '.[].name' > labels.txt
+          grep -qx 'checks: pass' labels.txt || { echo "现在检查没过"; exit 0; }
+          if grep -q '^held: ' labels.txt; then echo "挂起中，不提醒"; exit 0; fi
+          pinged=$(gh api "repos/$GITHUB_REPOSITORY/issues/$N/comments" --paginate --jq ".[] | select(.user.login == \"${APP_SLUG}[bot]\" and (.body | startswith(\"<!-- dsh-gallery-ping -->\"))) | .id" | tail -1)
+          [ -z "$pinged" ] || { echo "提醒过了"; exit 0; }
+          printf '%s\n' "$PING" > ping.md
+          gh pr comment "$N" --repo "$GITHUB_REPOSITORY" --body-file ping.md >/dev/null

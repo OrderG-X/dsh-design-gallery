@@ -6,7 +6,9 @@
  *   node scripts/intake.mjs --out out/intake
  *
  * 做的事：
- *   1. 从表单里找附件：只认 https://github.com/user-attachments/ 下的 .zip，匿名下载，跳转只放行 GitHub 自己的存储
+ *   0. 「确认」四条都要勾（API 开的 issue 不受表单必填约束，这里自己查）
+ *   1. 从表单里找附件：只认 https://github.com/user-attachments/ 下的 .zip，或投稿人自己仓库里按提交号钉死的 .zip
+ *      （设计台一键投稿走这条），匿名下载，跳转只放行 GitHub 自己的存储
  *   2. 严格解包（和插件同一份 readZip：防路径穿越、软链接、zip 炸弹、限个数和大小）
  *   3. 能自动修的修掉（注释、站外链接改 #、表单提交地址），图片去掉 EXIF / 文字块；写清单 author = issue 作者
  *   4. 用 ci 规则查一遍：不过就写 intake.json { ok:false, errors }，由下一步回复投稿人
@@ -50,12 +52,56 @@ export function findAttachments(text) {
   return [...new Set(String(text || '').match(ATTACH) || [])]
 }
 
+// 设计台一键投稿：zip 放在投稿人自己的仓库（一般是 fork）的某个提交里，地址按提交号钉死。
+// 后面紧跟查询串、# 的不认（插件不会这么写；截掉再认就成了另一个地址）
+const REPO_ZIP = /https:\/\/github\.com\/([A-Za-z0-9-]{1,39})\/[A-Za-z0-9._-]{1,100}\/raw\/[0-9a-f]{40}\/[A-Za-z0-9._-]{1,80}\.zip(?![\w.\/?#-])/g
+
+/** 正文里放在 GitHub 仓库里的 zip：只认投稿人自己仓库的（mine），别人的单独数出来（others） */
+export function findRepoZips(text, login) {
+  const me = String(login || '').toLowerCase()
+  const mine = new Set()
+  let others = 0
+  for (const m of String(text || '').matchAll(REPO_ZIP)) {
+    if (me && m[1].toLowerCase() === me) mine.add(m[0])
+    else others++
+  }
+  return { mine: [...mine], others }
+}
+
+// 表单「确认」四条的开头（.github/ISSUE_TEMPLATE/submit-design.yml；设计台一键投稿照抄同样的字）
+const AGREE = ['这是我自己', '品牌是虚构的', '里面没有真实的个人信息', '同意按上面选的授权公开']
+
+/** 「确认」那一栏四条都勾了（表单要求必勾；API 开的 issue 不受表单约束，这里逐条查，别的勾选顶替不了） */
+export function agreed(form) {
+  const lines = String(field(form, 'Confirm', '确认')).split(/\r?\n/)
+  return AGREE.every((a) => lines.some((l) => /^[ \t]*[-*] \[[xX]\] /.test(l) && l.replace(/^[ \t]*[-*] \[[xX]\] /, '').startsWith(a)))
+}
+
+/** 一键投稿的 zip 地址拆开：{ owner, repo, sha, file }（小写的 owner / repo），不是就 null */
+export function repoZipParts(url) {
+  const m = /^https:\/\/github\.com\/([A-Za-z0-9-]{1,39})\/([A-Za-z0-9._-]{1,100})\/raw\/([0-9a-f]{40})\/([A-Za-z0-9._-]{1,80}\.zip)$/.exec(String(url))
+  return m ? { owner: m[1].toLowerCase(), repo: m[2].toLowerCase(), sha: m[3], file: m[4] } : null
+}
+
+/** 下载一键投稿的 zip：每一跳都得还是同一个仓库、同一个提交、同一个文件（仓库转给别人后的跳转不跟） */
+export function sameRepoZip(want) {
+  return (u) => {
+    if (!want) return false
+    const x = new URL(u)
+    if (x.protocol !== 'https:' || x.search || x.username || x.port) return false
+    const m = x.hostname === 'github.com' ? /^\/([^/]+)\/([^/]+)\/raw\/([0-9a-f]{40})\/([^/]+)$/.exec(x.pathname)
+      : x.hostname === 'raw.githubusercontent.com' ? /^\/([^/]+)\/([^/]+)\/([0-9a-f]{40})\/([^/]+)$/.exec(x.pathname) : null
+    return !!m && m[1].toLowerCase() === want.owner && m[2].toLowerCase() === want.repo && m[3] === want.sha && m[4] === want.file
+  }
+}
+
 /** 匿名下载，跟跳转但只跟 GitHub 自己的存储，超过上限就停 */
-export async function download(url, { max = ZIP_MAX, fetcher = globalThis.fetch } = {}) {
+export async function download(url, { max = ZIP_MAX, fetcher = globalThis.fetch, allow = null } = {}) {
   let u = url
   for (let hop = 0; hop < 5; hop++) {
     const host = new URL(u).hostname
     if (!REDIRECT_OK(host) || new URL(u).protocol !== 'https:') throw new Error(`不下载这个地址：${host}`)
+    if (allow && !allow(u)) throw new Error(`不下载这个地址：${host}${new URL(u).pathname.slice(0, 80)}`)
     const r = await fetcher(u, { redirect: 'manual', signal: AbortSignal.timeout(30000), headers: { 'User-Agent': 'dsh-design-gallery-intake' } })
     if (r.status >= 300 && r.status < 400) {
       const loc = r.headers.get('location')
@@ -191,9 +237,14 @@ async function main() {
     if (!readJson(path.join(ROOT, 'policy', 'intake.json'), { open: true }).open) { result.errors.push({ code: 'closed', msg: '投稿暂停中，晚点再交', msgEn: 'Submissions are paused, please try later' }); return done() }
     if (!/^[A-Za-z0-9-]{1,39}$/.test(login) || !Number.isInteger(id) || id <= 0) throw new Error('不知道是谁交的')
     const form = parseForm(process.env.ISSUE_BODY || '')
-    const urls = findAttachments(field(form, 'Design pack', '设计包') || process.env.ISSUE_BODY)
+    if (!agreed(form)) { result.errors.push({ code: 'agree', msg: '「确认」那四条没勾全：勾上再交', msgEn: 'Not all four boxes under "Confirm" are ticked' }); return done() }
+    const text = field(form, 'Design pack', '设计包') || process.env.ISSUE_BODY
+    const repo = findRepoZips(text, login)
+    const urls = [...findAttachments(text), ...repo.mine]
+    if (!urls.length && repo.others) { result.errors.push({ code: 'attachOwner', msg: '设计包要放在你自己的 GitHub 仓库里（或者直接把 zip 拖进「设计包」那一栏）', msgEn: 'The design pack must be in your own GitHub repository (or drag the zip into the "Design pack" field)' }); return done() }
     if (urls.length !== 1) { result.errors.push({ code: 'attach', msg: urls.length ? '一次只交一个 zip' : '没找到设计包：把插件「分享到市场」存下的 zip 拖进「设计包」那一栏', msgEn: urls.length ? 'Attach exactly one zip' : 'No design pack found: drag the zip saved by the plugin into the "Design pack" field' }); return done() }
-    const zip = await download(urls[0])
+    const own = repoZipParts(urls[0])
+    const zip = await download(urls[0], own ? { allow: sameRepoZip(own) } : {})
     const { files } = readZip(zip)
     const license = /CC-BY/i.test(field(form, 'License', '授权')) ? 'CC-BY-4.0' : 'CC0-1.0'
     const p = prepare(files, { login, id, license, slug: field(form, 'Short name', '短名'), vocab: loadVocab() })

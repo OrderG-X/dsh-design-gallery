@@ -15,7 +15,8 @@ concurrency:
 
 jobs:
   unpack:
-    if: contains(github.event.issue.labels.*.name, 'submission') && github.event.issue.state == 'open'
+    # 表单开的带 submission 标签；设计台一键投稿是投稿人用 API 开的，外人开 issue 加不了标签，按标题认
+    if: (contains(github.event.issue.labels.*.name, 'submission') || startsWith(github.event.issue.title, '投稿 / Submission:')) && github.event.issue.state == 'open'
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     steps:
@@ -98,3 +99,5 @@ jobs:
           [ -f reply.md ] || echo "### ✗ 没处理成 / Could not process" > reply.md
           if [ -n "$PR_URL" ]; then printf '\nPR: %s\n' "$PR_URL" >> reply.md; fi
           gh issue comment "$N" --repo "$GITHUB_REPOSITORY" --body-file reply.md
+          # 一键投稿开的 issue 没有标签：补上，和表单投稿的归到一起
+          gh issue edit "$N" --repo "$GITHUB_REPOSITORY" --add-label submission >/dev/null 2>&1 || true

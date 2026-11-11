@@ -12,9 +12,9 @@ Install the design studio in DSH (Plugins → Add plugin → `dsh-design-studio`
 
 ## 怎么投稿 / Contribute
 
-最简单：在设计台里点「分享到设计市场」，它会检查、打好 zip、打开投稿表单，你把 zip 拖进去提交就行。会 git 的也可以直接提 PR。详见 [CONTRIBUTING.zh.md](CONTRIBUTING.zh.md) / [CONTRIBUTING.md](CONTRIBUTING.md)。
+最简单：在设计台里点「分享到设计市场」，它会检查，过了点「一键投稿」就交上来了（第一次要连一下 GitHub）。不想连的也可以打开投稿表单拖 zip。会 git 的也可以直接提 PR。详见 [CONTRIBUTING.zh.md](CONTRIBUTING.zh.md) / [CONTRIBUTING.md](CONTRIBUTING.md)。
 
-Easiest: click *Share to the gallery* in the studio. It checks your design, saves a zip and opens the submission form; drop the zip in and submit. Pull requests work too. See [CONTRIBUTING.md](CONTRIBUTING.md).
+Easiest: click *Share to the gallery* in the studio. It checks your design; once it passes, click *Submit* (connect GitHub once the first time). You can also open the submission form and drop the zip in. Pull requests work too. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## 收什么 / What we accept
 

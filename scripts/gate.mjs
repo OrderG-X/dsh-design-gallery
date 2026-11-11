@@ -13,8 +13,9 @@
  *   SHOTS_BASE                       截图的公开地址前缀（孤儿分支 review-shots 的 raw 地址）
  *   （违规记录 policy/strikes.json、手动信任 trust-overrides.json 由这里自己从 main 读，按数字 id 认）
  *   PENDING / TODAY                  作者同时在等审核的投稿数、24 小时内交了几套（含这一个）
+ *   MAINTAINER                       仓库主人（别人的投稿等人看时 @ 这个账号）
  *
- * 产物 gate.json：{ conclusion, lane, labels, automerge, held, summary, comment }
+ * 产物 gate.json：{ conclusion, lane, labels, automerge, held, ping, comment }（ping：要单独发的 @ 维护者那条，不用发就是空）
  *
  * 车道（第一版：只有你一个人审，先保守）：
  *   A 自动合并：全绿没标记、只有一套风格卡（作者 ≥30 天）。模板、设计系统（包括老作者更新自己的）一律等维护者看
@@ -116,7 +117,7 @@ export function tierOf({ createdAt, priorMerged = 0, reports = 0, now = Date.now
  * 挂起：账号不满 7 天（/trust 过的不挂）；同时在等的超过 3 个、24 小时内交了超过 3 套
  * 违规两次（strikes.json）：不再收
  */
-export function decide(res, { login = '', createdAt = '', priorMerged = 0, strikes = 0, override = '', pending = 0, today = 0, partial = false, shotsBase = '', now = Date.now() } = {}) {
+export function decide(res, { login = '', createdAt = '', priorMerged = 0, strikes = 0, override = '', pending = 0, today = 0, partial = false, shotsBase = '', owner = '', now = Date.now() } = {}) {
   const labels = new Set()
   const { tier, age } = tierOf({ createdAt, priorMerged, reports: strikes, now, override })
   const blocked = strikes >= 2
@@ -138,7 +139,11 @@ export function decide(res, { login = '', createdAt = '', priorMerged = 0, strik
   labels.add(`lane: ${lane}`)
   const automerge = lane === 'A' && !failed && !held
   const conclusion = failed ? 'failure' : held || lane !== 'A' ? 'neutral' : 'success'
-  return { conclusion, lane, labels: [...labels].slice(0, 12), automerge, held, tier, comment: card(res, { login, lane, tier, held, failed, blocked, pending, today, partial, shotsBase, age }) }
+  // 别人交的、检查过了、没挂起、要人看：单独发一条 @ 维护者（审核卡是反复改的那一条，改出来的 @ 不会提醒）
+  const ping = !failed && !held && lane !== 'A' && /^[A-Za-z0-9-]{1,39}$/.test(owner) && String(login).toLowerCase() !== owner.toLowerCase()
+    ? `<!-- dsh-gallery-ping -->\n@${owner} 有新投稿过了检查，等你看一眼（车道 ${lane}）。 / A new submission passed the checks and is waiting for your review (lane ${lane}).`
+    : ''
+  return { conclusion, lane, labels: [...labels].slice(0, 12), automerge, held, tier, ping, comment: card(res, { login, lane, tier, held, failed, blocked, pending, today, partial, shotsBase, age }) }
 }
 
 /** 审核卡（中英文）：结论、问题清单、截图、维护者能回的命令 */
@@ -217,8 +222,8 @@ function main() {
   const login = process.env.PR_AUTHOR_LOGIN || ''
   const st = standing({ login, id: Number(process.env.PR_AUTHOR_ID || 0), strikes: pol('strikes.json', []), overrides: pol('trust-overrides.json', {}) })
   const g = res
-    ? decide(res, { login, createdAt: process.env.ACCOUNT_CREATED_AT || '', priorMerged: Number(process.env.PRIOR_MERGED || 0), strikes: st.strikes, override: st.override, pending: Number(process.env.PENDING || 0), today: Number(process.env.TODAY || 0), partial: process.env.COUNT_PARTIAL !== '0', shotsBase: process.env.SHOTS_BASE || '' })
-    : { conclusion: 'failure', lane: 'B', labels: ['checks: fail'], automerge: false, held: '', comment: '<!-- dsh-gallery-gate -->\n### ✗ 检查结果读不出来 / Could not read check results\n\n维护者看一下工作流日志。 / A maintainer will look at the workflow log.' }
+    ? decide(res, { login, createdAt: process.env.ACCOUNT_CREATED_AT || '', priorMerged: Number(process.env.PRIOR_MERGED || 0), strikes: st.strikes, override: st.override, pending: Number(process.env.PENDING || 0), today: Number(process.env.TODAY || 0), partial: process.env.COUNT_PARTIAL !== '0', shotsBase: process.env.SHOTS_BASE || '', owner: process.env.MAINTAINER || '' })
+    : { conclusion: 'failure', lane: 'B', labels: ['checks: fail'], automerge: false, held: '', ping: '', comment: '<!-- dsh-gallery-gate -->\n### ✗ 检查结果读不出来 / Could not read check results\n\n维护者看一下工作流日志。 / A maintainer will look at the workflow log.' }
   fs.mkdirSync(path.dirname(path.resolve(out)), { recursive: true })
   fs.writeFileSync(out, JSON.stringify(g, null, 2) + '\n')
   console.log(`${g.conclusion} · 车道 ${g.lane}${g.held ? ' · 挂起' : ''}${g.automerge ? ' · 自动合并' : ''}`)

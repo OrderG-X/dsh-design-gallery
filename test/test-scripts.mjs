@@ -25,7 +25,7 @@ const { guard, parseChanged, checkEntry, changeRatio, changeParts, BIG_CHANGE } 
 const { changedDirs } = await import('../scripts/changed.mjs')
 const { build, paletteOf, todayVersion, nextSerial, contentSha, readShots } = await import('../scripts/build-index.mjs')
 const { signBytes, verifyBytes, rawPublic } = await import('../scripts/sign.mjs')
-const { parseForm, field, findAttachments, prepare, stripJpeg, stripPng, slugify, download } = await import('../scripts/intake.mjs')
+const { parseForm, field, findAttachments, findRepoZips, agreed, repoZipParts, sameRepoZip, prepare, stripJpeg, stripPng, slugify, download } = await import('../scripts/intake.mjs')
 const { apply } = await import('../scripts/intake-apply.mjs')
 const { readResults, decide, mergeResults, standing, countMine } = await import('../scripts/gate.mjs')
 const { parseReport, shouldHide, candidates, restoredSince } = await import('../scripts/reports.mjs')
@@ -504,6 +504,40 @@ test('收稿：表单、附件地址、下载只跟 GitHub 自己的跳转', asy
   assert.deepEqual(findAttachments(field(f, 'Design pack')), ['https://github.com/user-attachments/files/123456/matcha.zip'])
   assert.deepEqual(findAttachments('https://evil.example/x.zip https://github.com/someone/repo/raw/x.zip'), [])
   assert.equal(slugify('Matcha Time!! 抹茶'), 'matcha-time')
+  // 一键投稿：zip 在投稿人自己仓库里、按提交号钉死；别人仓库的不认，分支名（会变）的不认
+  const sha = 'a'.repeat(40)
+  const own = `https://github.com/Alice-1/dsh-design-gallery/raw/${sha}/submission.zip`
+  assert.deepEqual(findRepoZips(`[x](${own})`, 'alice-1'), { mine: [own], others: 0 })
+  assert.deepEqual(findRepoZips(`https://github.com/bob/dsh-design-gallery/raw/${sha}/submission.zip`, 'alice-1'), { mine: [], others: 1 })
+  assert.deepEqual(findRepoZips('https://github.com/Alice-1/r/raw/main/submission.zip', 'alice-1'), { mine: [], others: 0 })
+  assert.deepEqual(findRepoZips(`${own}.exe ${own}/x`, 'alice-1'), { mine: [], others: 0 })
+  assert.deepEqual(findRepoZips(`${own}?download=1 ${own}#x`, 'alice-1'), { mine: [], others: 0 })
+  assert.deepEqual(findRepoZips(`见 ${own}。`, 'alice-1'), { mine: [own], others: 0 })
+  // 四个确认要逐条勾上（API 开的 issue 不受表单必填约束；别的勾选顶替不了）
+  const AG = ['这是我自己（或用设计台）做的原创设计', '品牌是虚构的，没有仿冒', '里面没有真实的个人信息 / x', '同意按上面选的授权公开，并收进设计市场']
+  const conf = (n, extra = '') => parseForm(`### 确认 / Confirm\n\n${AG.map((x, i) => `- [${i < n ? 'X' : ' '}] ${x}`).join('\n')}${extra}`)
+  assert.equal(agreed(conf(4)), true)
+  assert.equal(agreed(conf(3)), false)
+  assert.equal(agreed(conf(3, '\n- [x] 别的东西\n- [x] 再来一个')), false)
+  assert.equal(agreed(parseForm(`### 确认 / Confirm\n\n${AG.map((x) => `- [x] ${x}`).slice(0, 3).join('\n')}\n- [x] ${AG[0]}`)), false)
+  assert.equal(agreed(parseForm(`### 设计包 / Design pack\n\n${AG.map((x) => `- [x] ${x}`).join('\n')}`)), false)
+  // 下载一键投稿的 zip：每一跳都得是同一个仓库、同一个提交、同一个文件
+  const want = repoZipParts(own)
+  assert.deepEqual(want, { owner: 'alice-1', repo: 'dsh-design-gallery', sha, file: 'submission.zip' })
+  const ok = sameRepoZip(want)
+  assert.equal(ok(own), true)
+  assert.equal(ok(`https://raw.githubusercontent.com/alice-1/dsh-design-gallery/${sha}/submission.zip`), true)
+  assert.equal(ok(`https://github.com/bob/dsh-design-gallery/raw/${sha}/submission.zip`), false) // 仓库转给别人后的跳转
+  assert.equal(ok(`https://raw.githubusercontent.com/bob/dsh-design-gallery/${sha}/submission.zip`), false)
+  assert.equal(ok(`https://raw.githubusercontent.com/alice-1/dsh-design-gallery/${'d'.repeat(40)}/submission.zip`), false)
+  assert.equal(ok(`https://raw.githubusercontent.com/alice-1/dsh-design-gallery/${sha}/other.zip`), false)
+  assert.equal(ok(`https://raw.githubusercontent.com/alice-1/dsh-design-gallery/${sha}/submission.zip?x=1`), false)
+  const moved = { [own]: { status: 301, location: `https://github.com/bob/dsh-design-gallery/raw/${sha}/submission.zip` } }
+  const fk = async (u) => { const h = moved[u]; return { status: h ? h.status : 200, headers: { get: (k) => (k === 'location' && h ? h.location : null) }, body: [Buffer.from('PK')] } }
+  await assert.rejects(download(own, { fetcher: fk, allow: ok }), /不下载/)
+  const fine = { [own]: { status: 302, location: `https://raw.githubusercontent.com/Alice-1/dsh-design-gallery/${sha}/submission.zip` } }
+  const fk2 = async (u) => { const h = fine[u]; return { status: h ? h.status : 200, headers: { get: (k) => (k === 'location' && h ? h.location : null) }, body: [Buffer.from('PK')] } }
+  assert.equal((await download(own, { fetcher: fk2, allow: ok })).toString(), 'PK')
   // 跳到别处的不下载
   const hops = { 'https://github.com/user-attachments/files/1/a.zip': { status: 302, location: 'https://evil.example/a.zip' } }
   const fake = async (u) => { const h = hops[u]; return { status: h ? h.status : 404, headers: new Map(Object.entries({ location: h && h.location })), body: [] } }
@@ -597,6 +631,13 @@ test('闸门：严格读结果、车道、挂起、审核卡', () => {
   assert.match(b.comment, /<!-- dsh-gallery-gate -->/)
   assert.match(b.comment, /review-shots\/3\/9\/shots\/alice-1__matcha\/home\.jpg/)
   assert.match(b.comment, /\/approve/)
+  // 别人交的、要人看：单独 @ 维护者；自己交的、自动合并的、挂起的、没过的都不 @
+  assert.match(decide(tpl, { login: 'alice-1', createdAt: old, owner: 'OrderG-X', now }).ping, /^<!-- dsh-gallery-ping -->\n@OrderG-X /)
+  assert.equal(decide(tpl, { login: 'orderg-x', createdAt: old, owner: 'OrderG-X', now }).ping, '')
+  assert.equal(decide(res, { login: 'alice-1', createdAt: old, owner: 'OrderG-X', now }).ping, '')
+  assert.equal(decide(tpl, { login: 'alice-1', createdAt: '2026-11-03T00:00:00Z', owner: 'OrderG-X', now }).ping, '')
+  assert.equal(decide(tpl, { login: 'alice-1', createdAt: old, owner: '', now }).ping, '')
+  assert.equal(decide(readResults(JSON.stringify({ entries: [{ id: 'alice-1__matcha', type: 'template', ok: false, errors: [{ code: 'x', msg: 'x' }], flags: [], shots: [] }] })), { login: 'alice-1', createdAt: old, owner: 'OrderG-X', now }).ping, '')
   const bad = decide(readResults(JSON.stringify({ guard: [{ code: 'protected', msg: '改了 scripts' }], lane: 'C', entries: [] })), { createdAt: old, now })
   assert.equal(bad.conclusion, 'failure')
   assert.equal(bad.lane, 'C')
