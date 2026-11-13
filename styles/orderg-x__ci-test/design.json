@@ -1,0 +1,21 @@
+{
+  "format": 1,
+  "type": "style",
+  "title": {
+    "zh": "线上测试（不合并）",
+    "en": "CI test (do not merge)"
+  },
+  "description": {
+    "zh": "深海青配珊瑚橙、细线框、方角",
+    "en": "Deep teal with coral, hairline frames, square corners"
+  },
+  "license": "CC0-1.0",
+  "author": {
+    "login": "orderg-x",
+    "id": 271418316
+  },
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.19.0"
+  }
+}

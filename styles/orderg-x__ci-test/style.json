@@ -1,0 +1,21 @@
+{
+  "c": {
+    "bg": "#0E2A2E",
+    "surface": "#133539",
+    "text": "#E8F1EF",
+    "muted": "#9DB7B3",
+    "line": "#24494D",
+    "primary": "#FF7A59",
+    "accent": "#3FB8A9",
+    "on": "#0E2A2E",
+    "link": "#FF9A7F"
+  },
+  "head": "GROTESK",
+  "w": 700,
+  "radius": 2,
+  "shadow": "none",
+  "dzh": "深海青配珊瑚橙、细线框、方角",
+  "den": "Deep teal with coral, hairline frames, square corners",
+  "nzh": "底色深海青，强调色只用珊瑚橙；所有卡片细线框、方角、不用阴影；字用浅薄荷白，标题粗、正文细",
+  "nen": "Deep teal ground, coral as the only accent; hairline frames on every card, square corners, no shadows; pale mint-white text, bold headings and light body"
+}
