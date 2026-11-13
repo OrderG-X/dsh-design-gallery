@@ -1248,7 +1248,9 @@ test('维护者命令：先认人（不排队）；动手（apply）不排任何
   assert.match(apply, /^\n  apply:\n    needs: auth\n    if: needs\.auth\.outputs\.ok == 'true'\n/)
   assert.match(confirm, /^\n  confirm:\n    needs: \[auth, apply\]\n    if: needs\.apply\.outputs\.action == 'merge' \|\| needs\.apply\.outputs\.action == 'hold' \|\| needs\.apply\.outputs\.action == 'untrust'\n/)
   // cancelled 也管 apply 在「照做」开始之前就失败了（准备的步骤出错）——再认人时确实不是维护者了的不管
-  assert.match(canc, /^\n  cancelled:\n    needs: \[auth, apply, confirm\]\n(    #.*\n)*    if: always\(\) && needs\.auth\.outputs\.ok == 'true' && \(needs\.apply\.result == 'cancelled' \|\| needs\.confirm\.result == 'cancelled' \|\| \(needs\.apply\.result == 'failure' && needs\.apply\.outputs\.did != 'true' && needs\.apply\.outputs\.denied != 'true'\)\)\n/)
+  assert.match(canc, /^\n  cancelled:\n    needs: \[auth, apply, confirm\]\n(    #.*\n)*    if: always\(\) && \(needs\.auth\.outputs\.err == 'true' \|\| \(needs\.auth\.outputs\.ok == 'true' && \(needs\.apply\.result == 'cancelled' \|\| needs\.confirm\.result == 'cancelled' \|\| \(needs\.apply\.result == 'failure' && needs\.apply\.outputs\.did != 'true' && needs\.apply\.outputs\.denied != 'true'\)\)\)\)\n/)
+  assert.match(auth, /\n      err: \$\{\{ steps\.who\.outputs\.err \}\}\n/)
+  assert.match(canc, /\n          AUTH_ERR: \$\{\{ needs\.auth\.outputs\.err \}\}\n/)
   assert.match(apply, /\n      did: \$\{\{ steps\.do\.outputs\.did \}\}\n/)
   assert.match(apply, /\n      denied: \$\{\{ steps\.reauth\.outputs\.denied \}\}\n/)
   assert.match(apply, /- name: 动手前再认一次人\n        id: reauth\n/)
@@ -1670,10 +1672,47 @@ test('/approve：同一个来源后来的一回被取消了（重跑旧的一回
   assert.equal(merges(rn).length, 1)
 })
 
-test('维护者命令：轮到了再认一次人——排队时权限被撤了、查不到就不做', { skip: SKIP }, () => {
-  const go = (resp) => runStep('chatops.yml', '轮到了再认一次人', { fix: { '^GET repos/o/r/collaborators/maint/permission$': resp }, env: { GH_TOKEN: 'app', ACTOR: 'maint' } })
+test('维护者命令：轮到了再认一次人——排队时权限被撤了不做（不回话）；一直查不到（试 3 回）不合、回话请再发', { skip: SKIP }, () => {
+  const go = (resp) => runStep('chatops.yml', '轮到了再认一次人', { fix: { '^GET repos/o/r/collaborators/maint/permission$': resp, '^issue comment$': {} }, env: { GH_TOKEN: 'app', ACTOR: 'maint', N: '7' } })
+  const tries = (r) => r.calls.filter((c) => c.route === 'GET repos/o/r/collaborators/maint/permission').length
   for (const p of ['admin', 'maintain', 'write']) assert.equal(go({ body: { permission: p } }).code, 0, p)
-  for (const resp of [{ body: { permission: 'read' } }, { body: { permission: 'none' } }, { code: 1 }]) assert.notEqual(go(resp).code, 0, JSON.stringify(resp))
+  // 出错一回、第二回读到了：照做
+  assert.equal(go({ codes: [1, 0], bodies: [{}, { permission: 'write' }] }).code, 0)
+  for (const resp of [{ body: { permission: 'read' } }, { body: { permission: 'none' } }, { code: 1, stderr: 'gh: Not Found (HTTP 404)\n' }]) {
+    const r = go(resp)
+    assert.notEqual(r.code, 0, JSON.stringify(resp))
+    assert.deepEqual(replies(r), [], JSON.stringify(resp))
+  }
+  for (const resp of [{ code: 1, stderr: 'HTTP 502' }, { body: {} }]) {
+    const r = go(resp)
+    assert.notEqual(r.code, 0, JSON.stringify(resp))
+    assert.match(replies(r)[0], /合并前一直查不到你的权限.*没合并，请再发一次/)
+  }
+  assert.equal(tries(go({ code: 1, stderr: 'HTTP 502' })), 3)
+  assert.equal(tries(go({ body: {} })), 3)
+  assert.equal(go({ bodies: [{}, { permission: 'admin' }] }).code, 0)
+  // 回话发不出去：试 3 回（还是失败：这步失败、不合）
+  const mute = runStep('chatops.yml', '轮到了再认一次人', { fix: { '^GET repos/o/r/collaborators/maint/permission$': { code: 1, stderr: 'HTTP 502' }, '^issue comment$': { codes: [1, 1, 0] } }, env: { GH_TOKEN: 'app', ACTOR: 'maint', N: '7' } })
+  assert.notEqual(mute.code, 0)
+  assert.equal(mute.calls.filter((c) => c.args[0] === 'issue' && c.args[1] === 'comment').length, 3)
+})
+
+test('chatops 认人：一直查不到权限（接口出错，试 3 回）记 err（cancelled 回话请再发）；404、不是维护者都只是不理', { skip: SKIP }, () => {
+  const go = (resp) => {
+    const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-auth-'))
+    const o = path.join(cwd, 'out'); fs.writeFileSync(o, '')
+    const r = runStep('chatops.yml', '是不是维护者', { fix: { '^GET repos/o/r/collaborators/maint/permission$': resp }, env: { GH_TOKEN: 'app', ACTOR: 'maint', GITHUB_OUTPUT: o }, cwd })
+    return { code: r.code, out: fs.readFileSync(o, 'utf8'), tries: r.calls.length }
+  }
+  for (const p of ['admin', 'maintain', 'write']) assert.deepEqual(go({ body: { permission: p } }), { code: 0, out: 'ok=true\n', tries: 1 }, p)
+  for (const p of ['read', 'triage', 'none']) assert.deepEqual(go({ body: { permission: p } }), { code: 0, out: 'ok=false\n', tries: 1 }, p)
+  assert.deepEqual(go({ code: 1, stderr: 'gh: Not Found (HTTP 404)\n' }), { code: 0, out: 'ok=false\n', tries: 1 })
+  assert.deepEqual(go({ codes: [1, 0], bodies: [{}, { permission: 'write' }], stderr: 'HTTP 502' }), { code: 0, out: 'ok=true\n', tries: 2 })
+  assert.deepEqual(go({ code: 1, stderr: 'HTTP 502' }), { code: 0, out: 'ok=false\nerr=true\n', tries: 3 })
+  // 200 但缺字段、不认得的值：接着试；试 3 回还是读不出来就记 err
+  assert.deepEqual(go({ body: {} }), { code: 0, out: 'ok=false\nerr=true\n', tries: 3 })
+  assert.deepEqual(go({ bodies: [{}, { permission: 'write' }] }), { code: 0, out: 'ok=true\n', tries: 2 })
+  assert.deepEqual(go({ bodies: [{ permission: 'weird' }, { permission: 'read' }] }), { code: 0, out: 'ok=false\n', tries: 2 })
 })
 
 test('apply 动手前再认人：确实不是维护者了记下 denied（cancelled 不回话）；读不出来、不认得的值不记（cancelled 说没能处理）', { skip: SKIP }, () => {
@@ -1685,7 +1724,9 @@ test('apply 动手前再认人：确实不是维护者了记下 denied（cancell
   }
   for (const p of ['admin', 'maintain', 'write']) assert.deepEqual(go({ body: { permission: p } }), { code: 0, out: '' }, p)
   for (const p of ['read', 'triage', 'none']) assert.deepEqual(go({ body: { permission: p } }), { code: 1, out: 'denied=true\n' }, p)
-  for (const resp of [{ code: 1 }, { body: {} }, { body: { permission: 'weird' } }]) assert.deepEqual(go(resp), { code: 1, out: '' }, JSON.stringify(resp))
+  for (const resp of [{ code: 1, stderr: 'HTTP 502' }, { body: {} }, { body: { permission: 'weird' } }]) assert.deepEqual(go(resp), { code: 1, out: '' }, JSON.stringify(resp))
+  // 404（不是协作者了）：算不是维护者
+  assert.deepEqual(go({ code: 1, stderr: 'gh: Not Found (HTTP 404)\n' }), { code: 1, out: 'denied=true\n' })
 })
 
 test('同一个来源后来的一回被取消了（重跑旧的一回时 PR 的并发组会取消新的）——不算「后面又跑过」：核对、probe、检查没跑完都照常', { skip: SKIP }, () => {
@@ -2159,6 +2200,20 @@ test('chatops 解析：/trust、/untrust 写在说明下面一行、前面有空
 test('chatops 的 cancelled：apply 被取消、/approve 被取消（照实说合没合并）、/hold /untrust 的核对被取消——各说清楚', { skip: SKIP }, () => {
   const go = (APPLY, ACTION, merged = { body: { merged: false } }, COMMENT_BODY = ACTION === 'merge' ? '/approve x' : '  /untrust @a', scripts = {}) => replies(runStep('chatops.yml', '说一声命令被取消了', { fix: { '^issue comment$': {}, '^GET repos/o/r/pulls/7$': merged }, env: { GH_TOKEN: 'app', N: '7', APPLY, ACTION, COMMENT_BODY, IS_PR: 'true', GALLERY_ROOT: '' }, scripts }))[0]
   assert.match(go('cancelled', ''), /可能没做完，请再发一次/)
+  // 认人时一直查不到权限：说没处理、请再发（认得出是命令才说）
+  const authErr = (COMMENT_BODY) => replies(runStep('chatops.yml', '说一声命令被取消了', { fix: { '^issue comment$': {} }, env: { GH_TOKEN: 'app', N: '7', APPLY: 'skipped', ACTION: '', AUTH_ERR: 'true', COMMENT_BODY, IS_PR: 'true', GALLERY_ROOT: '' } }))[0]
+  assert.match(authErr('/reject spam'), /一直查不到你的权限.*这条命令没处理，请再发一次/)
+  // 回话发不出去：试 3 回，还不行这步失败
+  const cmt = (codes) => runStep('chatops.yml', '说一声命令被取消了', { fix: { '^issue comment$': { codes } }, env: { GH_TOKEN: 'app', N: '7', APPLY: 'cancelled', ACTION: '', COMMENT_BODY: '/hold', IS_PR: 'true', GALLERY_ROOT: '' } })
+  const c2 = cmt([1, 0])
+  assert.equal(c2.code, 0, c2.out)
+  assert.equal(c2.calls.filter((c) => c.args[1] === 'comment').length, 2)
+  const c3 = cmt([1, 1, 1])
+  assert.notEqual(c3.code, 0)
+  assert.equal(c3.calls.filter((c) => c.args[1] === 'comment').length, 3)
+  assert.equal(authErr('看这里 https://x.y/z'), undefined)
+  //   解析器自己出错了（认不出是不是命令）：发评论的可能是任何人，不说
+  assert.equal(replies(runStep('chatops.yml', '说一声命令被取消了', { fix: { '^issue comment$': {} }, env: { GH_TOKEN: 'app', N: '7', APPLY: 'skipped', ACTION: '', AUTH_ERR: 'true', COMMENT_BODY: '/reject spam', IS_PR: 'true', GALLERY_ROOT: '' }, scripts: { 'chatops.mjs': 'process.exit(1)\n' } }))[0], undefined)
   // apply 在「照做」之前就失败了：说没能处理、什么都没改
   assert.match(go('failure', ''), /没能处理（准备的时候出错了，什么都没改），请再发一次/)
   assert.match(go('failure', '', undefined, '/reject spam'), /没能处理/)

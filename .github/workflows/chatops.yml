@@ -18,6 +18,8 @@ jobs:
     timeout-minutes: 3
     outputs:
       ok: ${{ steps.who.outputs.ok }}
+      # 一直查不到权限（GitHub 出错）：cancelled 那个 job 回话请再发（不然 /hold、/reject 这些悄悄没生效）
+      err: ${{ steps.who.outputs.err }}
     steps:
       - id: app
         uses: actions/create-github-app-token@v1
@@ -31,8 +33,20 @@ jobs:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           ACTOR: ${{ github.event.comment.user.login }}
         run: |
-          perm=$(gh api "repos/$GITHUB_REPOSITORY/collaborators/$ACTOR/permission" --jq .permission 2>/dev/null || echo none)
-          case "$perm" in admin|maintain|write) echo "ok=true" >> "$GITHUB_OUTPUT" ;; *) echo "不是维护者（${perm}），不理"; echo "ok=false" >> "$GITHUB_OUTPUT" ;; esac
+          # 接口出错（不是 404：404 就是没这个人 / 不是协作者）试 3 回
+          perm=error
+          for i in 1 2 3; do
+            # 读到认得的权限才算数（200 但缺字段、不认得的值：接着试）
+            if p=$(gh api "repos/$GITHUB_REPOSITORY/collaborators/$ACTOR/permission" --jq .permission 2> perm-err.txt); then
+              case "$p" in admin|maintain|write|triage|read|none) perm=$p; break ;; *) perm=$p ;; esac
+            elif grep -q 'HTTP 404' perm-err.txt; then perm=none; break; fi
+            [ "$i" = 3 ] || sleep 5
+          done
+          case "$perm" in
+            admin|maintain|write) echo "ok=true" >> "$GITHUB_OUTPUT" ;;
+            read|triage|none) echo "不是维护者（${perm}），不理"; echo "ok=false" >> "$GITHUB_OUTPUT" ;;
+            *) echo "::warning::一直查不到 ${ACTOR} 的权限（${perm}）"; echo "ok=false" >> "$GITHUB_OUTPUT"; echo "err=true" >> "$GITHUB_OUTPUT" ;;
+          esac
 
   # 动手：不排任何队。PR 里的工作流（pull_request 用的是 PR 里的版本）能用同名的并发组把排着、跑着的 job 取消掉——
   #   保护性的命令（/hold、/untrust、/takedown、/reject……）不能被它取消，所以都在这里直接生效。
@@ -63,7 +77,14 @@ jobs:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           ACTOR: ${{ github.event.comment.user.login }}
         run: |
-          perm=$(gh api "repos/$GITHUB_REPOSITORY/collaborators/$ACTOR/permission" --jq .permission 2>/dev/null || echo error)
+          perm=error
+          for i in 1 2 3; do
+            # 读到认得的权限才算数（200 但缺字段、不认得的值：接着试）
+            if p=$(gh api "repos/$GITHUB_REPOSITORY/collaborators/$ACTOR/permission" --jq .permission 2> perm-err.txt); then
+              case "$p" in admin|maintain|write|triage|read|none) perm=$p; break ;; *) perm=$p ;; esac
+            elif grep -q 'HTTP 404' perm-err.txt; then perm=none; break; fi
+            [ "$i" = 3 ] || sleep 5
+          done
           case "$perm" in
             admin|maintain|write) ;;
             read|triage|none) echo "denied=true" >> "$GITHUB_OUTPUT"; echo "::error::不是维护者了（${perm}），不做"; exit 1 ;;
@@ -273,9 +294,25 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           ACTOR: ${{ github.event.comment.user.login }}
+          N: ${{ github.event.issue.number }}
         run: |
-          perm=$(gh api "repos/$GITHUB_REPOSITORY/collaborators/$ACTOR/permission" --jq .permission 2>/dev/null || echo none)
-          case "$perm" in admin|maintain|write) ;; *) echo "::error::不是维护者了（${perm}），不做"; exit 1 ;; esac
+          perm=error
+          for i in 1 2 3; do
+            # 读到认得的权限才算数（200 但缺字段、不认得的值：接着试）
+            if p=$(gh api "repos/$GITHUB_REPOSITORY/collaborators/$ACTOR/permission" --jq .permission 2> perm-err.txt); then
+              case "$p" in admin|maintain|write|triage|read|none) perm=$p; break ;; *) perm=$p ;; esac
+            elif grep -q 'HTTP 404' perm-err.txt; then perm=none; break; fi
+            [ "$i" = 3 ] || sleep 5
+          done
+          case "$perm" in
+            admin|maintain|write) ;;
+            read|triage|none) echo "::error::不是维护者了（${perm}），不做"; exit 1 ;;
+            *)
+              # 一直查不到：不合，说一声请再发（不能悄悄不合）
+              printf '%s\n' "⚠ 合并前一直查不到你的权限（GitHub 出错），没合并，请再发一次 /approve。 / Could not check your permission before merging (GitHub error); nothing was merged, please send /approve again." > reauth.md
+              for i in 1 2 3; do gh issue comment "$N" --repo "$GITHUB_REPOSITORY" --body-file reauth.md >/dev/null 2>&1 && break; [ "$i" = 3 ] || sleep 5; done
+              echo "::error::查不到权限（${perm}），不做"; exit 1 ;;
+          esac
 
       # 检出 main 现在的样子、完整历史：/approve 要比同名的设计从闸门算的那版到现在变没变
       - uses: actions/checkout@v4
@@ -498,7 +535,8 @@ jobs:
   cancelled:
     needs: [auth, apply, confirm]
     # 也管 apply 在「照做」开始之前就失败了（检出、装 node、解析出错）：不然保护性的命令（/untrust、/takedown、/reject）悄悄没生效、也没回话
-    if: always() && needs.auth.outputs.ok == 'true' && (needs.apply.result == 'cancelled' || needs.confirm.result == 'cancelled' || (needs.apply.result == 'failure' && needs.apply.outputs.did != 'true' && needs.apply.outputs.denied != 'true'))
+    #   还管认人时一直查不到权限（auth 记了 err）：不然命令悄悄没处理
+    if: always() && (needs.auth.outputs.err == 'true' || (needs.auth.outputs.ok == 'true' && (needs.apply.result == 'cancelled' || needs.confirm.result == 'cancelled' || (needs.apply.result == 'failure' && needs.apply.outputs.did != 'true' && needs.apply.outputs.denied != 'true'))))
     runs-on: ubuntu-24.04
     timeout-minutes: 3
     steps:
@@ -525,6 +563,7 @@ jobs:
           N: ${{ github.event.issue.number }}
           APPLY: ${{ needs.apply.result }}
           ACTION: ${{ needs.apply.outputs.action }}
+          AUTH_ERR: ${{ needs.auth.outputs.err }}
           COMMENT_BODY: ${{ github.event.comment.body }}
           IS_PR: ${{ github.event.issue.pull_request != null }}
         run: |
@@ -533,7 +572,11 @@ jobs:
           #   （认不出来——比如 node 出错——就当是命令照说：多说一句不碍事）
           act=$(node scripts/chatops.mjs --action 2>/dev/null || echo unknown)
           [ "$act" != none ] || { echo "不是命令，不用说"; exit 0; }
-          if [ "$APPLY" = failure ]; then
+          # 认人时查不到权限的：发评论的可能是任何人，认不出是命令（解析器出错）就不说，免得回普通评论
+          if [ "${AUTH_ERR:-}" = true ] && [ "$act" = unknown ]; then echo "认不出是不是命令，不说"; exit 0; fi
+          if [ "${AUTH_ERR:-}" = true ]; then
+            msg="⚠ 机器人一直查不到你的权限（GitHub 出错），这条命令没处理，请再发一次。 / Could not check your permission (GitHub error); this command was not processed, please send it again."
+          elif [ "$APPLY" = failure ]; then
             msg="⚠ 这条命令没能处理（准备的时候出错了，什么都没改），请再发一次。 / This command could not be processed (setup failed, nothing was changed); please send it again."
           elif [ "$APPLY" = cancelled ]; then
             msg="⚠ 这条命令被取消了，可能没做完，请再发一次。 / This command was cancelled and may not have finished; please send it again."
@@ -548,4 +591,6 @@ jobs:
             msg="⚠ 命令已经生效，但排队核对时被取消了：没确认这期间有没有赶在生效前合并的，请看一下最近合并的 PR。 / The command took effect, but the follow-up check was cancelled; please look at recently merged PRs for anything that slipped in first."
           fi
           printf '%s\n' "$msg" > reply.md
-          gh issue comment "$N" --repo "$GITHUB_REPOSITORY" --body-file reply.md >/dev/null
+          # 说不出去试 3 回（这是最后一道回话）
+          for i in 1 2 3; do gh issue comment "$N" --repo "$GITHUB_REPOSITORY" --body-file reply.md >/dev/null && exit 0; [ "$i" = 3 ] || sleep 5; done
+          exit 1
