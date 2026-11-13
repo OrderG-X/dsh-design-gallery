@@ -60,6 +60,19 @@ export function loadVocab(root = ROOT) {
 
 export const readJson = (p, dflt) => { try { return JSON.parse(fs.readFileSync(p, 'utf8')) } catch { return dflt } }
 
+/**
+ * 读规矩文件（违规记录、信任名单……）：只有文件不存在才用默认值；读不了、JSON 坏了（手改漏个逗号）、类型和默认值不一样（数组 / 对象）都报错——
+ * 不能当成空名单（违规记录、/untrust 就都不算了，写回去还会把别的条目冲掉）
+ */
+export function readPolicyJson(p, dflt) {
+  let text
+  try { text = fs.readFileSync(p, 'utf8') } catch (e) { if (e && e.code === 'ENOENT') return dflt; throw e }
+  const v = JSON.parse(text)
+  const arr = Array.isArray(dflt)
+  if (arr ? !Array.isArray(v) : !(v && typeof v === 'object' && !Array.isArray(v))) throw new Error(`${p} 的格式不对`)
+  return v
+}
+
 /** 仓库里现有的全部设计：[{ type, dir, id, abs }] */
 export function listEntries(root = ROOT) {
   const out = []

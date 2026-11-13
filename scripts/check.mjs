@@ -100,6 +100,9 @@ const GUARD_MSG = {
   qrSkipped: { zh: '「{x}」没查完有没有二维码（{n}）：要维护者看一眼', en: '"{x}" was not fully checked for QR codes ({n}): a maintainer needs to look' },
   qrLike: { zh: '「{x}」里有像二维码定位块的花纹（扫不出内容）：看一眼是不是二维码', en: '"{x}" has a pattern that looks like QR finder squares (nothing decodes): check whether it is a QR code' },
   hard: { zh: '「{x}」体检有严重问题：{n}', en: '"{x}" has a serious layout problem: {n}' },
+  behind: { zh: '「{x}」合进 main 以后会和 PR 里的不一样（main 上这一套在 PR 分出去之后也改过）：先把 main 合进来（PR 页面上的「Update branch」）再推', en: '"{x}" would end up different from this PR once merged (it also changed on main after this PR branched off): merge main into your branch ("Update branch" on the PR page) and push again' },
+  conflict: { zh: '这个 PR 和 main 合不到一起（有冲突）：先把 main 合进来、解决冲突再推', en: 'This PR conflicts with main: merge main into your branch, resolve the conflicts and push again' },
+  crash: { zh: '「{x}」检查到一半出错了（{n}）：多半是 design.json 里有字段的写法不对（比如该是文字的写成了别的），改好再推', en: '"{x}": the check crashed ({n}); most likely a field in design.json has the wrong type. Fix it and push again' },
   needsFix: { zh: '「{x}」还有能自动修的问题（注释 / 站外链接 / 表单地址），用插件「打成 zip」或「分享」会自动修好', en: '"{x}" still has auto-fixable problems (comments / outside links / form targets); the plugin\'s zip / share does this for you' },
 }
 const say = (p, lang = 'zh') => (GUARD_MSG[p.code] ? (lang === 'en' ? GUARD_MSG[p.code].en : GUARD_MSG[p.code].zh).replace(/\{(\w+)\}/g, (_, k) => (p[k] === undefined ? '' : String(p[k]))) : message(p, lang))
@@ -125,7 +128,7 @@ export function prevAuthorId(rel, root = ROOT) {
 }
 
 /**
- * 和 main 上原来那版比，改了多少（0 = 一样，1 = 全换了）。老作者（T2）更新能自动合并，但大改要人看。
+ * 和 main 上原来那版比，改了多少（0 = 一样，1 = 全换了）。审核卡标出大改，维护者重点看。
  * 分几组各比各的，取最大的那组（分开比是为了不让大量没变的部分把「某一类全换了」稀释掉）：
  *   text  页面里看得到的字
  *   attrs 属性值（alt、title、value、class、链接……带不带引号都认；style 归样式）
@@ -241,15 +244,17 @@ export async function checkEntry(rel, { vocab, login = '', id = 0, maintainer = 
   const m = r.manifest
   if (m && m.type && DIR_OF[m.type] !== e.dir) add({ code: 'typeDir', x: DIR_OF[m.type], n: m.type })
   if (m && m.author && typeof m.author === 'object') {
-    if (String(m.author.login || '').toLowerCase() !== e.login) add({ code: 'owner', x: e.login })
-    else if (login && !maintainer && (String(m.author.login).toLowerCase() !== login.toLowerCase() || (id && m.author.id !== id))) add({ code: 'owner', x: login })
+    // login 不是文字（对象、数字……）就当没写：不拿它 String()（带怪 toString 的对象会让检查崩掉）
+    const al = typeof m.author.login === 'string' ? m.author.login : ''
+    if (al.toLowerCase() !== e.login) add({ code: 'owner', x: e.login })
+    else if (login && !maintainer && (al.toLowerCase() !== login.toLowerCase() || (id && m.author.id !== id))) add({ code: 'owner', x: login })
   }
   // 已经在 main 上的这套：数字 ID 要和原来的一样（同名的新账号不能顶替）
   if (!maintainer) {
     const was = prevAuthor(rel)
     if (was && !(m && m.author && m.author.id === was)) add({ code: 'ownerId', x: rel })
     else if (was) {
-      res.update = true // 作者更新自己已上架的那套（老作者可自动合并）
+      res.update = true // 作者更新自己已上架的那套
       // 大改（某一类改了三成以上）：标出来，转人工看（标记会让车道走 B）
       const ratio = changeRatio(rel, files)
       if (ratio > BIG_CHANGE) flag({ code: 'bigChange', x: rel, n: Math.round(ratio * 100) })
@@ -350,7 +355,25 @@ async function main() {
     if (x.type !== 'template' || dirs.includes(`${x.dir}/${x.id}`)) continue
     try { others.set(fingerprint(loadDir(x.abs).files), x.id) } catch { /* 坏的不算 */ }
   }
-  for (const d of dirs) result.entries.push(await checkEntry(d, { vocab, login, id, maintainer, render, out, others }))
+  // 一套查崩了（投稿里的怪写法、规则库没防到的）：这一套记成没过，接着查别的、照样写出结果——不能让整个检查崩掉、闸门没有结论
+  for (const d of dirs) {
+    try { result.entries.push(await checkEntry(d, { vocab, login, id, maintainer, render, out, others })) } catch (err) {
+      let why = 'error'
+      try { why = String(err && err.message).slice(0, 200) } catch { /* 连错误都读不出来 */ }
+      const p = { code: 'crash', x: d, n: why }
+      result.entries.push({ id: d.split('/').pop(), dir: d, type: '', ok: false, errors: [{ code: 'crash', msg: say(p), msgEn: say(p, 'en') }], flags: [], shots: [], kind: '', screens: [] })
+    }
+  }
+  // 合进 main 以后的样子和 PR 里的不一样（闸门用 git merge-tree 算好、经环境变量传进来）：查的、渲染的都不是会合进去的样子
+  //   CONFLICT=1 合不到一起；BEHIND 是合并出来和 PR 里不一样的设计目录（空格分开）
+  if (process.env.CONFLICT === '1') result.guard.push({ code: 'conflict', msg: say({ code: 'conflict' }), msgEn: say({ code: 'conflict' }, 'en') })
+  //   查了的目录记在那一套的错误里；没查的（整套删掉的，只记在 deleted 里）记成守卫错误——一个都不能漏，不然删整套时 main 那边新加的文件会被悄悄留下
+  for (const d of new Set(String(process.env.BEHIND || '').split(/\s+/).filter(Boolean))) {
+    const p = { code: 'behind', x: d }
+    const err = { code: 'behind', msg: say(p), msgEn: say(p, 'en') }
+    const x = result.entries.find((e) => e.dir === d)
+    if (x) { x.errors.push(err); x.ok = false } else result.guard.push(err)
+  }
 
   fs.writeFileSync(path.join(out, 'results.json'), JSON.stringify(result, null, 2) + '\n')
   const bad = result.guard.length + result.entries.filter((x) => !x.ok).length

@@ -1,4 +1,4 @@
-# 定时活：每 6 小时复查挂起的（账号太新、一次交太多）；关掉 14 天没动静的；每周用当前规则重查全部、清理截图分支。
+# 定时活：每 6 小时复查挂起的（账号太新、一次交太多），能接着走了就重跑检查；关掉 14 天没动静的；每周用当前规则重查全部、清理截图分支。
 name: scheduled
 
 on:
@@ -12,30 +12,185 @@ permissions: {}
 jobs:
   recheck-held:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    # 重跑一个最多要等两三分钟（等 GitHub 算冲突）：重跑只在开头 7 分钟内起头，剩下的下一轮；留足余量不被整个掐掉
+    timeout-minutes: 15
+    # 挂起 14 天没动静的不在这里关：列出来交给下面的 close-stale，一个 PR 一个任务、排进这个 PR 的队（和闸门、维护者命令同一个锁）
+    outputs:
+      close: ${{ steps.held.outputs.close }}
     steps:
       - id: app
         uses: actions/create-github-app-token@v1
         with:
           app-id: ${{ vars.GALLERY_APP_ID }}
           private-key: ${{ secrets.GALLERY_APP_PRIVATE_KEY }}
-      - name: 挂起的重跑检查（账号满 7 天、前面的处理完了就放行）；挂起 14 天没动静的关掉
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: 挂起的：能接着走了（账号满 7 天、数量回到上限以内）就重跑检查；挂起 14 天没动静的列出来
+        id: held
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
+          APP_SLUG: ${{ steps.app.outputs.app-slug }}
         run: |
           set -euo pipefail
+          R="$GITHUB_REPOSITORY"
           now=$(date +%s)
-          { gh pr list --repo "$GITHUB_REPOSITORY" --label 'held: author' --state open --json number,updatedAt,headRefOid --jq '.[] | "\(.number) \(.updatedAt) \(.headRefOid)"'
-            gh pr list --repo "$GITHUB_REPOSITORY" --label 'held: limit' --state open --json number,updatedAt,headRefOid --jq '.[] | "\(.number) \(.updatedAt) \(.headRefOid)"'; } | sort -u | while read -r n upd sha; do
+          since=$(date -u -d '24 hours ago' +%Y-%m-%dT%H:%M:%SZ)
+          # 在等的 PR 全取；24 小时内的按创建时间倒序翻到早于 24 小时为止（和闸门同一套数法）
+          # 每一页都得是 PR 数组（null、错误对象、里面不是 PR 都不行）：坏了整个任务失败，不能当成「没有 PR」
+          pulls_ok='all(.[]; type == "array" and all(.[]; type == "object" and (.number | type) == "number"))'
+          gh api --paginate "repos/$R/pulls?state=open&per_page=100" > open-raw.json
+          jq -e -s "$pulls_ok" open-raw.json > /dev/null || { echo "开着的 PR 列表不对"; exit 1; }
+          jq -s 'add // []' open-raw.json > open-pulls.json
+          echo '[]' > recent-pulls.json
+          # 每一步单独写（a && b、if [ "$(…)" ] 里出错 -e 管不到）
+          for page in $(seq 1 30); do
+            gh api "repos/$R/pulls?state=all&sort=created&direction=desc&per_page=100&page=$page" > page.json
+            jq -e -s "$pulls_ok" page.json > /dev/null || { echo "第 $page 页 PR 列表不对"; exit 1; }
+            jq -s 'add' recent-pulls.json page.json > r.tmp
+            mv r.tmp recent-pulls.json
+            len=$(jq length page.json)
+            last=$(jq -r '.[-1].created_at // ""' page.json)
+            if [ "$len" -lt 100 ]; then break; fi
+            if [ "$last" \< "$since" ]; then break; fi
+          done
+          # 一个 PR 出错不耽误后面的，但最后整个任务算失败（Actions 里能看到红的）
+          fail=0
+          # 兜底：机器人为了重跑检查转的草稿，半小时后还没标回（任务被取消、机器没了）就替它标回。
+          # 只认「最后一次转草稿 / 标回」是机器人转草稿的（之后作者自己又转过、或已经标回过的不动）
+          half=$(date -u -d '30 minutes ago' +%Y-%m-%dT%H:%M:%SZ)
+          # 要处理的号先单独取出来（写在 for 里，jq 出错 -e 管不到，循环就悄悄空了）
+          drafts=$(jq -r '.[] | select(.draft == true) | .number' open-pulls.json)
+          held=$(jq -r '.[] | select([.labels[].name] | any(. == "held: author" or . == "held: limit")) | .number' open-pulls.json)
+          # 这一轮替机器人标回的：标回本身会触发检查，后面「挂起的重跑」不再动它（不然又转草稿、把刚起的检查取消掉）
+          restored=' '
+          # 要关的（挂起 14 天没动静）：「号 updated_at」一行一个，最后交给 close-stale
+          : > close.txt
+          for n in $drafts; do
+            if ! gh api --paginate "repos/$R/issues/$n/timeline?per_page=100" --jq '.[] | select(.event == "convert_to_draft" or .event == "ready_for_review") | "\(.created_at) \(.event) \(.actor.login // "-")"' > tl.txt; then
+              echo "#$n 查不到时间线"; fail=1; continue
+            fi
+            # 时间线接口按发生先后给（同一秒的也是）：取最后一条，不能按文字排序（同一秒时会按事件名排错）
+            ev=$(tail -1 tl.txt)
+            [ -n "$ev" ] || continue
+            set -- $ev
+            if [ "$2" = convert_to_draft ] && [ "$3" = "${APP_SLUG}[bot]" ] && [[ "$1" < "$half" ]]; then
+              echo "#$n 是机器人转的草稿、一直没标回，标回去"
+              id=$(jq -r --argjson n "$n" '.[] | select(.number == $n) | .node_id' open-pulls.json)
+              # 不管标回成没成都记上（报错的也可能其实标回了、检查已经在跑）：这一轮后面都不再动它，下一轮再看
+              restored="$restored$n "
+              gh api graphql -f query='mutation($id: ID!) { markPullRequestReadyForReview(input: {pullRequestId: $id}) { pullRequest { isDraft } } }' -f id="$id" >/dev/null || fail=1
+            fi
+          done
+          # 先挑出要关的、交出去（后面重跑要等，任务超时、出错也不耽误关），一回最多 50 个，剩下的下一轮
+          #   （先单独算：写在 echo "...$(…)" 里，jq 出错会被 echo 盖掉）
+          for n in $held; do
+            case "$restored" in *" $n "*) continue ;; esac
+            upd=$(jq -r --argjson n "$n" '.[] | select(.number == $n) | .updated_at' open-pulls.json)
             age=$(( (now - $(date -d "$upd" +%s)) / 86400 ))
-            if [ "$age" -ge 14 ]; then
-              gh pr close "$n" --repo "$GITHUB_REPOSITORY" --comment "14 天没有动静，先关掉；随时可以重新提交。 / Closed after 14 days without activity; feel free to resubmit." || true
+            if [ "$age" -ge 14 ]; then echo "#$n 挂起 14 天没动静，排队去关"; printf '%s %s\n' "$n" "$upd" >> close.txt; fi
+          done
+          close=$(jq -Rnc '[inputs | select(test("^[1-9][0-9]* [0-9TZ:-]+$")) | split(" ") | {n: (.[0] | tonumber), upd: .[1]}] | .[:50]' close.txt)
+          echo "close=$close" >> "$GITHUB_OUTPUT"
+          # 重跑只在开头 7 分钟内起头（一个最多要等两三分钟），来不及的下一轮（6 小时后）再说，不算失败
+          t0=$(date +%s)
+          for n in $held; do
+            case "$restored" in *" $n "*) echo "#$n 刚替机器人标回（检查会重跑），这回不再动"; continue ;; esac
+            if grep -q "^$n " close.txt; then continue; fi
+            jq --argjson n "$n" '.[] | select(.number == $n)' open-pulls.json > p.json
+            # 维护者 /hold 过的（held: maintainer 和 held: author / limit 可以同时在）不自动放
+            if jq -e '[.labels[].name] | index("held: maintainer")' p.json >/dev/null; then echo "#$n 维护者挂起了"; continue; fi
+            login=$(jq -r .user.login p.json); id=$(jq -r .user.id p.json); sha=$(jq -r .head.sha p.json)
+            # 机器人代开的：投稿人写在说明的 Submitted-by 行里
+            if [ "$login" = "${APP_SLUG}[bot]" ]; then
+              line=$(jq -r '.body // ""' p.json | tr -d '\r' | grep -E '^Submitted-by: [A-Za-z0-9-]{1,39} \([0-9]+\)$' | head -1 || true)
+              [ -n "$line" ] || { echo "#$n 找不到投稿人"; continue; }
+              login=$(echo "$line" | sed -E 's/^Submitted-by: ([A-Za-z0-9-]+) .*/\1/'); id=$(echo "$line" | sed -E 's/.*\(([0-9]+)\)$/\1/')
+            fi
+            # 账号注册时间按数字 id 查（用户名能改、旧名能被别人占用）。查不到账号：没这个账号了（404）就不管；别的错、对不上记失败
+            [[ "$id" =~ ^[1-9][0-9]*$ ]] || { echo "#$n 投稿人 id 不对"; fail=1; continue; }
+            if ! acct=$(gh api "user/$id" --jq '"\(.id) \(.created_at)"' 2>user-err.txt); then
+              if grep -q 'HTTP 404' user-err.txt; then echo "#$n 投稿人账号没了"; else echo "#$n 查不到投稿人账号"; fail=1; fi
               continue
             fi
-            # 重跑这次提交的 pr-check（gate 会跟着重算账号年龄）
-            run=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow pr-check --commit "$sha" --limit 1 --json databaseId --jq '.[0].databaseId // empty')
-            [ -n "$run" ] && gh run rerun "$run" --repo "$GITHUB_REPOSITORY" || true
+            [ "${acct%% *}" = "$id" ] || { echo "#$n 查到的账号对不上"; fail=1; continue; }
+            created=${acct#* }
+            if ! out=$(ID="$id" LOGIN="$login" BOT="${APP_SLUG}[bot]" SINCE="$since" ACCOUNT_CREATED_AT="$created" node scripts/gate.mjs --held open-pulls.json recent-pulls.json); then
+              echo "#$n 算不出能不能放"; fail=1; continue
+            fi
+            case "$(printf '%s\n' "$out" | sed -nE 's/^ready=([01])$/\1/p')" in
+              1) ;;
+              0) echo "#$n 还得等"; continue ;;
+              *) echo "#$n 算出来的结果不对：$out"; fail=1; continue ;;
+            esac
+            # 自动重跑设上限（比如检查根本没被触发，不然每 6 小时一回、永远停不下来，也会一直刷新 updated_at、14 天关不掉）：
+            #   这个提交已经停过（机器人发过带这个 sha 的「不再自动重跑」）就不再动，有新提交才重新算；
+            #   一周内机器人转过 3 回草稿、或者重跑没成 @ 过（加起来 3 回）还挂着：停下、@ 维护者一次
+            if ! gh api --paginate "repos/$R/issues/$n/comments" --jq ".[] | select(.user.login == \"${APP_SLUG}[bot]\") | \"\\(.created_at) \\(.body | split(\"\\n\")[0])\"" > bot-comments.txt; then
+              echo "#$n 查不到评论"; fail=1; continue
+            fi
+            if grep -qxF -- "<!-- dsh-gallery-stuck held $sha -->" <(cut -d' ' -f2- bot-comments.txt); then echo "#$n 这个提交已经停了自动重跑"; continue; fi
+            week=$(date -u -d '7 days ago' +%Y-%m-%dT%H:%M:%SZ)
+            if ! tl=$(gh api --paginate "repos/$R/issues/$n/timeline?per_page=100" --jq "[.[] | select(.event == \"convert_to_draft\" and .actor.login == \"${APP_SLUG}[bot]\" and .created_at >= \"$week\")] | length"); then
+              echo "#$n 查不到重跑记录"; fail=1; continue
+            fi
+            drafts=$(printf '%s\n' "$tl" | awk '{ s += $1 } END { print s + 0 }')
+            stucks=$(awk -v w="$week" '$1 >= w && $2 == "<!--" && $3 == "dsh-gallery-stuck" && $4 == "-->"' bot-comments.txt | grep -c . || true)
+            tries=$(( drafts + stucks ))
+            if [ "$tries" -ge 3 ]; then
+              echo "#$n 一周内重跑了 $tries 回还挂着，这个提交不再自动重跑"
+              printf '<!-- dsh-gallery-stuck held %s -->\n@%s 这个投稿已经可以接着走了，机器人一周内重跑了 %s 回检查它还是挂着，这个提交不再自动重跑，麻烦看一下（作者推新提交会重新检查）。 / This submission should no longer be on hold, but it is still held after %s automatic re-runs this week; the bot will stop re-running this commit, please take a look (a new commit re-runs the checks).\n' "$sha" "$GITHUB_REPOSITORY_OWNER" "$tries" "$tries" > held-stuck.md
+              gh pr comment "$n" --repo "$R" --body-file held-stuck.md >/dev/null || fail=1
+              continue
+            fi
+            # 闸门按现在的数不会再挂起：让检查重跑（转草稿再标回；动手前 recheck.sh 会再查一遍开着、提交没变、标签还在、维护者没 /hold）
+            if [ $(( $(date +%s) - t0 )) -ge 420 ]; then echo "#$n 能接着走了，但这一轮时间不够了，下一轮再重跑"; continue; fi
+            echo "#$n 能接着走了，重跑检查"
+            bash scripts/recheck.sh "$n" "$sha" '^held: (author|limit)$' || fail=1
           done
+          [ "$fail" = 0 ] || { echo "::error::有 PR 没处理成（见上面）"; exit 1; }
+
+  # 挂起 14 天没动静的：一个 PR 一个任务，排进这个 PR 的队（dsh-pr-<号>，和闸门写结果、维护者命令同一个锁；queue: max 不会被后来的顶掉），
+  # 轮到了再单独查一遍——还开着、还挂着、这期间没人动过（作者推送、维护者放行、闸门改标签都会改 updated_at）——才关
+  close-stale:
+    needs: recheck-held
+    if: ${{ !cancelled() && needs.recheck-held.outputs.close != '' && needs.recheck-held.outputs.close != '[]' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    strategy:
+      fail-fast: false
+      matrix:
+        pr: ${{ fromJSON(needs.recheck-held.outputs.close) }}
+    concurrency:
+      group: dsh-pr-${{ matrix.pr.n }}
+      cancel-in-progress: false
+      queue: max
+    steps:
+      - id: app
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.GALLERY_APP_ID }}
+          private-key: ${{ secrets.GALLERY_APP_PRIVATE_KEY }}
+      - name: 再查一遍，没动静就关
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          N: ${{ matrix.pr.n }}
+          UPD: ${{ matrix.pr.upd }}
+        run: |
+          set -euo pipefail
+          [[ "$N" =~ ^[1-9][0-9]*$ ]] || { echo "PR 号不对：$N"; exit 1; }
+          gh api "repos/$GITHUB_REPOSITORY/pulls/$N" > c.json || { echo "#$N 查不到，这回先不关"; exit 1; }
+          s=$(jq -r 'if (.state | type) == "string" and (.updated_at | type) == "string" and (.labels | type) == "array" then "\(.state) \(.updated_at) \([.labels[].name] | any(. == "held: author" or . == "held: limit"))" else error("bad") end' c.json) || { echo "#$N 读不出来"; exit 1; }
+          if [ "$s" != "open $UPD true" ]; then echo "#$N 这期间有动静了，不关（${s}）"; exit 0; fi
+          # 先关、再说（gh 带 --comment 是先发评论再关：评论发了、关失败，评论会刷新「最后动静」，又要再等 14 天）
+          gh pr close "$N" --repo "$GITHUB_REPOSITORY" >/dev/null
+          [ "$(gh api "repos/$GITHUB_REPOSITORY/pulls/$N" --jq .state)" = closed ] || { echo "#$N 没关上"; exit 1; }
+          # 关上了再说一声；说不出去再试一次，还不行只记个警告（PR 已经关了，该做的做完了；重跑这步会因为已经关了直接退出）
+          msg="14 天没有动静，先关掉；随时可以重新提交。 / Closed after 14 days without activity; feel free to resubmit."
+          gh pr comment "$N" --repo "$GITHUB_REPOSITORY" --body "$msg" >/dev/null 2>&1 || { sleep 10; gh pr comment "$N" --repo "$GITHUB_REPOSITORY" --body "$msg" >/dev/null 2>&1; } || echo "::warning::#$N 关上了，但说明没发出去"
 
   weekly:
     if: github.event.schedule == '41 2 * * 1' || github.event_name == 'workflow_dispatch'
@@ -61,16 +216,32 @@ jobs:
           npm ci --ignore-scripts --no-audit --no-fund
           node scripts/check.mjs --all > weekly.txt 2>&1 || true
           bad=$(grep -c '^✗' weekly.txt || true)
-          held=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --label 'lane: B' --json number --jq length)
+          # gh pr list 默认只给 30 个：给足上限（数不出来就写「?」）
+          held=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --label 'lane: B' --limit 1000 --json number --jq length 2>/dev/null || echo '?')
           { echo "### 周报 / Weekly"; echo; echo "- 重查：$bad 套不符合现行规则 / $bad entries fail current rules"; echo "- 等人看（B 车道）：$held / Waiting for review: $held"; echo; echo '```'; grep -E '^(✗|    ✗)' weekly.txt | head -100; echo '```'; } > report.md
           n=$(gh issue list --repo "$GITHUB_REPOSITORY" --label weekly-report --state open --json number --jq '.[0].number // empty')
           if [ -n "$n" ]; then gh issue comment "$n" --repo "$GITHUB_REPOSITORY" --body-file report.md; else gh issue create --repo "$GITHUB_REPOSITORY" --title "周报 / Weekly report" --label weekly-report --body-file report.md; fi
-      - name: 清理截图分支（只留最近的）
+      - name: 清理截图分支（只留开着的 PR 的）
         env:
           TOKEN: ${{ steps.app.outputs.token }}
+          GH_TOKEN: ${{ steps.app.outputs.token }}
         run: |
+          set -euo pipefail
           remote="https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          # 开着的 PR 的审核卡还在用它们的截图（review-shots/<PR 号>/…）：留着，别的清掉。
+          #   先取分支、再列开着的 PR：截图总是 PR 开了以后才推的，取到的截图对应的 PR 一定在后列的名单里；之后再推的截图由 lease 挡住
           git init -q s && cd s
+          had=0
+          git fetch -q --depth=1 "$remote" review-shots 2>/dev/null && had=1
+          open=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --limit 1000 --json number --jq '.[].number') || { echo "开着的 PR 列不出来，这回不清理"; exit 0; }
           git checkout -q --orphan review-shots
-          git -c user.name=dsh-design-gallery-bot -c user.email=bot@users.noreply.github.com commit -q --allow-empty -m "reset review shots"
-          git push -q -f "$remote" HEAD:review-shots || true
+          if [ "$had" = 1 ]; then
+            for n in $open; do
+              [[ "$n" =~ ^[1-9][0-9]*$ ]] || continue
+              if git cat-file -e "FETCH_HEAD:$n" 2>/dev/null; then git checkout -q FETCH_HEAD -- "$n"; fi
+            done
+          fi
+          git -c user.name=dsh-design-gallery-bot -c user.email=bot@users.noreply.github.com commit -q --allow-empty -m "reset review shots (keep open PRs)"
+          # 只在分支还是刚才取的那一版时才覆盖：这期间闸门推了新截图就这回不清（下周再清），不能把它冲掉
+          lease=""; [ "$had" = 1 ] && lease=$(git rev-parse FETCH_HEAD)
+          git push -q --force-with-lease="review-shots:$lease" "$remote" HEAD:review-shots || echo "截图分支这期间有新推送，这回不清理"

@@ -1,5 +1,5 @@
 # 维护者命令：在 PR / issue 里回 /approve /hold /reject /feature /trust /takedown /restore …
-# 先用 API 确认评论人有 write 以上权限；命令只取评论第一行，经环境变量传。
+# 先用 API 确认评论人有 write 以上权限；命令取评论里第一条以 / 开头的行（前面可以有说明、空格），评论原样经环境变量传。
 name: chatops
 
 on:
@@ -9,10 +9,15 @@ on:
 permissions: {}
 
 jobs:
-  run:
-    if: startsWith(github.event.comment.body, '/') && github.event.comment.user.type != 'Bot'
+  # 先认人（不排队）：不是维护者的评论后面都不跑（不然谁都能发一串 / 开头的评论把合并的队排满、拖住 /approve）。
+  #   入口只粗筛「评论里有 /」：命令不一定在第一个字（前面有空格、空行、说明），和 chatops.mjs 的解析一样认；
+  #   筛得比解析窄的话，维护者写在说明下面的 /hold 会被整个跳过、没有标签也没有回话，之前排着的 /approve 照样合
+  auth:
+    if: contains(github.event.comment.body, '/') && github.event.comment.user.type != 'Bot'
     runs-on: ubuntu-24.04
-    timeout-minutes: 8
+    timeout-minutes: 3
+    outputs:
+      ok: ${{ steps.who.outputs.ok }}
     steps:
       - id: app
         uses: actions/create-github-app-token@v1
@@ -27,69 +32,520 @@ jobs:
           ACTOR: ${{ github.event.comment.user.login }}
         run: |
           perm=$(gh api "repos/$GITHUB_REPOSITORY/collaborators/$ACTOR/permission" --jq .permission 2>/dev/null || echo none)
-          case "$perm" in admin|maintain|write) echo "ok=true" >> "$GITHUB_OUTPUT" ;; *) echo "不是维护者（$perm），不理"; echo "ok=false" >> "$GITHUB_OUTPUT" ;; esac
+          case "$perm" in admin|maintain|write) echo "ok=true" >> "$GITHUB_OUTPUT" ;; *) echo "不是维护者（${perm}），不理"; echo "ok=false" >> "$GITHUB_OUTPUT" ;; esac
 
-      - uses: actions/checkout@v4
-        if: steps.who.outputs.ok == 'true'
+  # 动手：不排任何队。PR 里的工作流（pull_request 用的是 PR 里的版本）能用同名的并发组把排着、跑着的 job 取消掉——
+  #   保护性的命令（/hold、/untrust、/takedown、/reject……）不能被它取消，所以都在这里直接生效。
+  #   /approve 的合并、/hold 和 /untrust 的回话在下面的 confirm（排合并的队）
+  apply:
+    needs: auth
+    if: needs.auth.outputs.ok == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    outputs:
+      action: ${{ steps.do.outputs.action }}
+      json: ${{ steps.do.outputs.json }}
+      # 「照做」开始了（之后出错它自己回话）；没开始就失败了（准备的步骤出错）由 cancelled 那个 job 回话
+      did: ${{ steps.do.outputs.did }}
+      # 再认人时确实不是维护者了：不回话
+      denied: ${{ steps.reauth.outputs.denied }}
+    steps:
+      - id: app
+        uses: actions/create-github-app-token@v1
         with:
+          app-id: ${{ vars.GALLERY_APP_ID }}
+          private-key: ${{ secrets.GALLERY_APP_PRIVATE_KEY }}
+
+      # 再认一次人：单独重跑这个 job 时 auth 的结果是旧的（权限可能已经撤了）
+      - name: 动手前再认一次人
+        id: reauth
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          ACTOR: ${{ github.event.comment.user.login }}
+        run: |
+          perm=$(gh api "repos/$GITHUB_REPOSITORY/collaborators/$ACTOR/permission" --jq .permission 2>/dev/null || echo error)
+          case "$perm" in
+            admin|maintain|write) ;;
+            read|triage|none) echo "denied=true" >> "$GITHUB_OUTPUT"; echo "::error::不是维护者了（${perm}），不做"; exit 1 ;;
+            *) echo "::error::读不出权限（${perm}），不做"; exit 1 ;;
+          esac
+
+      # 检出 main 现在的样子（不是评论那会儿的提交：改规矩文件要在最新的上面改）
+      - uses: actions/checkout@v4
+        with:
+          ref: main
           token: ${{ steps.app.outputs.token }}
 
       - uses: actions/setup-node@v4
-        if: steps.who.outputs.ok == 'true'
         with:
           node-version: 22
 
       - name: 解析命令、改规矩文件
-        if: steps.who.outputs.ok == 'true'
         env:
           COMMENT_BODY: ${{ github.event.comment.body }}
+          # 命令的先后按评论时间算：重跑的旧命令、排在后面才跑到的旧命令，不能盖掉后来发的（记录里的 at 也用它）
+          COMMENT_AT: ${{ github.event.comment.created_at }}
           IS_PR: ${{ github.event.issue.pull_request != null }}
           GH_TOKEN: ${{ steps.app.outputs.token }}
         run: |
-          npm ci --ignore-scripts --no-audit --no-fund
-          # /trust @x、/untrust @x：先查 x 的数字 id（信任按 id 记）
-          first=$(printf '%s\n' "$COMMENT_BODY" | head -1)
-          u=$(printf '%s' "$first" | sed -nE 's/^\/(un)?trust @([A-Za-z0-9-]{1,39})[[:space:]]*$/\2/p')
+          # chatops.mjs 只用 node 自带的模块：不装依赖（少一个会失败的步骤）
+          # /trust @x、/untrust @x：先查 x 的数字 id（信任按 id 记）。用户名从同一个解析器拿（命令可以写在说明下面一行、前面有空格）
+          u=$(node scripts/chatops.mjs --target)
           if [ -n "$u" ]; then TARGET_ID=$(gh api "users/$u" --jq .id 2>/dev/null || echo 0); export TARGET_ID; fi
           node scripts/chatops.mjs --apply --out action.json
           cat action.json
 
       - name: 照做
-        if: steps.who.outputs.ok == 'true'
+        id: do
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           N: ${{ github.event.issue.number }}
           ACTOR: ${{ github.event.comment.user.login }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+          APP_SLUG: ${{ steps.app.outputs.app-slug }}
         run: |
           set -euo pipefail
+          echo "did=true" >> "$GITHUB_OUTPUT"
           a=$(jq -r .action action.json)
           say() { printf '%s\n' "$1" > reply.md; gh issue comment "$N" --repo "$GITHUB_REPOSITORY" --body-file reply.md >/dev/null; }
+          # 交给 confirm 的（/approve 去合并；/hold、/untrust 生效以后去那边核对、回话）：命令的内容原样传过去
+          handoff() { local d; d="EOF_$(od -An -N8 -tx1 /dev/urandom | tr -d ' \n')"; { echo "action=$a"; echo "json<<$d"; jq -c . action.json; echo "$d"; } >> "$GITHUB_OUTPUT"; }
+          # 记下这条 /hold、/reject 生效了：机器人给这条评论点个 👀（试 3 回）。之前排着的 /approve 核对时认它——
+          #   发的人后来不是维护者了也算（只按现在的权限认，降权以后这条就被忽略了；标签本来就挂着时再挂、PR 没关上，都没有别的记录）
+          mark() {
+            local i
+            for i in 1 2 3; do
+              if gh api -X POST "repos/$GITHUB_REPOSITORY/issues/comments/$COMMENT_ID/reactions" -f content=eyes >/dev/null 2>&1; then return 0; fi
+              [ "$i" = 3 ] || sleep 3
+            done
+            return 1
+          }
           case "$a" in
             none) exit 0 ;;
             error) say "⚠ $(jq -r .msg action.json)" ;;
             merge)
-              # 检查没过的不合（维护者也不行：先让作者改）
-              sha=$(gh pr view "$N" --json headRefOid --jq .headRefOid)
-              c=$(gh api "repos/$GITHUB_REPOSITORY/commits/$sha/check-runs?check_name=Submission%20gate" --jq '.check_runs[0].conclusion // "none"')
-              if [ "$c" != "success" ] && [ "$c" != "neutral" ]; then say "⚠ 检查没过或还没跑完（$c），先不合并。 / Checks have not passed ($c), not merging."; exit 0; fi
-              body=$(gh pr view "$N" --json body --jq .body)
-              sub=$(printf '%s\n' "$body" | grep -E '^Submission: https://github\.com/[A-Za-z0-9._-]+/[A-Za-z0-9._-]+/issues/[0-9]+$' | head -1 || true)
-              [ -n "$sub" ] || sub="Submission: $(gh pr view "$N" --json url --jq .url)"
-              gh pr edit "$N" --add-label reviewed --remove-label 'held: maintainer' >/dev/null 2>&1 || true
-              # 只合检查过的那一版：查完到合并之间作者又推了，就不合（会重新检查）
-              gh pr merge "$N" --squash --match-head-commit "$sha" --body "$(printf '%s\nApproved-by: %s' "$sub" "$ACTOR")" ;;
+              # /approve 要带上维护者看过的那一版的完整提交号：只合那一版（看完之后作者又推了的、强推回以前某一版的，都对不上；
+              #   要 40 位：几位的短号能被刻意造出一个撞上的提交）
+              if [[ "$(jq -r '.sha // ""' action.json)" =~ ^[0-9a-f]{40}$ ]]; then handoff; exit 0; fi
+              cur=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$N" --jq .head.sha 2>/dev/null || true)
+              if [[ "$cur" =~ ^[0-9a-f]{40}$ ]]; then
+                say "⚠ /approve 要写上你看过的那一版的完整提交号（40 位，审核卡上照抄）。PR 现在是这一版，看过的话发：\`/approve $cur\`。没合并。 / /approve needs the full commit SHA you reviewed (40 hex characters, copy it from the review card). The PR is at this commit now; if this is what you reviewed, send: \`/approve $cur\`. Not merged."
+              else
+                say "⚠ /approve 要写上你看过的那一版的完整提交号（40 位，审核卡上照抄）。没合并。 / /approve needs the full commit SHA you reviewed (40 hex characters, copy it from the review card). Not merged."
+              fi ;;
             hold)
-              gh issue edit "$N" --add-label 'held: maintainer' >/dev/null
-              jq -r .text action.json > reply.md; gh issue comment "$N" --body-file reply.md >/dev/null ;;
+              # 先点 👀、再打标签：标签打不上（这步失败、请再发），之前排着的 /approve 也认这条
+              rec=0; mark || rec=1
+              gh issue edit "$N" --add-label 'held: maintainer' >/dev/null 2>&1 || { say "⚠ 没打上 held: maintainer（GitHub 报错），请再发一次 /hold。 / Could not add held: maintainer (GitHub error), please send /hold again."; exit 1; }
+              # 点不上 👀：照样生效，回话里说一声
+              if [ "$rec" = 1 ]; then jq '. + {unrecorded: true}' action.json > action.tmp && mv action.tmp action.json; fi
+              handoff ;;
             close)
-              jq -r .text action.json > reply.md; gh issue comment "$N" --body-file reply.md >/dev/null
-              if [ "$(jq -r '.issue.pull_request != null' "$GITHUB_EVENT_PATH")" = "true" ]; then gh pr close "$N" >/dev/null; else gh issue close "$N" --reason 'not planned' >/dev/null; fi ;;
+              # 先关、关上了才回原因（先回了「拒了」再关不上，PR 还开着、还能被合并）。
+              #   顺序：先关投稿的 issue（关了以后，开 PR 的工作流不会再开新的；正开到一半的，开完会再看一眼 issue、自己关掉），
+              #   再关这个 PR，最后关机器人替这个 issue 开的别的 PR
+              jq -r .text action.json > reject.md
+              # 先点 👀（关不上的时候，之前排着的 /approve 靠它认这条 /reject；点不上不拦：关上了有关闭记录，关不上会请你再发）
+              mark || echo "::warning::没能给这条 /reject 点上 👀"
+              iss=""; is_pr=$(jq -r '.issue.pull_request != null' "$GITHUB_EVENT_PATH")
+              # 先打上作者去不掉的记号（只有维护者、机器人能改标签）。打不上照样往下关（关上才是最要紧的），最后这步算失败、请再发一次：
+              #   这个 PR 标 held: maintainer——在读 PR 之前打：读不出来、关不上，之前排着的 /approve 也不合；作者能重开自己的 PR，重开了也要维护者再 /approve
+              lab=0; miss=0
+              if [ "$is_pr" = true ]; then gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$N/labels" -f 'labels[]=held: maintainer' >/dev/null 2>&1 || lab=1; fi
+              if [ "$is_pr" = true ]; then
+                # 评论事件里带着发评论那会儿 PR 的作者和说明（只有机器人、维护者能改）：机器人替网页投稿开的，先从这里认出投稿的 issue，
+                #   读不出 PR（或者读出来缺作者、缺状态）时照样拿它保护投稿 issue——不然作者改一下 issue 又会开出一个新号的 PR
+                iss_ev=$(jq -r --arg bot "${APP_SLUG}[bot]" --arg pre "Submission: https://github.com/$GITHUB_REPOSITORY/issues/" 'if (.issue.user.login // "") == $bot then [(.issue.body // "") | split("\n")[] | sub("\r$"; "") | select(startswith($pre)) | ltrimstr($pre)][0] // "" else "" end' "$GITHUB_EVENT_PATH" 2>/dev/null || true)
+                [[ "$iss_ev" =~ ^[1-9][0-9]*$ ]] || iss_ev=""
+                if ! gh api "repos/$GITHUB_REPOSITORY/pulls/$N" > pr-now.json 2>/dev/null || ! jq -e '(.user.login | type) == "string" and .user.login != "" and (.state | type) == "string" and (.merged | type) == "boolean"' pr-now.json > /dev/null 2>&1; then
+                  zh=""; en=""
+                  if [ -n "$iss_ev" ]; then
+                    ok=0
+                    gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$iss_ev/labels" -f 'labels[]=rejected' >/dev/null 2>&1 || ok=1
+                    gh issue close "$iss_ev" --reason 'not planned' >/dev/null 2>&1 || true
+                    [ "$(gh api "repos/$GITHUB_REPOSITORY/issues/$iss_ev" --jq .state 2>/dev/null || echo error)" = closed ] || ok=1
+                    if [ "$ok" = 0 ]; then
+                      zh="投稿的 issue #$iss_ev 已经标了 rejected、关掉了。"; en=" The submission issue #$iss_ev has been labelled rejected and closed."
+                    else
+                      zh="投稿的 issue #$iss_ev 没处理完（标签或关闭没成），再发一次会接着处理。"; en=" The submission issue #$iss_ev was not fully handled (label or close failed); sending /reject again will finish it."
+                    fi
+                  fi
+                  say "⚠ 查不到这个 PR，PR 没关，请再发一次 /reject。${zh} / Could not read this PR, so it was not closed; please send /reject again.${en}"; exit 1
+                fi
+                if [ "$(jq -r '"\(.state) \(.merged)"' pr-now.json)" = "closed true" ]; then say "⚠ 这个 PR 已经合并了，关不了；需要的话用 /takedown 下架。 / This PR has already been merged and cannot be closed; use /takedown if needed."; exit 0; fi
+                # 机器人替网页投稿开的 PR：投稿的 issue 也关（不然作者改一下 issue，又会开出一个新的 PR）
+                iss=$(jq -r --arg bot "${APP_SLUG}[bot]" --arg pre "Submission: https://github.com/$GITHUB_REPOSITORY/issues/" 'if (.user.login // "") == $bot then [(.body // "") | split("\n")[] | sub("\r$"; "") | select(startswith($pre)) | ltrimstr($pre)][0] // "" else "" end' pr-now.json)
+                [[ "$iss" =~ ^[1-9][0-9]*$ ]] || iss=""
+                # 机器人开的、现在的说明里读不出投稿 issue：用评论事件里认出来的
+                if [ -z "$iss" ] && [ "$(jq -r .user.login pr-now.json)" = "${APP_SLUG}[bot]" ]; then
+                  iss=$iss_ev
+                  # 两处都读不出来：照样关这个 PR，最后说清楚、算失败（请人手动处理投稿 issue）
+                  [ -n "$iss" ] || miss=1
+                fi
+              else
+                iss=$N
+              fi
+              # 0. 投稿的 issue 标 rejected——作者自己关过的 issue 能自己重开，重开、改了也不会再开 PR，合并前也认这个标签
+              if [ -n "$iss" ]; then gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$iss/labels" -f 'labels[]=rejected' >/dev/null 2>&1 || lab=1; fi
+              # 1. 投稿的 issue
+              if [ -n "$iss" ]; then
+                ist=$(gh api "repos/$GITHUB_REPOSITORY/issues/$iss" --jq .state 2>/dev/null || echo error)
+                if [ "$ist" = open ]; then
+                  # 不带 --comment：gh 会先发评论再关，评论发不出去就不关了；原因等都关上了再说
+                  gh issue close "$iss" --reason 'not planned' >/dev/null 2>&1 || true
+                  ist=$(gh api "repos/$GITHUB_REPOSITORY/issues/$iss" --jq .state 2>/dev/null || echo error)
+                fi
+                [ "$ist" = closed ] || { say "⚠ 投稿的 issue #$iss 没关上（${ist}），请再发一次 /reject。 / Could not close the submission issue #$iss ($ist), please send /reject again."; exit 1; }
+              fi
+              # 2. 这个 PR
+              if [ "$is_pr" = true ]; then
+                prst() { gh api "repos/$GITHUB_REPOSITORY/pulls/$N" --jq '"\(.state) \(.merged)"' 2>/dev/null || echo error; }
+                st=$(prst)
+                if [ "$st" = "open false" ]; then gh pr close "$N" >/dev/null 2>&1 || true; st=$(prst); fi
+                case "$st" in
+                  "closed false") ;;
+                  "closed true") say "⚠ 这个 PR 已经合并了，关不了；需要的话用 /takedown 下架。 / This PR has already been merged and cannot be closed; use /takedown if needed."; exit 0 ;;
+                  *) say "⚠ 没关上这个 PR（${st}），请再发一次 /reject。 / Could not close this PR ($st), please send /reject again."; exit 1 ;;
+                esac
+              fi
+              # 3. 机器人替这个 issue 开的别的 PR（不然拒了的投稿还能过检查被合并；合并前也会再看一眼 issue 开没开）
+              if [ -n "$iss" ]; then
+                if ! gh api --paginate "repos/$GITHUB_REPOSITORY/pulls?state=open&per_page=100" > open-raw.json || ! jq -e -s 'all(.[]; type == "array")' open-raw.json > /dev/null; then
+                  say "⚠ 已经关了，但查不到机器人替投稿 #$iss 开的别的 PR，请看一下有没有要一起关的。 / Closed, but the other bot PRs for submission #$iss could not be listed; please check whether one needs closing."; exit 1
+                fi
+                jq -r -s --arg u "Submission: https://github.com/$GITHUB_REPOSITORY/issues/$iss" --arg bot "${APP_SLUG}[bot]" --argjson me "$N" '.[][] | select(.number != $me and .user.login == $bot and (((.body // "") | split("\n") | map(sub("\r$"; "")) | index($u)) != null)) | .number' open-raw.json > bot-prs.txt
+                while read -r p; do
+                  [[ "$p" =~ ^[1-9][0-9]*$ ]] || continue
+                  gh pr close "$p" >/dev/null || { say "⚠ 已经关了，但投稿 #$iss 的另一个 PR #$p 没关上，请手动关一下。 / Closed, but another PR #$p for submission #$iss could not be closed; please close it by hand."; exit 1; }
+                  gh pr comment "$p" --body-file reject.md >/dev/null 2>&1 || true
+                done < bot-prs.txt
+              fi
+              # 都关上了，再回原因：这条命令在哪儿发的就回在哪儿；PR 上发的，投稿的 issue 上也留一份（作者在那儿看）。
+              #   两处各发各的（一处发不出去不耽误另一处），有一处没发出去这步算失败
+              sent=0
+              gh issue comment "$N" --body-file reject.md >/dev/null 2>&1 || sent=1
+              if [ -n "$iss" ] && [ "$iss" != "$N" ]; then gh issue comment "$iss" --body-file reject.md >/dev/null 2>&1 || sent=1; fi
+              [ "$miss" = 0 ] || { say "⚠ 这个 PR 关了，但读不出它是哪个投稿 issue 的（机器人开的 PR 说明里没有），请手动把投稿的 issue 标 rejected、关掉。 / This PR is closed, but its submission issue could not be found; please label that issue rejected and close it by hand."; exit 1; }
+              [ "$lab" = 0 ] || { say "⚠ 已经关了，但没打上「拒了」的标签（作者重开以后可能还会被处理），请再发一次 /reject。 / Closed, but the rejected label could not be added (it might be processed again if reopened); please send /reject again."; exit 1; }
+              [ "$sent" = 0 ] || { echo "::error::都关上了，但拒稿原因没发出去"; exit 1; } ;;
             feature|unfeature|trust|untrust|takedown|restore)
+              # 同一个账号 / 同一套设计已经有比这条评论晚的命令记下了（这条是重跑的、或者排在后面才跑到的旧命令）：不改
+              if [ "$(jq -r '.stale // false' action.json)" = true ]; then say "⚠ 对同一个账号 / 同一套设计已经有更晚发的命令生效了，这条旧的没改。 / A newer command for the same account / design has already taken effect; this older one was skipped."; exit 0; fi
               f=$(jq -r .changed action.json)
-              if [ -z "$f" ] || [ "$f" = "null" ] || git diff --quiet -- "$f"; then say "没有要改的。 / Nothing to change."; exit 0; fi
+              [ -n "$f" ] && [ "$f" != "null" ] || { say "没有要改的。 / Nothing to change."; exit 0; }
+              # 先加进暂存区再比：文件原来没有（第一次 /trust）时 git diff 看不到新文件
+              git add -- "$f"
+              if git diff --cached --quiet -- "$f"; then say "没有要改的。 / Nothing to change."; exit 0; fi
               git -c user.name=dsh-design-gallery-bot -c user.email=bot@users.noreply.github.com commit -q -m "$a by $ACTOR (#$N)" -- "$f"
               # 不用另外派发 publish：机器人（App token）推到 main、改的是 policy/** → publish 的 push 触发器自己会跑
               # （App 也没有 Actions 写权限，gh workflow run 会 403）。别把 checkout 换成 GITHUB_TOKEN：它推的不触发工作流
               if ! git push -q origin HEAD:main; then say "⚠ 推不上 main（可能刚有别的改动），请再发一次命令。 / Could not push to main, please send the command again."; exit 1; fi
-              say "✓ 已处理：$a / Done: $a" ;;
+              if [ "$a" = untrust ]; then handoff; else say "✓ 已处理：$a / Done: $a"; fi ;;
           esac
+
+  # 排「合并的队」（dsh-merge：全仓库一个，只有 /approve 在这里合并）：一次只合一个。
+  #   /approve：在这里合并。
+  #   /hold、/untrust：已经在 apply 里生效了；在这里等前面正在合的走完（它们可能是生效之前核过、按旧的样子合的），
+  #     看有没有赶在生效前合进去的，然后才回话——回了话以后，不会再有按旧的样子合进去的
+  #   queue: max——排队的不会被后来的顶掉（GitHub 默认一个组只留一个排队的）
+  confirm:
+    needs: [auth, apply]
+    if: needs.apply.outputs.action == 'merge' || needs.apply.outputs.action == 'hold' || needs.apply.outputs.action == 'untrust'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    concurrency:
+      group: dsh-merge
+      cancel-in-progress: false
+      queue: max
+    # 只读 Actions：/approve 要看 pr-check 是不是正在重跑（用 GITHUB_TOKEN 读，App 没有 Actions 权限）
+    permissions:
+      actions: read
+    steps:
+      - id: app
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.GALLERY_APP_ID }}
+          private-key: ${{ secrets.GALLERY_APP_PRIVATE_KEY }}
+
+      # 轮到了再认一次人（只管 /approve：排队的时候权限可能被撤了）
+      - name: 轮到了再认一次人
+        if: needs.apply.outputs.action == 'merge'
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          ACTOR: ${{ github.event.comment.user.login }}
+        run: |
+          perm=$(gh api "repos/$GITHUB_REPOSITORY/collaborators/$ACTOR/permission" --jq .permission 2>/dev/null || echo none)
+          case "$perm" in admin|maintain|write) ;; *) echo "::error::不是维护者了（${perm}），不做"; exit 1 ;; esac
+
+      # 检出 main 现在的样子、完整历史：/approve 要比同名的设计从闸门算的那版到现在变没变
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: 合并（/approve）
+        if: needs.apply.outputs.action == 'merge'
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          N: ${{ github.event.issue.number }}
+          ACTOR: ${{ github.event.comment.user.login }}
+          SINCE: ${{ github.event.comment.created_at }}
+          COMMENT_ID: ${{ github.event.comment.id }}
+          ACTION_JSON: ${{ needs.apply.outputs.json }}
+          APP_ID: ${{ vars.GALLERY_APP_ID }}
+          APP_SLUG: ${{ steps.app.outputs.app-slug }}
+          READ_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          say() { printf '%s\n' "$1" > reply.md; gh issue comment "$N" --repo "$GITHUB_REPOSITORY" --body-file reply.md >/dev/null; }
+          # 检查没过的不合（维护者也不行：先让作者改）。只认机器人 App 自己写的 Submission gate、取最新的一条（PR 能另加个同名检查）
+          # 还得是最新那回 pr-check 算出来的：闸门写检查时把「哪一回、按哪一版规矩、哪一版 main」
+          # （<run id>/<attempt>/<违规记录>/<信任名单>/<main 前 12 位>）记在 external_id 里，
+          # 要和这个 PR 现在最新的那回 pr-check（只数这个 PR 的来源跑的、id 最大的、现在的 attempt）对得上，而且那回已经跑完；
+          # pr-check 正在（重）跑、重跑完闸门还没重算、或者是旧回合写的（不能只比时间：旧回合可能写得更晚）都算没跑完；
+          # 过了的还得是按 main 上现在的违规记录、信任名单算的（变了就 policy），main 上的设计、检查规则也没动过（动了就 base）：都让检查按现在的重算
+          # 每一步都自己查错（在 $(...) 里调用，-e 管不到）
+          source scripts/policy-lib.sh
+          gate() {
+            local g r want rest s t b x rc
+            gh api --paginate "repos/$GITHUB_REPOSITORY/commits/$1/check-runs?check_name=Submission%20gate&app_id=$APP_ID&filter=all&per_page=100" \
+              --jq '.check_runs[] | "\(.id) \(.status) \(.conclusion // "none") \(if (.external_id // "") == "" then "-" else .external_id end)"' > gate-runs.txt 2>/dev/null || { echo error; return 0; }
+            # 只算这个 PR 的来源（来源仓库 node_id + 分支）跑的：别的 PR 指着同一个提交、跑得更晚，不能把这个 PR 的检查顶成「不是最新」；
+            # 被取消了的不算（重跑旧的一回时，新的一回会被取消）
+            GH_TOKEN="$READ_TOKEN" gh api --paginate "repos/$GITHUB_REPOSITORY/actions/workflows/pr-check.yml/runs?head_sha=$1&per_page=100" > check-raw.json 2>/dev/null || { echo error; return 0; }
+            jq -r --arg b "$head_branch" --arg r "$head_repo" '.workflow_runs[] | select(.head_branch == $b and .head_repository.node_id == $r and .conclusion != "cancelled") | "\(.id) \(.status) \(.run_attempt)"' check-raw.json > check-runs.txt 2>/dev/null || { echo error; return 0; }
+            if grep -qvE '^[0-9]+ [a-z_]+ [0-9]+$' check-runs.txt; then echo error; return 0; fi
+            if grep -qvE '^[0-9]+ [a-z_]+ [a-z_]+ [^ ]+$' gate-runs.txt; then echo error; return 0; fi
+            r=$(sort -n check-runs.txt | tail -1) || { echo error; return 0; }
+            [ -n "$r" ] || { echo error; return 0; }
+            set -- $r
+            [ "$2" = completed ] || { echo pending; return 0; }
+            # 记的是最新那回的检查里取最新一条（同一回的闸门重跑过就有几条）；一条都没有：别的回合写过就是还没算到这回
+            # （「检查没跑完」写的失败检查只记 <run id>/<attempt>）
+            want="$1/$3"
+            g=$(awk -v w="$want" '$4 == w || index($4, w "/") == 1' gate-runs.txt | sort -n | tail -1) || { echo error; return 0; }
+            if [ -z "$g" ]; then if [ -s gate-runs.txt ]; then echo pending; else echo none; fi; return 0; fi
+            set -- $g
+            [ "$2" = completed ] || { echo pending; return 0; }
+            if passed "$3"; then
+              # 过了的要记全规矩版本和 main 版本（缺了就是不是按现在的写法算的：当成还没算完）
+              case "$4" in "$want/"*) rest=${4#"$want/"} ;; *) echo pending; return 0 ;; esac
+              IFS=/ read -r s t b x <<< "$rest" || true
+              [ -n "$s" ] && [ -n "$t" ] && [ -n "$b" ] && [ -z "$x" ] || { echo pending; return 0; }
+              policy_now || { echo error; return 0; }
+              [ "$s/$t" = "$(policy_short "$pol")" ] || { echo policy; return 0; }
+              rc=0; bash scripts/base-moved.sh "$b" > base-moved.txt 2>&1 || rc=$?
+              case "$rc" in 0) ;; 3) echo base; return 0 ;; *) echo error; return 0 ;; esac
+            fi
+            echo "$3"
+          }
+          passed() { [ "$1" = success ] || [ "$1" = neutral ]; }
+          # 没过：说清楚；规矩变了（policy）、同名的设计变了（base）：让检查按现在的重算
+          notyet() {
+            case "$1" in
+              policy)
+                say "⚠ 检查是按旧的违规记录 / 信任名单算的，已经让它按现在的重算；算完再发一次 /approve。 / The checks were computed with an older strikes / trust list; they are being re-run now, send /approve again when they finish."
+                bash scripts/recheck.sh "$N" "$sha" || true ;;
+              base)
+                say "⚠ 检查算完以后 main 动过（别的投稿先合进去了，或者检查规则改了），已经让检查按现在的 main 重算；算完再发一次 /approve。 / main changed after the checks ran (another submission was merged first, or the check rules changed); the checks are being re-run against the current main, send /approve again when they finish."
+                bash scripts/recheck.sh "$N" "$sha" || true ;;
+              *) say "⚠ 检查没过或还没跑完（$1），先不合并。 / Checks have not passed ($1), not merging." ;;
+            esac
+          }
+          # 维护者发 /approve 之后又挂起了：以后发的为准，不合。查不到算挂起了
+          #   - 这条 /approve 之后（评论 id 更大，或者同一秒：同一秒按保护的算）有人发了 /hold，而且发的人现在还是维护者、
+          #     或者机器人当时给这条点了 👀（apply 认过人、生效了：发的人后来降权了也算）
+          #     （标签本来就挂着时再 /hold，不会多出「打标签」的记录，只能看评论；用和命令一样的解析认 /hold）
+          #   - held: maintainer 在、而且是这条评论之后打上的（维护者在网页上手动挂起）
+          #   - 这条 /approve 之后（同一秒也算）PR 被关过（/reject、手动关，又被重开了；机器人代开的看投稿的 issue）：
+          #     谁关的都算，关它的人后来不是维护者了也一样作废
+          held_after() {
+            local t u p cid r rc=0
+            gh api "repos/$GITHUB_REPOSITORY/pulls/$N" > held-pr.json 2>/dev/null || return 0
+            bash scripts/was-closed.sh held-pr.json "$SINCE" || rc=$?
+            [ "$rc" = 3 ] || return 0
+            gh api --paginate "repos/$GITHUB_REPOSITORY/issues/$N/comments?per_page=100" > later-raw.json 2>/dev/null || return 0
+            jq -s . later-raw.json > later.json 2>/dev/null || return 0
+            node scripts/chatops.mjs --holds later.json --id "$COMMENT_ID" --since "$SINCE" > holders.txt 2>/dev/null || return 0
+            while read -r cid u; do
+              [[ "$cid" =~ ^[1-9][0-9]*$ && "$u" =~ ^[A-Za-z0-9-]{1,39}$ ]] || return 0
+              p=$(gh api "repos/$GITHUB_REPOSITORY/collaborators/$u/permission" --jq .permission 2>/dev/null) || return 0
+              # 明确是维护者：挂起；明确不是：再看 👀；读不出来、不认得的值：算挂起
+              case "$p" in admin|maintain|write) return 0 ;; read|triage|none) ;; *) return 0 ;; esac
+              r=$(gh api --paginate "repos/$GITHUB_REPOSITORY/issues/comments/$cid/reactions?content=eyes&per_page=100" --jq ".[] | select(.user.login == \"${APP_SLUG}[bot]\") | .id" 2>/dev/null) || return 0
+              [ -z "$r" ] || return 0
+            done < holders.txt
+            gh api --paginate "repos/$GITHUB_REPOSITORY/issues/$N/labels?per_page=100" --jq '.[].name' > labels.txt 2>/dev/null || return 0
+            grep -qx 'held: maintainer' labels.txt || return 1
+            t=$(gh api --paginate "repos/$GITHUB_REPOSITORY/issues/$N/events?per_page=100" --jq '.[] | select(.event == "labeled" and .label.name == "held: maintainer") | .created_at' 2>/dev/null | sort | tail -1) || return 0
+            [ -n "$t" ] || return 0
+            ! [[ "$t" < "$SINCE" ]]
+          }
+          held_msg="⚠ 发 /approve 之后又挂起了、拒了或者关过（/hold、/reject、held: maintainer、关了又重开），先不合并；要合就再发一次 /approve。 / The PR was put on hold, rejected or closed after /approve, not merging; send /approve again to merge."
+          # 合并之前每回都核：开着、不是草稿、还是维护者批准的那一版、来源没变、还往 main 合（排队、等草稿的时候都可能变）。
+          #   来源仓库按 node_id 认（改名也不变）；fork 删了（没有来源仓库）就不合
+          look() {
+            gh pr view "$N" --json state,isDraft,headRefOid,headRefName,headRepository,baseRefName --jq 'if (.headRefOid | type) == "string" and (.headRefOid | test("^[0-9a-f]{40}$")) and (.headRefName | type) == "string" and .headRefName != "" and (.headRepository.id | type) == "string" and .headRepository.id != "" and (.baseRefName | type) == "string" and .baseRefName != "" then "\(.state) \(.isDraft) \(.headRefOid) \(.headRefName) \(.headRepository.id) \(.baseRefName)" else "" end' 2>/dev/null || true
+          }
+          # 机器人代开的（网页投稿）：投稿的 issue 还开着才合（维护者在 issue 上 /reject 了就不合）
+          subok() {
+            local rc=0
+            gh api "repos/$GITHUB_REPOSITORY/pulls/$N" > pr-now.json 2>/dev/null || { say "⚠ 查不到这个 PR，先不合并，请再发一次。 / Could not read the PR, not merging; please try again."; exit 1; }
+            bash scripts/submission-open.sh pr-now.json || rc=$?
+            case "$rc" in
+              0) ;;
+              3) say "⚠ 投稿的 issue 已经关了（拒了或作者撤了），不合并。 / The submission issue is closed (rejected or withdrawn), not merging."; exit 0 ;;
+              *) say "⚠ 查不到投稿的 issue 是不是还开着，先不合并，请再发一次。 / Could not check the submission issue, not merging; please try again."; exit 1 ;;
+            esac
+          }
+          # 只合维护者批准的那一版：/approve <完整提交号>（apply 已经核过写法）
+          approved=$(printf '%s' "$ACTION_JSON" | jq -r '.sha // ""' 2>/dev/null || true)
+          [[ "$approved" =~ ^[0-9a-f]{40}$ ]] || { say "⚠ 读不出要合的是哪一版，先不合并，请再发一次 /approve <完整提交号>。 / Could not read which commit to merge; please send /approve <full sha> again."; exit 1; }
+          read -r st draft sha head_branch head_repo base_ref <<< "$(look)" || true
+          [ -n "${sha:-}" ] && [ -n "${head_branch:-}" ] && [ -n "${head_repo:-}" ] && [ -n "${base_ref:-}" ] || { say "⚠ 查不到这个 PR，先不合并，请再发一次。 / Could not read the PR, not merging; please try again."; exit 1; }
+          [ "$base_ref" = main ] || { say "⚠ 这个 PR 不是往 main 合的（${base_ref}），不合并。 / This PR does not target main ($base_ref), not merging."; exit 0; }
+          [ "$sha" = "$approved" ] || { say "⚠ PR 现在是 ${sha:0:7}，不是你批准的 ${approved:0:7}（之后又有提交）：先不合并，看过新的再发 \`/approve $sha\`。 / The PR is now at ${sha:0:7}, not the ${approved:0:7} you approved: not merging; review it, then send \`/approve $sha\`."; exit 0; }
+          if held_after; then say "$held_msg"; exit 0; fi
+          c=$(gate "$sha"); passed "$c" || { notyet "$c"; exit 0; }
+          body=$(gh pr view "$N" --json body --jq .body)
+          sub=$(printf '%s\n' "$body" | tr -d '\r' | grep -E '^Submission: https://github\.com/[A-Za-z0-9._-]+/[A-Za-z0-9._-]+/issues/[0-9]+$' | head -1 || true)
+          [ -n "$sub" ] || sub="Submission: $(gh pr view "$N" --json url --jq .url)"
+          # 合并报错不一定没合上（响应丢了）：已经合上、合的就是批准的这一版，就当合上了（记「审过」、摘挂起的标签）
+          merged_ok() { [ "$(gh api "repos/$GITHUB_REPOSITORY/pulls/$N" --jq '"\(.merged) \(.head.sha)"' 2>/dev/null || true)" = "true $sha" ]; }
+          done_ok() { gh pr edit "$N" --add-label reviewed --remove-label 'held: maintainer' >/dev/null 2>&1 || true; exit 0; }
+          tried=
+          for try in 1 2 3; do
+            # 机器人重跑检查时会把 PR 转成草稿再马上标回（草稿不能合并）：等它标回来，最多半分钟
+            for i in 1 2 3 4 5 6; do [ "$(gh pr view "$N" --json isDraft --jq .isDraft || true)" = true ] || break; sleep 5; done
+            # 等完再核一遍：还开着、不是草稿、还是批准的那一版、来源和目标分支没变，机器人的检查也还是过的（等的时候可能重算过）
+            #   上一回合并报错、当时没查到合上（查询也出错了）：现在看到 PR 变了，先看是不是其实合上了
+            now=$(look)
+            if [ "$now" != "OPEN false $sha $head_branch $head_repo main" ]; then
+              if [ -n "$tried" ] && merged_ok; then done_ok; fi
+              say "⚠ PR 变了（关了、还是草稿、有新提交，或者改了来源 / 目标分支），先不合并；需要的话再发一次 /approve。 / The PR changed (closed, still a draft, new commits, or a different source / target branch), not merging; send /approve again if needed."; exit 0; fi
+            c=$(gate "$sha"); passed "$c" || { notyet "$c"; exit 0; }
+            if held_after; then say "$held_msg"; exit 0; fi
+            subok
+            # 上面这些查询要花点时间：合并之前最后再看一眼（这期间改了目标分支、关了、推了新提交）
+            if [ "$(look)" != "OPEN false $sha $head_branch $head_repo main" ]; then say "⚠ PR 变了（关了、还是草稿、有新提交，或者改了来源 / 目标分支），先不合并；需要的话再发一次 /approve。 / The PR changed (closed, still a draft, new commits, or a different source / target branch), not merging; send /approve again if needed."; exit 0; fi
+            # 只合检查过的那一版：查完到合并之间作者又推了，就不合（会重新检查）
+            # 合上了才记「审过」（合不上的不留这个标签）
+            if gh pr merge "$N" --squash --match-head-commit "$sha" --body "$(printf '%s\nApproved-by: %s' "$sub" "$ACTOR")"; then done_ok; fi
+            tried=1
+            if merged_ok; then done_ok; fi
+            # 合不上（多半是刚好被转成了草稿）：过一会儿从头再核一遍再试
+            sleep 5
+          done
+          if merged_ok; then done_ok; fi
+          say "⚠ 合并试了 3 回都没成功，请看一下 PR 再发一次 /approve。 / Merging failed 3 times; please check the PR and send /approve again."
+          exit 1
+
+      # /hold、/untrust 已经生效了（apply 里）；轮到这里时，前面排着的合并都走完了：看有没有赶在生效前合进去的，再回话
+      - name: 核对、回话（/hold、/untrust）
+        if: needs.apply.outputs.action == 'hold' || needs.apply.outputs.action == 'untrust'
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          N: ${{ github.event.issue.number }}
+          IS_PR: ${{ github.event.issue.pull_request != null }}
+          SINCE: ${{ github.event.comment.created_at }}
+          APP_SLUG: ${{ steps.app.outputs.app-slug }}
+          ACTION_JSON: ${{ needs.apply.outputs.json }}
+        run: |
+          set -euo pipefail
+          say() { printf '%s\n' "$1" > reply.md; gh issue comment "$N" --repo "$GITHUB_REPOSITORY" --body-file reply.md >/dev/null; }
+          printf '%s\n' "$ACTION_JSON" > action.json
+          a=$(jq -r .action action.json)
+          if [ "$a" = hold ]; then
+            # apply 没能给这条 /hold 点上 👀：每种回话都带上一句
+            note=
+            if [ "$(jq -r '.unrecorded // false' action.json)" = true ]; then note='⚠ 没能给这条 /hold 点上 👀（GitHub 报错）：发这条之前就排着的 /approve，只在你还是维护者时认它。 / Could not mark this /hold with 👀 (GitHub error): an /approve queued before it only honours it while you are still a maintainer.'; fi
+            hsay() { { printf '%s\n' "$1"; if [ -n "$note" ]; then printf '\n%s\n' "$note"; fi; } > reply.md; gh issue comment "$N" --repo "$GITHUB_REPOSITORY" --body-file reply.md >/dev/null; }
+            if [ "$IS_PR" = true ]; then
+              merged=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$N" --jq .merged || echo error)
+              case "$merged" in
+                false) ;;
+                true) hsay "⚠ 已经打上 held: maintainer，但核对时这个 PR 已经合并了，请看一眼（需要的话用 /takedown 下架）。 / Labelled held: maintainer, but the PR was already merged when this was checked; please take a look (use /takedown if needed)."; exit 0 ;;
+                *) hsay "⚠ 已经打上 held: maintainer，但查不到这个 PR 是不是已经合并了，请看一眼。 / Labelled held: maintainer, but could not tell whether the PR was already merged; please take a look."; exit 1 ;;
+              esac
+            fi
+            hsay "$(jq -r .text action.json)"
+            exit 0
+          fi
+          # /untrust：这个人（按数字 id；机器人代开的看 Submitted-by 行）在评论之后合并的 PR——生效之前核过、按旧名单合进去的
+          uid=$(jq -r .uid action.json)
+          [[ "$uid" =~ ^[1-9][0-9]*$ ]] || { say "✓ 已处理：untrust（读不出账号 id，没核对这期间有没有赶在生效前合并的，请看一下最近合并的 PR） / Done: untrust (could not check for merges that slipped in first; please look at recently merged PRs)"; exit 1; }
+          : > merged.txt; ok=0
+          for page in $(seq 1 10); do
+            gh api "repos/$GITHUB_REPOSITORY/pulls?state=closed&sort=updated&direction=desc&per_page=100&page=$page" > page.json || break
+            jq -e 'type == "array"' page.json > /dev/null || break
+            jq -r --arg since "$SINCE" --arg uid "$uid" --arg bot "${APP_SLUG}[bot]" '.[] | select(.merged_at != null and .merged_at >= $since) | select((.user.id | tostring) == $uid or (.user.login == $bot and ((.body // "") | gsub("\r"; "") | test("(?m)^Submitted-by: [A-Za-z0-9-]+ \\(" + $uid + "\\)$")))) | "#\(.number)"' page.json >> merged.txt || break
+            # 按更新时间倒序：这一页最后一个已经早于评论（或者不满一页）就翻完了
+            if [ "$(jq length page.json)" -lt 100 ] || [ "$(jq -r '.[-1].updated_at // ""' page.json)" \< "$SINCE" ]; then ok=1; break; fi
+          done
+          if [ "$ok" != 1 ]; then say "✓ 已处理：untrust（没查全这期间有没有赶在生效前合并的，请看一下最近合并的 PR） / Done: untrust (could not fully check for merges that slipped in first; please look at recently merged PRs)"; exit 1; fi
+          if [ -s merged.txt ]; then
+            say "✓ 已处理：untrust。⚠ 这条命令发出以后，这个人有这些 PR 合并了，请核对一下：$(sort -u merged.txt | tr '\n' ' ')（需要的话用 /takedown 下架）。 / Done: untrust. These PRs by this person were merged after the command was sent; please double-check them: $(sort -u merged.txt | tr '\n' ' ')(use /takedown if needed)."
+          else
+            say "✓ 已处理：untrust / Done: untrust"
+          fi
+
+  # 被取消了要说一声（PR 里的工作流用同名的并发组取消了排队的 confirm，或者有人手动取消）：这个 job 不排任何队，取消不了它
+  cancelled:
+    needs: [auth, apply, confirm]
+    # 也管 apply 在「照做」开始之前就失败了（检出、装 node、解析出错）：不然保护性的命令（/untrust、/takedown、/reject）悄悄没生效、也没回话
+    if: always() && needs.auth.outputs.ok == 'true' && (needs.apply.result == 'cancelled' || needs.confirm.result == 'cancelled' || (needs.apply.result == 'failure' && needs.apply.outputs.did != 'true' && needs.apply.outputs.denied != 'true'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - id: app
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.GALLERY_APP_ID }}
+          private-key: ${{ secrets.GALLERY_APP_PRIVATE_KEY }}
+      # 认是不是命令：用和 apply 同一个解析器（scripts/chatops.mjs，只用 node 自带的模块，不用装依赖）。
+      #   这两步出错了也接着回话（认不出来就当是命令照说），不能因为准备没成把「被取消了」吞掉
+      - uses: actions/checkout@v4
+        continue-on-error: true
+        timeout-minutes: 1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        continue-on-error: true
+        timeout-minutes: 1
+        with:
+          node-version: 22
+      - name: 说一声命令被取消了
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          N: ${{ github.event.issue.number }}
+          APPLY: ${{ needs.apply.result }}
+          ACTION: ${{ needs.apply.outputs.action }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          IS_PR: ${{ github.event.issue.pull_request != null }}
+        run: |
+          set -euo pipefail
+          # 入口只粗筛了「评论里有 /」：维护者的普通评论（带链接）被取消了不用说。和 apply 一样认（第一条 / 开头的行）是命令才说
+          #   （认不出来——比如 node 出错——就当是命令照说：多说一句不碍事）
+          act=$(node scripts/chatops.mjs --action 2>/dev/null || echo unknown)
+          [ "$act" != none ] || { echo "不是命令，不用说"; exit 0; }
+          if [ "$APPLY" = failure ]; then
+            msg="⚠ 这条命令没能处理（准备的时候出错了，什么都没改），请再发一次。 / This command could not be processed (setup failed, nothing was changed); please send it again."
+          elif [ "$APPLY" = cancelled ]; then
+            msg="⚠ 这条命令被取消了，可能没做完，请再发一次。 / This command was cancelled and may not have finished; please send it again."
+          elif [ "$ACTION" = merge ]; then
+            # 可能是合完、回话之前被取消的：照实说
+            case "$(gh api "repos/$GITHUB_REPOSITORY/pulls/$N" --jq .merged 2>/dev/null || echo error)" in
+              true) msg="⚠ /approve 的这一回被取消了，不过 PR 已经合并了。 / This /approve run was cancelled, but the PR has been merged." ;;
+              false) msg="⚠ /approve 被取消了，没有合并，请再发一次。 / /approve was cancelled; nothing was merged, please send it again." ;;
+              *) msg="⚠ /approve 被取消了，查不到合没合并，请看一眼 PR。 / /approve was cancelled and the merge state could not be read; please check the PR." ;;
+            esac
+          else
+            msg="⚠ 命令已经生效，但排队核对时被取消了：没确认这期间有没有赶在生效前合并的，请看一下最近合并的 PR。 / The command took effect, but the follow-up check was cancelled; please look at recently merged PRs for anything that slipped in first."
+          fi
+          printf '%s\n' "$msg" > reply.md
+          gh issue comment "$N" --repo "$GITHUB_REPOSITORY" --body-file reply.md >/dev/null

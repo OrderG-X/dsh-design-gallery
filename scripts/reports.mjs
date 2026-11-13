@@ -4,16 +4,16 @@
  * → 先写进下架名单（reason: reported），立刻发新目录；维护者看过后：误伤回 /restore，确认就不用动。
  *
  *   node scripts/reports.mjs parse                       读 ISSUE_BODY（刚开的举报 issue），GITHUB_OUTPUT 写 id=、kind=、hide_kind=true|false
- *   node scripts/reports.mjs candidates --id <作者__名字> --issues issues.json   要查账号年龄的人（每行一个）
+ *   node scripts/reports.mjs candidates --id <作者__名字> --issues issues.json   要查账号年龄的人（每行一个「数字 id 用户名」）
  *   node scripts/reports.mjs decide --id <作者__名字> --issues issues.json --ages ages.json [--apply] --out action.json
  *     issues.json：API 列出的 label=report、还开着的 issue（分页取全；内容不可信，严格解析）
  *     只算上次撤销下架（/restore）之后的举报；维护者关掉的举报不算
- *     ages.json：{ 用户名: 账号创建时间 }（工作流用 API 查的）
+ *     ages.json：{ 数字账号 id: 账号创建时间 }（工作流按 id 用 API 查的：用户名能改、旧名能被别人占用，按名字查会把别人的年龄算进来）
  */
 
 import fs from 'node:fs'
 import path from 'node:path'
-import { ROOT, readJson } from './lib/repo.mjs'
+import { ROOT, readJson, readPolicyJson } from './lib/repo.mjs'
 import { applyPolicy } from './chatops.mjs'
 
 const DAY = 86400000
@@ -39,30 +39,48 @@ export function parseReport(body) {
 }
 
 /**
- * 有效举报人（按数字 id 去重）：同一套、两类之一、还开着、在上次撤销下架之后提的、不是机器人、不是作者自己
- * 账号年龄另查（只查这些人），见 shouldHide
+ * main 上这套的作者数字 id（design.json 的 author.id；找不到、读不出来给 0）。
+ * 用户名能改、旧名能被别人占用：认「是不是作者自己」要按 id，不能拿设计 id 里的用户名比
  */
-export function candidates(issues, { id, since = '' }) {
+export function designAuthorId(id, root = ROOT) {
+  if (!ID.test(id)) return 0
+  for (const dir of ['templates', 'systems', 'styles']) {
+    try {
+      const m = JSON.parse(fs.readFileSync(path.join(root, dir, id, 'design.json'), 'utf8'))
+      if (m && m.author && Number.isInteger(m.author.id) && m.author.id > 0) return m.author.id
+    } catch {}
+  }
+  return 0
+}
+
+/**
+ * 有效举报人（按数字 id 去重）：同一套、两类之一、还开着、在上次撤销下架之后提的、不是机器人、不是作者自己
+ * （authorId：作者的数字 id，按它认；不知道（0）时才退回按设计 id 里的用户名认）
+ * 账号年龄另查（只查这些人，按数字 id），见 shouldHide。返回 [{ id, login }]
+ */
+export function candidates(issues, { id, since = '', authorId = 0 }) {
   const author = id.split('__')[0]
+  // 按时间比（不按字符串：/restore 记的是带毫秒的 …00.000Z，举报是 …00Z，同一秒的字符串比会算成「之后」）；读不出来的不算
+  const sinceT = since ? Date.parse(since) : NaN
   const who = new Map()
   for (const it of Array.isArray(issues) ? issues : []) {
     if (!it || it.pull_request) continue
     if (it.state && it.state !== 'open') continue // 维护者关掉的（处理过 / 判了没问题）不算
-    if (since && !(String(it.created_at || '') > since)) continue // 撤销下架之前的旧举报不算
+    if (since && !(Date.parse(String(it.created_at || '')) > sinceT)) continue // 撤销下架之前（同一秒也算之前）的旧举报不算
     const r = parseReport(it.body)
     const u = it.user || {}
     if (!r || r.id !== id || !HIDE_KINDS.includes(r.kind)) continue
     if (u.type === 'Bot' || typeof u.login !== 'string' || !/^[A-Za-z0-9-]{1,39}$/.test(u.login) || !Number.isInteger(u.id)) continue
-    if (u.login.toLowerCase() === author) continue
+    if (authorId ? u.id === authorId : u.login.toLowerCase() === author) continue
     if (!who.has(u.id)) who.set(u.id, u.login)
   }
-  return [...who.values()]
+  return [...who].map(([id, login]) => ({ id, login }))
 }
 
 /** 够不够自动先隐藏：有效举报人里账号满 30 天的不同账号 ≥ 3 */
-export function shouldHide(issues, { id, ages = {}, now = Date.now(), since = '' }) {
-  const ok = candidates(issues, { id, since }).filter((login) => (now - Date.parse(ages[login] || '')) / DAY >= MIN_AGE)
-  return { hide: ok.length >= NEED, reporters: ok.slice(0, 10) }
+export function shouldHide(issues, { id, ages = {}, now = Date.now(), since = '', authorId = 0 }) {
+  const ok = candidates(issues, { id, since, authorId }).filter((c) => (now - Date.parse((ages && Object.hasOwn(ages, String(c.id)) && ages[String(c.id)]) || '')) / DAY >= MIN_AGE)
+  return { hide: ok.length >= NEED, reporters: ok.slice(0, 10).map((c) => c.login) }
 }
 
 /** 这一套上次被撤销下架是什么时候（之前的举报都处理过了） */
@@ -85,11 +103,11 @@ function main() {
     return
   }
   if (cmd === 'candidates') {
-    // 要查账号年龄的人（每行一个用户名，全部列出；工作流逐个查，凑够 3 个满 30 天的就停）
+    // 要查账号年龄的人（每行一个「数字 id 用户名」，全部列出；工作流按 id 逐个查，凑够 3 个满 30 天的就停）
     const id = arg('--id')
     if (!ID.test(id)) { console.error('id 不对'); process.exit(2) }
-    const since = restoredSince(readJson(path.join(ROOT, 'policy', 'denylist.json'), []), id)
-    for (const u of candidates(readJson(arg('--issues'), []), { id, since })) console.log(u)
+    const since = restoredSince(readPolicyJson(path.join(ROOT, 'policy', 'denylist.json'), []), id)
+    for (const c of candidates(readJson(arg('--issues'), []), { id, since, authorId: designAuthorId(id) })) console.log(`${c.id} ${c.login}`)
     return
   }
   if (cmd === 'decide') {
@@ -97,9 +115,9 @@ function main() {
     if (!ID.test(id)) { console.error('id 不对'); process.exit(2) }
     const issues = readJson(arg('--issues'), [])
     const ages = readJson(arg('--ages'), {})
-    const deny = readJson(path.join(ROOT, 'policy', 'denylist.json'), [])
+    const deny = readPolicyJson(path.join(ROOT, 'policy', 'denylist.json'), [])
     const already = deny.some((d) => d && d.id === id && !d.restored)
-    const r = shouldHide(issues, { id, ages, since: restoredSince(deny, id) })
+    const r = shouldHide(issues, { id, ages, since: restoredSince(deny, id), authorId: designAuthorId(id) })
     const a = { ...r, id, already }
     if (r.hide && !already && process.argv.includes('--apply')) a.changed = applyPolicy({ action: 'takedown', id, reason: 'reported' })
     fs.writeFileSync(arg('--out') || 'action.json', JSON.stringify(a, null, 2) + '\n')

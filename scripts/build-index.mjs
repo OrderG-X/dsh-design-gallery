@@ -23,7 +23,7 @@ import path from 'node:path'
 import crypto from 'node:crypto'
 import { execFileSync } from 'node:child_process'
 import { checkPack, renderPack, KINDS, STYLE_IDS } from 'dsh-design-studio/gallery'
-import { ROOT, listEntries, loadDir, loadVocab, readJson } from './lib/repo.mjs'
+import { ROOT, listEntries, loadDir, loadVocab, readJson, readPolicyJson } from './lib/repo.mjs'
 
 export const CATALOG_PKG = 'dsh-design-gallery'
 export const PACKS_PKG = 'dsh-design-gallery-packs'
@@ -181,11 +181,12 @@ export function nextSerial(prev, d = new Date()) {
 
 export async function build({ out, prev = null, prevDir = '', packsVersion = '', render = true, shotsFrom = '', now = new Date(), budget = PACK_BUDGET }) {
   const vocab = loadVocab()
-  const denyAll = readJson(path.join(ROOT, 'policy', 'denylist.json'), [])
+  // 下架名单、精选读不出来（手改坏了）就别发：当成空的发出去，下架的会重新露出来
+  const denyAll = readPolicyJson(path.join(ROOT, 'policy', 'denylist.json'), [])
   const denylist = denyAll.filter((d) => !d.restored)
   // 撤销过下架的（/restore）：从下架名单里拿掉，另发一份「撤销名单」（插件本地记着下架名单，见到签了名的撤销才放出来）
   const restored = new Map(denyAll.filter((d) => d.restored && !denylist.some((x) => x.id === d.id)).map((d) => [d.id, d.restored]))
-  const featured = new Set(readJson(path.join(ROOT, 'policy', 'featured.json'), []))
+  const featured = new Set(readPolicyJson(path.join(ROOT, 'policy', 'featured.json'), []))
   const denied = new Map(denylist.map((d) => [d.id, d]))
   const prevById = new Map(((prev && [...(prev.designs || []), ...(prev.systems || []), ...(prev.styles || [])]) || []).map((e) => [e.id, e]))
   // 下架名单：上一版的 + 这次的，只增不减

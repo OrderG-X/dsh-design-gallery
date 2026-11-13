@@ -16,7 +16,8 @@ concurrency:
 jobs:
   unpack:
     # 表单开的带 submission 标签；设计台一键投稿是投稿人用 API 开的，外人开 issue 加不了标签，按标题认
-    if: (contains(github.event.issue.labels.*.name, 'submission') || startsWith(github.event.issue.title, '投稿 / Submission:')) && github.event.issue.state == 'open'
+    # 维护者 /reject 过的（rejected 标签，作者去不掉）：作者自己重开、再改，也不再处理
+    if: (contains(github.event.issue.labels.*.name, 'submission') || startsWith(github.event.issue.title, '投稿 / Submission:')) && github.event.issue.state == 'open' && !contains(github.event.issue.labels.*.name, 'rejected')
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     steps:
@@ -73,8 +74,30 @@ jobs:
         run: |
           node scripts/intake-apply.mjs artifact --reply reply.md
           rm -rf artifact node_modules
-      - name: 开 PR
+      # 维护者可能已经 /reject（关了 issue）：还开着才开 PR。查不到就这步失败、不开
+      - name: issue 还开着才开 PR
         if: steps.apply.outputs.ok == 'true'
+        id: still
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          N: ${{ github.event.issue.number }}
+          AUTHOR_ID: ${{ github.event.issue.user.id }}
+        run: |
+          set -euo pipefail
+          # 还开着、没被拒（rejected 标签）才开
+          st=$(gh api "repos/$GITHUB_REPOSITORY/issues/$N" --jq '"\(.state) \([.labels[]?.name] | any(. == "rejected"))"')
+          if [ "$st" != "open false" ]; then echo "issue 已经关了或被拒了（${st}），不开 PR"; echo "open=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          # 被别人（维护者 /reject、手动关）关过的：作者重开、再改也不再开 PR（拒稿的标签可能没打上）。作者自己关了又开的照常。
+          #   查不到就这步失败、不开（就算开了，被关过的投稿也要维护者再 /approve）
+          [[ "$AUTHOR_ID" =~ ^[1-9][0-9]*$ ]] || { echo "投稿人 id 不对：$AUTHOR_ID"; exit 1; }
+          rc=0; bash scripts/closed-by.sh "$N" "$AUTHOR_ID" || rc=$?
+          case "$rc" in
+            3) echo "open=true" >> "$GITHUB_OUTPUT" ;;
+            0) echo "这个投稿被维护者关过（拒过），不开 PR"; echo "open=false" >> "$GITHUB_OUTPUT" ;;
+            *) echo "查不到这个 issue 有没有被关过"; exit 1 ;;
+          esac
+      - name: 开 PR
+        if: steps.apply.outputs.ok == 'true' && steps.still.outputs.open == 'true'
         id: cpr
         uses: peter-evans/create-pull-request@v7
         with:
@@ -89,15 +112,61 @@ jobs:
 
             由网页表单投稿自动生成。 / Opened automatically from a web-form submission.
           labels: submission
-      - name: 回复投稿人
-        if: always()
+      # 开 PR 的时候维护者刚好 /reject 了（上一步看的时候还开着）：开完再看一眼，关了就把 PR 也关掉
+      #   （/reject 那边会关掉已经开出来的；这里管它查完之后才开出来的）。
+      #   按分支找机器人开的 PR，不只看上一步的输出：上一步开出了 PR、后面加标签失败时也没有输出
+      - name: 开完再看一眼 issue
+        if: always() && steps.still.outputs.open == 'true'
+        id: after
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           N: ${{ github.event.issue.number }}
-          PR_URL: ${{ steps.cpr.outputs.pull-request-url }}
+          AUTHOR_ID: ${{ github.event.issue.user.id }}
+          BRANCH: ${{ steps.apply.outputs.branch }}
+          APP_SLUG: ${{ steps.app.outputs.app-slug }}
+        run: |
+          set -euo pipefail
+          [[ "$BRANCH" =~ ^submission/[1-9][0-9]*$ ]] || { echo "分支名不对：$BRANCH"; exit 1; }
+          [[ "$AUTHOR_ID" =~ ^[1-9][0-9]*$ ]] || { echo "投稿人 id 不对：$AUTHOR_ID"; exit 1; }
+          gh api "repos/$GITHUB_REPOSITORY/pulls?state=open&per_page=100&head=$GITHUB_REPOSITORY_OWNER:$BRANCH" > mine.json
+          jq -r --arg bot "${APP_SLUG}[bot]" '.[] | select(.user.login == $bot) | "\(.number) \(.html_url)"' mine.json > mine.txt
+          st=$(gh api "repos/$GITHUB_REPOSITORY/issues/$N" --jq '"\(.state) \([.labels[]?.name] | any(. == "rejected"))"')
+          if [ "$st" = "open false" ]; then
+            # 还开着：和开 PR 之前一样，再看有没有被别人关过（开 PR 的时候维护者关了、作者又马上重开了）。查不到这步失败
+            rc=0; bash scripts/closed-by.sh "$N" "$AUTHOR_ID" || rc=$?
+            case "$rc" in
+              3) echo "url=$(head -1 mine.txt | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"; exit 0 ;;
+              0) echo "开 PR 的时候被维护者关过（又被重开了），PR 一起关掉" ;;
+              *) echo "查不到这个 issue 有没有被关过"; exit 1 ;;
+            esac
+          fi
+          # 先记下「issue 关了」（回话那步就不说收到了），再关 PR：关不上这步失败，也不会回成「收到了」
+          echo "closed=true" >> "$GITHUB_OUTPUT"
+          printf '%s\n' "投稿的 issue 被关了（维护者拒了），这个 PR 一起关掉。 / The submission issue was closed (rejected), so this PR is closed too." > close.md
+          while read -r p _; do
+            [[ "$p" =~ ^[1-9][0-9]*$ ]] || continue
+            # 先关、关上了再说原因（gh 带 --comment 是先发评论再关，评论发不出去就不关了）
+            gh pr close "$p" --repo "$GITHUB_REPOSITORY" >/dev/null
+            gh pr comment "$p" --repo "$GITHUB_REPOSITORY" --body-file close.md >/dev/null 2>&1 || true
+          done < mine.txt
+      - name: 回复投稿人
+        # issue 已经关了（维护者拒了）就不再回「收到了」；开完再看 issue 那步失败了（不知道关没关）也不回成功
+        if: always() && steps.still.outputs.open != 'false' && steps.after.outputs.closed != 'true'
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          N: ${{ github.event.issue.number }}
+          OK: ${{ steps.apply.outputs.ok }}
+          CPR: ${{ steps.cpr.outcome }}
+          AFTER: ${{ steps.after.outcome }}
+          PR_URL: ${{ steps.after.outputs.url || steps.cpr.outputs.pull-request-url }}
         run: |
           [ -f reply.md ] || echo "### ✗ 没处理成 / Could not process" > reply.md
-          if [ -n "$PR_URL" ]; then printf '\nPR: %s\n' "$PR_URL" >> reply.md; fi
+          # 查过了、但不能确认这回的内容进了 PR（开 / 更新 PR 那步没成功——它可能已经开了、更新了，只是后面加标签之类失败了；
+          #   找不到 PR；开完再看 issue 那步失败了）：别说「收到了」；找得到 PR 就附上，请作者看一眼是不是这一版
+          if [ "$OK" = true ] && { [ "$CPR" != success ] || [ "$AFTER" != success ] || [ -z "$PR_URL" ]; }; then
+            printf '%s\n' "### ⚠ 没能确认处理完 / Could not confirm this was processed" "" "投稿查过了，但没能确认这回的内容放进了 PR；请过一会儿改一下 issue（改一个字就行）重新触发。 / The submission passed the checks, but it could not be confirmed that this version made it into a PR; please edit the issue a little later (any small change) to retry." > reply.md
+            if [ -n "$PR_URL" ]; then printf '\n%s\n' "现有的 PR（请看一下里面是不是这一版）： / The existing PR (please check whether it has this version): $PR_URL" >> reply.md; fi
+          elif [ -n "$PR_URL" ]; then printf '\nPR: %s\n' "$PR_URL" >> reply.md; fi
           gh issue comment "$N" --repo "$GITHUB_REPOSITORY" --body-file reply.md
           # 一键投稿开的 issue 没有标签：补上，和表单投稿的归到一起
           gh issue edit "$N" --repo "$GITHUB_REPOSITORY" --add-label submission >/dev/null 2>&1 || true

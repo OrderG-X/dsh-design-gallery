@@ -46,41 +46,82 @@ jobs:
           ID: ${{ steps.r.outputs.id }}
         run: |
           set -euo pipefail
-          # 还开着的举报全取（分页）；先挑出有效举报人（按数字 id 去重），只查他们的账号年龄
-          gh api --paginate "repos/$GITHUB_REPOSITORY/issues?labels=report&state=open&per_page=100" | jq -s 'add // []' > issues.json
+          cut=$(date -u -d '30 days ago' +%Y-%m-%dT%H:%M:%SZ)
           echo '{}' > ages.json
-          # 候选人全查（不截断）；凑够 3 个满 30 天的就不用再查了
-          cut=$(date -u -d '30 days ago' +%Y-%m-%dT%H:%M:%SZ); ok=0
-          for u in $(node scripts/reports.mjs candidates --id "$ID" --issues issues.json | grep -E '^[A-Za-z0-9-]{1,39}$'); do
-            c=$(gh api "users/$u" --jq .created_at 2>/dev/null || echo '')
-            jq --arg u "$u" --arg c "$c" '. + {($u): $c}' ages.json > ages.tmp && mv ages.tmp ages.json
-            if [ -n "$c" ] && [ "$c" \< "$cut" ]; then ok=$((ok + 1)); fi
-            if [ "$ok" -ge 3 ]; then break; fi
-          done
-          # 写 main：先对齐最新的 main 再判断、再提交；推不上去（别的举报 / 命令刚推过）就重来
-          for try in 1 2 3 4 5; do
-            git fetch -q origin main && git reset -q --hard origin/main
+          # 每回判断前都重新数（等着重推的时候举报可能被关了、改了类别，维护者可能 /restore 了）：
+          #   还开着的举报全取（分页）；按 main 现在的下架名单、作者挑出有效举报人（按数字 id 去重），只查他们的账号年龄。
+          #   年龄按数字 id 查（用户名能改、旧名能被别人占用：按名字查会把接手旧名的人的注册时间算给举报人）；返回的 id 对不上、查不到就不算这个人；
+          #   查到的按 id 记着（注册时间不会变），下一回不再查。凑够 3 个满 30 天的就不用再查了。
+          #   在 if 里调用（-e 管不到）：每一步自己查错，出错返回 1
+          count() {
+            local uid ulogin acct c ok=0
+            gh api --paginate "repos/$GITHUB_REPOSITORY/issues?labels=report&state=open&per_page=100" > issues-raw.json 2>/dev/null || return 1
+            jq -s 'add // []' issues-raw.json > issues.json 2>/dev/null || return 1
+            node scripts/reports.mjs candidates --id "$ID" --issues issues.json > cands.txt || return 1
+            while read -r uid ulogin; do
+              [[ "$uid" =~ ^[1-9][0-9]*$ ]] || continue
+              c=$(jq -r --arg u "$uid" '.[$u] // ""' ages.json) || return 1
+              if [ -z "$c" ]; then
+                acct=$(gh api "user/$uid" --jq '"\(.id) \(.created_at)"' 2>/dev/null || echo '')
+                [ "${acct%% *}" = "$uid" ] || { echo "查不到举报人 ${ulogin}（${uid}）的账号，不算"; continue; }
+                c=${acct#* }
+                jq --arg u "$uid" --arg c "$c" '. + {($u): $c}' ages.json > ages.tmp || return 1
+                mv ages.tmp ages.json || return 1
+              fi
+              if [ -n "$c" ] && [ "$c" \< "$cut" ]; then ok=$((ok + 1)); fi
+              if [ "$ok" -ge 3 ]; then break; fi
+            done < cands.txt
+          }
+          # 写 main：先对齐最新的 main、重新数举报再判断、再提交；推不上去（别的举报 / 命令刚推过）就重来。
+          #   推送报错不一定没推上去（响应丢了）：下一回取到的 main 里有这个提交，就是推上去了——这时按 main 现在的下架名单说话
+          #   （之后维护者可能已经 /restore 了）。最多推 5 回；第 6 回只用来确认第 5 回推上去没有（还要改就是没推上）。
+          #   没写进去（要隐藏却推不上、一直取不到 main / 举报）：这步失败，下一步回话 @ 维护者
+          wrote=0; pending=
+          for try in 1 2 3 4 5 6; do
+            # 取不到 main 就这回不判断（本地可能还留着上一回没推上去的提交，会被当成「已经下架了」），等一会儿再试
+            if ! git fetch -q origin main; then echo "取不到 main，等一会儿再试"; sleep $((try * 5)); continue; fi
+            git reset -q --hard origin/main
+            landed=0
+            if [ -n "$pending" ] && git merge-base --is-ancestor "$pending" origin/main; then landed=1; fi
+            if ! count; then echo "读不到举报 / 举报人，等一会儿再试"; sleep $((try * 5)); continue; fi
             node scripts/reports.mjs decide --id "$ID" --issues issues.json --ages ages.json --apply --out action.json
             cat action.json
             f=$(jq -r '.changed // ""' action.json)
-            if [ -z "$f" ] || git diff --quiet -- "$f"; then break; fi
+            # 先加进暂存区再比：下架名单原来没有（第一次写）时 git diff 看不到新文件
+            if [ -n "$f" ]; then git add -- "$f"; fi
+            if [ -z "$f" ] || git diff --cached --quiet -- "$f"; then
+              # 不用改了。之前那回推送报错、其实推上去了，而且现在还下架着：是这回隐藏的
+              if [ "$landed" = 1 ] && [ "$(jq -r '.already' action.json)" = true ]; then echo "hidden=true" >> "$GITHUB_OUTPUT"; fi
+              wrote=1
+              break
+            fi
+            [ "$try" -lt 6 ] || break
             git -c user.name=dsh-design-gallery-bot -c user.email=bot@users.noreply.github.com commit -q -m "auto-hide $ID (3 reports)" -- "$f"
+            pending=$(git rev-parse HEAD)
             # 推到 main 后 publish 靠 push 触发器自己跑（改的是 policy/**）；不另外派发：App 没有 Actions 写权限，会 403
             if git push -q origin HEAD:main; then
               echo "hidden=true" >> "$GITHUB_OUTPUT"
+              wrote=1
               break
             fi
             sleep $((try * 5))
           done
+          [ "$wrote" = 1 ] || { echo "::error::没能写进下架名单（推不上 main，或者一直取不到 main / 举报）"; exit 1; }
 
+      # 前面哪一步出错了（装依赖、读举报、数举报、推不上 main……）也要回话：@ 维护者，不能悄悄没下文
       - name: 告诉举报人和维护者
+        if: ${{ !cancelled() }}
         env:
+          JOB_STATUS: ${{ job.status }}
           GH_TOKEN: ${{ steps.app.outputs.token }}
           N: ${{ github.event.issue.number }}
           HIDDEN: ${{ steps.d.outputs.hidden }}
+          COUNTED: ${{ steps.d.outcome }}
           ID: ${{ steps.r.outputs.id }}
         run: |
-          if [ "$HIDDEN" = "true" ]; then
+          if [ "$COUNTED" = failure ] || [ "$JOB_STATUS" = failure ]; then
+            printf '收到。⚠ @%s 数这条举报、自动隐藏的时候出错了（查不到、或者下架名单推不上 main），没能自动处理，请看一下。 / Thanks. @%s Counting the reports or hiding the design failed (a lookup failed or the denylist could not be pushed to main); please take a look.\n' "$GITHUB_REPOSITORY_OWNER" "$GITHUB_REPOSITORY_OWNER" > reply.md
+          elif [ "$HIDDEN" = "true" ]; then
             printf '已有 3 个账号举报，**先自动隐藏了**（新目录发出后插件里就看不到），维护者会尽快判断。\nThree accounts reported this design, so it is **hidden for now**; a maintainer will review it soon.\n\n维护者：确认违规不用动；误伤回 `/restore %s`。\n' "$ID" > reply.md
             gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$N/labels" -f 'labels[]=auto-hidden' >/dev/null || true
           else

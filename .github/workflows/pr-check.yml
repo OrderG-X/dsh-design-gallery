@@ -4,18 +4,22 @@ name: pr-check
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
+    # edited：改了目标分支（比如从别的分支改成往 main 合）不推提交也要重查，不然往 main 合的这个 PR 没有闸门结论。
+    #   改标题、说明也会重查一回（投稿量小，不另外分辨）
+    types: [opened, synchronize, reopened, ready_for_review, edited]
 
 permissions: {}
 
+# 同一个 PR、同一个提交只跑最新那回（转草稿再标回、手动重跑时，旧的那回取消）。按提交分组：维护者重跑旧提交的检查，
+#   不会把现在这个提交正在跑的那回取消掉（不然旧提交那回闸门不写——不是现在的 head，这回又被取消，现在的提交就没有闸门结论）
 concurrency:
-  group: pr-check-${{ github.event.pull_request.number }}
+  group: pr-check-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
   cancel-in-progress: true
 
 jobs:
   check:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 30
     steps:
       - name: 检出 main（脚本和规则）
         uses: actions/checkout@v4
@@ -53,7 +57,15 @@ jobs:
         working-directory: main
         run: |
           npm ci --ignore-scripts --no-audit --no-fund
-          sudo apt-get update -qq && sudo apt-get install -y -qq fonts-noto-cjk >/dev/null
+          # GitHub 机器的软件源偶尔连不上（11-11 断过快一小时）：每回最多 3 分钟，不行就等一会儿再来，一共 3 回
+          # 还不行就让这次检查失败：闸门会贴「检查没跑完」、过几分钟自动重跑
+          apt='-o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30'
+          ok=0
+          for i in 1 2 3; do
+            if timeout 180 sudo apt-get $apt update -qq && timeout 180 sudo apt-get $apt install -y -qq fonts-noto-cjk >/dev/null; then ok=1; break; fi
+            if [ "$i" -lt 3 ]; then echo "装中文字体没成功（多半是 GitHub 机器网络抖），第 $i 回，$((60 * i)) 秒后再试"; sleep $((60 * i)); fi
+          done
+          [ "$ok" = 1 ] || { echo "::error::装中文字体试了 3 回都没成功：GitHub 机器网络的问题，不是投稿的问题"; exit 1; }
 
       - name: 检查 + 断网渲染 + 截图
         working-directory: main
@@ -66,7 +78,7 @@ jobs:
         run: |
           # 机器人代开的（issue 投稿）：投稿人写在 PR 说明的 Submitted-by 行里
           if [ "$PR_USER_TYPE" = "Bot" ]; then
-            line=$(printf '%s\n' "$PR_BODY" | grep -E '^Submitted-by: [A-Za-z0-9-]{1,39} \([0-9]+\)$' | head -1 || true)
+            line=$(printf '%s\n' "$PR_BODY" | tr -d '\r' | grep -E '^Submitted-by: [A-Za-z0-9-]{1,39} \([0-9]+\)$' | head -1 || true)
             if [ -n "$line" ]; then
               SUBMITTER_LOGIN=$(echo "$line" | sed -E 's/^Submitted-by: ([A-Za-z0-9-]+) .*/\1/')
               SUBMITTER_ID=$(echo "$line" | sed -E 's/.*\(([0-9]+)\)$/\1/')

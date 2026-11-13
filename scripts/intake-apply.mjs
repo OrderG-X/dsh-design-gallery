@@ -11,7 +11,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { checkPack, message } from 'dsh-design-studio/gallery'
-import { ROOT, ID_RE, TYPE_DIRS, loadDir, loadVocab, readJson } from './lib/repo.mjs'
+import { ROOT, ID_RE, TYPE_DIRS, loadDir, loadVocab, readPolicyJson } from './lib/repo.mjs'
 import { standing } from './gate.mjs'
 
 const S = (v, n = 300) => (typeof v === 'string' ? v.replace(/[\u0000-\u001f\u007f<>`|[\]]/g, ' ').replace(/@/g, '＠').slice(0, n) : '')
@@ -27,7 +27,7 @@ export function apply(art, { login, id, issue, issueUrl = '', root = ROOT }) {
     return { ...res, reply: reply.join('\n') }
   }
   // 违规两次（main 上的 policy/strikes.json，按数字 id 认）：不再收
-  if (standing({ login, id, strikes: readJson(path.join(root, 'policy', 'strikes.json'), []) }).strikes >= 2) {
+  if (standing({ login, id, strikes: readPolicyJson(path.join(root, 'policy', 'strikes.json'), []) }).strikes >= 2) {
     reply.push('### ✗ 这个账号不再收稿 / This account can no longer submit', '', '这个账号已经有两次违规记录（见 POLICY.md）。有疑问请开 issue 找维护者。 / This account has two strikes (see POLICY.md). Open an issue if you think this is a mistake.')
     return { ...res, reply: reply.join('\n') }
   }

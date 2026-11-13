@@ -8,7 +8,7 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import crypto from 'node:crypto'
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import { writeZip, findBrowser } from 'dsh-design-studio/gallery'
 
@@ -28,7 +28,7 @@ const { signBytes, verifyBytes, rawPublic } = await import('../scripts/sign.mjs'
 const { parseForm, field, findAttachments, findRepoZips, agreed, repoZipParts, sameRepoZip, prepare, stripJpeg, stripPng, slugify, download } = await import('../scripts/intake.mjs')
 const { apply } = await import('../scripts/intake-apply.mjs')
 const { readResults, decide, mergeResults, standing, countMine } = await import('../scripts/gate.mjs')
-const { parseReport, shouldHide, candidates, restoredSince } = await import('../scripts/reports.mjs')
+const { parseReport, shouldHide, candidates, restoredSince, designAuthorId } = await import('../scripts/reports.mjs')
 const { parseCommand, applyPolicy } = await import('../scripts/chatops.mjs')
 const { stage } = await import('../scripts/stage-shots.mjs')
 const { extract, parseTree, safeEntry } = await import('../scripts/extract.mjs')
@@ -277,7 +277,7 @@ test('改动列表：-z 格式（中文名原样）、只列合法的设计目�
   fs.rmSync(repo, { recursive: true, force: true })
 })
 
-test('老作者大改：改了一半以上标出来，不自动合并', () => {
+test('老作者大改：改了一半以上标出来', () => {
   const repo = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-big-'))
   const git = (...a) => execFileSync('git', ['-C', repo, '-c', 'user.name=t', '-c', 'user.email=t@x', ...a])
   git('init', '-q')
@@ -344,12 +344,12 @@ test('老作者大改：改了一半以上标出来，不自动合并', () => {
   assert.equal(decide(upd, { login: 'alice-1', createdAt: '2024-01-01T00:00:00Z', priorMerged: 1, now }).lane, 'B')
 })
 
-test('闸门：24 小时投稿数没数全就不自动合并', () => {
+test('闸门：24 小时投稿数没数全就不算全绿（卡上提醒维护者留意）', () => {
   const now = Date.parse('2026-11-06T00:00:00Z')
   const style = readResults(JSON.stringify({ entries: [{ id: 'alice-1__mint', type: 'style', ok: true, errors: [], flags: [], shots: [] }] }))
-  assert.equal(decide(style, { login: 'alice-1', createdAt: '2024-01-01T00:00:00Z', now }).automerge, true)
+  assert.equal(decide(style, { login: 'alice-1', createdAt: '2024-01-01T00:00:00Z', now }).conclusion === 'success', true)
   const d = decide(style, { login: 'alice-1', createdAt: '2024-01-01T00:00:00Z', partial: true, now })
-  assert.equal(d.automerge, false)
+  assert.equal(d.conclusion === 'success', false)
   assert.equal(d.lane, 'B')
   assert.ok(d.labels.includes('count: partial'))
   assert.match(d.comment, /没数全/)
@@ -362,7 +362,7 @@ test('举报：候选人全列出来（不截前 100 个）', () => {
   fs.writeFileSync(f, JSON.stringify(issues))
   const out = execFileSync(process.execPath, [path.join(REAL, 'scripts/reports.mjs'), 'candidates', '--id', 'eve__bank', '--issues', f], { env: { ...process.env, GALLERY_ROOT: FAKE } }).toString().trim().split('\n')
   assert.equal(out.length, 105)
-  assert.equal(out[104], 'u104')
+  assert.equal(out[104], '1104 u104') // 「数字 id 用户名」：工作流按 id 查年龄
 })
 
 test('建目录：一个批次包装不下的下次再发（插件读得了）', async () => {
@@ -469,6 +469,13 @@ test('建目录：字段、调色板、风格卡内联、下架的不进、批�
   assert.ok(!r3.index.revoked.some((x) => x.id === 'carol__gone'), JSON.stringify(r3.index.revoked))
   assert.deepEqual(r3.index.restored, [{ id: 'carol__gone', at: '2026-11-07T00:00:00Z' }])
   assert.ok(r3.index.designs.some((x) => x.id === 'carol__gone'))
+  // 下架名单、精选手改坏了：不发（当成空的发出去，下架的会重新露出来）
+  for (const f of ['denylist.json', 'featured.json']) {
+    const keep = fs.readFileSync(path.join(FAKE, 'policy', f), 'utf8')
+    fs.writeFileSync(path.join(FAKE, 'policy', f), '[{"id": "carol__gone",}]')
+    await assert.rejects(build({ out: fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-dist-')), prev: r3.index, render: false, now }), f)
+    fs.writeFileSync(path.join(FAKE, 'policy', f), keep)
+  }
   fs.writeFileSync(path.join(FAKE, 'policy/denylist.json'), '[]')
   fs.writeFileSync(path.join(FAKE, 'policy/featured.json'), '[]')
   fs.rmSync(path.join(FAKE, 'templates/carol__gone'), { recursive: true })
@@ -614,11 +621,11 @@ test('闸门：严格读结果、车道、挂起、审核卡', () => {
   const old = '2024-01-01T00:00:00Z'
   const a = decide(res, { login: 'alice-1', createdAt: old, now })
   assert.equal(a.lane, 'A')
-  assert.equal(a.automerge, true)
+  assert.equal(a.conclusion === 'success', true)
   assert.equal(a.conclusion, 'success')
   const fresh = decide(res, { login: 'alice-1', createdAt: '2026-11-03T00:00:00Z', now })
   assert.equal(fresh.held, 'author')
-  assert.equal(fresh.automerge, false)
+  assert.equal(fresh.conclusion === 'success', false)
   assert.ok(fresh.labels.includes('held: author'))
   assert.match(fresh.comment, /账号太新/)
   assert.match(fresh.comment, /现在 3 天/)
@@ -630,14 +637,46 @@ test('闸门：严格读结果、车道、挂起、审核卡', () => {
   assert.ok(b.labels.includes('flag: password'))
   assert.match(b.comment, /<!-- dsh-gallery-gate -->/)
   assert.match(b.comment, /review-shots\/3\/9\/shots\/alice-1__matcha\/home\.jpg/)
-  assert.match(b.comment, /\/approve/)
-  // 别人交的、要人看：单独 @ 维护者；自己交的、自动合并的、挂起的、没过的都不 @
+  assert.match(b.comment, /\/approve <完整提交号>/)
+  // 知道是哪个提交：卡上直接给出整行 /approve <40 位>，照抄就行
+  const H = 'c'.repeat(40)
+  assert.ok(decide(tpl, { login: 'alice-1', createdAt: old, now, sha: H }).comment.includes(`/approve ${H}`))
+  // 别人交的、过了检查：单独 @ 维护者（A 车道也要人看：机器人不合并）；自己交的、挂起的、没过的都不 @
   assert.match(decide(tpl, { login: 'alice-1', createdAt: old, owner: 'OrderG-X', now }).ping, /^<!-- dsh-gallery-ping -->\n@OrderG-X /)
   assert.equal(decide(tpl, { login: 'orderg-x', createdAt: old, owner: 'OrderG-X', now }).ping, '')
-  assert.equal(decide(res, { login: 'alice-1', createdAt: old, owner: 'OrderG-X', now }).ping, '')
+  assert.match(decide(res, { login: 'alice-1', createdAt: old, owner: 'OrderG-X', now }).ping, /^<!-- dsh-gallery-ping -->\n@OrderG-X .*（车道 A）/)
   assert.equal(decide(tpl, { login: 'alice-1', createdAt: '2026-11-03T00:00:00Z', owner: 'OrderG-X', now }).ping, '')
   assert.equal(decide(tpl, { login: 'alice-1', createdAt: old, owner: '', now }).ping, '')
   assert.equal(decide(readResults(JSON.stringify({ entries: [{ id: 'alice-1__matcha', type: 'template', ok: false, errors: [{ code: 'x', msg: 'x' }], flags: [], shots: [] }] })), { login: 'alice-1', createdAt: old, owner: 'OrderG-X', now }).ping, '')
+  // 维护者挂起着（held: maintainer）：检查都过了也不说「自动合并」、不自动合、不 @；卡上照实写、给 /approve 命令；没过的照旧是失败
+  const mh = decide(res, { login: 'alice-1', createdAt: old, owner: 'OrderG-X', sha: H, maintHeld: true, now })
+  // 记下算的时候挂没挂起（post 写之前再比）
+  assert.equal(mh.maintHeld, true)
+  assert.equal(a.maintHeld, false)
+  assert.equal(mh.conclusion === 'success', false)
+  assert.equal(mh.conclusion, 'neutral')
+  assert.equal(mh.ping, '')
+  assert.match(mh.comment, /维护者挂起着/)
+  assert.ok(!/自动合并/.test(mh.comment.split('\n').slice(0, 3).join('\n')), mh.comment)
+  assert.ok(mh.comment.includes(`/approve ${H}`))
+  assert.equal(decide(tpl, { login: 'alice-1', createdAt: old, owner: 'OrderG-X', maintHeld: true, now }).ping, '')
+  const mhBad = decide(readResults(JSON.stringify({ entries: [{ id: 'alice-1__matcha', type: 'template', ok: false, errors: [{ code: 'x', msg: 'x' }], flags: [], shots: [] }] })), { login: 'alice-1', createdAt: old, maintHeld: true, now })
+  assert.equal(mhBad.conclusion, 'failure')
+  assert.ok(!/维护者挂起着/.test(mhBad.comment))
+  // 被关过又重开了（拒稿的标签可能没打上）：A 车道也不自动合并，卡上照实写、给 /approve、@ 维护者；没过的照旧是失败
+  const ro = decide(res, { login: 'alice-1', createdAt: old, owner: 'OrderG-X', sha: H, reopened: true, now })
+  assert.equal(ro.lane, 'A')
+  assert.equal(ro.conclusion === 'success', false)
+  assert.equal(ro.conclusion, 'neutral')
+  assert.match(ro.comment, /被关过又重开了/)
+  assert.ok(!/自动合并/.test(ro.comment.split('\n').slice(0, 3).join('\n')), ro.comment)
+  assert.ok(ro.comment.includes(`/approve ${H}`))
+  assert.match(ro.ping, /^<!-- dsh-gallery-ping -->\n@OrderG-X .*被关过又重开了/)
+  assert.equal(decide(res, { login: 'orderg-x', createdAt: old, owner: 'OrderG-X', reopened: true, now }).ping, '')
+  assert.equal(decide(res, { login: 'alice-1', createdAt: old, owner: 'OrderG-X', reopened: true, maintHeld: true, now }).ping, '')
+  const roBad = decide(readResults(JSON.stringify({ entries: [{ id: 'alice-1__matcha', type: 'template', ok: false, errors: [{ code: 'x', msg: 'x' }], flags: [], shots: [] }] })), { login: 'alice-1', createdAt: old, reopened: true, now })
+  assert.equal(roBad.conclusion, 'failure')
+  assert.ok(!/被关过又重开了/.test(roBad.comment))
   const bad = decide(readResults(JSON.stringify({ guard: [{ code: 'protected', msg: '改了 scripts' }], lane: 'C', entries: [] })), { createdAt: old, now })
   assert.equal(bad.conclusion, 'failure')
   assert.equal(bad.lane, 'C')
@@ -733,7 +772,7 @@ test('闸门：PR 改得了的产物只能多报问题，不能把没过的变�
   assert.ok(m.entries[0].flags.some((e) => e.code === 'password'))
   assert.deepEqual(m.entries[0].shots, ['shots/alice-1__matcha/home.jpg'])
   const now = Date.parse('2026-11-06T00:00:00Z')
-  assert.equal(decide(m, { login: 'alice-1', createdAt: '2024-01-01T00:00:00Z', now }).automerge, false)
+  assert.equal(decide(m, { login: 'alice-1', createdAt: '2024-01-01T00:00:00Z', now }).conclusion === 'success', false)
   // 可信侧过了、产物报渲染问题：不过
   const tOk = readResults(JSON.stringify({ lane: 'A', guard: [], entries: [{ id: 'alice-1__mint', type: 'style', ok: true, errors: [], flags: [], shots: [] }] }))
   const aBad = readResults(JSON.stringify({ lane: 'A', guard: [], entries: [{ id: 'alice-1__mint', type: 'style', ok: false, errors: [{ code: 'hard', msg: '底部被挡' }], flags: [], shots: [] }] }))
@@ -840,9 +879,14 @@ test('发布：同一提交再建一次，重截的封面字节变了也沿用�
 })
 
 test('维护者命令：解析、改规矩文件', () => {
-  assert.deepEqual(parseCommand('/approve', { isPr: true }), { action: 'merge' })
+  // /approve 要带完整的 40 位提交号（短号能被刻意撞上）：没带、带短的都交出空的，工作流回话让补上
+  const H = 'AbCdEf0123456789abcdef0123456789ABCDEF01'
+  assert.deepEqual(parseCommand(`/approve ${H}`, { isPr: true }), { action: 'merge', sha: H.toLowerCase() })
+  for (const c of ['/approve', '/approve abcdef0', `/approve ${H}0`, `/approve ${H.slice(0, 39)}g`]) assert.deepEqual(parseCommand(c, { isPr: true }), { action: 'merge', sha: '' }, c)
   assert.equal(parseCommand('/approve', { isPr: false }).action, 'error')
-  assert.equal(parseCommand('/hold brand').reason, 'brand')
+  assert.equal(parseCommand('/hold brand', { isPr: true }).reason, 'brand')
+  // /hold 只在 PR 上（合并只看 PR）：issue 上发的回话让去 PR
+  assert.equal(parseCommand('/hold brand').action, 'error')
   assert.equal(parseCommand('/reject whatever').reason, 'other')
   assert.equal(parseCommand('谢谢！\n/feature alice-1__mint').id, 'alice-1__mint')
   assert.equal(parseCommand('/feature ../../x').action, 'error')
@@ -856,17 +900,18 @@ test('维护者命令：解析、改规矩文件', () => {
   const now = new Date('2026-11-06T00:00:00Z')
   assert.equal(applyPolicy({ action: 'takedown', id: 'a__bcd', reason: 'policy' }, { root, now }), 'policy/denylist.json')
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(root, 'policy/denylist.json'))), [{ id: 'a__bcd', at: '2026-11-06T00:00:00.000Z', reason: 'policy' }])
-  assert.equal(applyPolicy({ action: 'restore', id: 'a__bcd' }, { root, now }), 'policy/denylist.json')
-  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(root, 'policy/denylist.json'))), [{ id: 'a__bcd', at: '2026-11-06T00:00:00.000Z', reason: 'policy', restored: '2026-11-06T00:00:00.000Z' }]) // 记录留着，标上撤销
+  const later = new Date('2026-11-06T01:00:00Z')
+  assert.equal(applyPolicy({ action: 'restore', id: 'a__bcd' }, { root, now: later }), 'policy/denylist.json')
+  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(root, 'policy/denylist.json'))), [{ id: 'a__bcd', at: '2026-11-06T00:00:00.000Z', reason: 'policy', restored: '2026-11-06T01:00:00.000Z' }]) // 记录留着，标上撤销
   assert.equal(applyPolicy({ action: 'restore', id: 'a__bcd' }, { root }), '')
-  applyPolicy({ action: 'takedown', id: 'a__bcd', reason: 'copyright' }, { root, now })
+  applyPolicy({ action: 'takedown', id: 'a__bcd', reason: 'copyright' }, { root, now: new Date('2026-11-06T02:00:00Z') })
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(root, 'policy/denylist.json'))).map((d) => [d.id, d.reason, !!d.restored]), [['a__bcd', 'copyright', false]]) // 再下架：换成新的一条
   applyPolicy({ action: 'feature', id: 'a__bcd' }, { root })
   assert.deepEqual(JSON.parse(fs.readFileSync(path.join(root, 'policy/featured.json'))), ['a__bcd'])
   // 信任按数字 id 记；查不到 id 的不记
   assert.equal(applyPolicy({ action: 'trust', login: 'alice-1' }, { root, now }), '')
   assert.equal(applyPolicy({ action: 'trust', login: 'alice-1', uid: 42 }, { root, now }), 'policy/trust-overrides.json')
-  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(root, 'policy/trust-overrides.json')))['alice-1'], { tier: 'T2', id: 42, at: '2026-11-06T00:00:00.000Z' })
+  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(root, 'policy/trust-overrides.json')))['id:42'], { tier: 'T2', id: 42, login: 'alice-1', at: '2026-11-06T00:00:00.000Z' })
 })
 
 /** 工作流里某一步的 run: | 脚本（去掉缩进） */
@@ -921,7 +966,7 @@ test('维护者命令：/takedown 真跑「照做」那步——推上 main、�
     fs.writeFileSync(path.join(work, 'policy/denylist.json'), JSON.stringify([{ id: 'a__bcd', at: new Date().toISOString(), reason: 'policy' }]) + '\n')
     let code = 0
     try {
-      execFileSync('bash', ['--noprofile', '--norc', '-eo', 'pipefail', '-c', script], { cwd: work, stdio: 'pipe', env: { ...process.env, PATH: `${bin}${path.delimiter}${process.env.PATH}`, GH_LOG: log, GH_TOKEN: 'x', N: '3', ACTOR: 'OrderG-X', GITHUB_REPOSITORY: 'o/r' } })
+      execFileSync('bash', ['--noprofile', '--norc', '-eo', 'pipefail', '-c', script], { cwd: work, stdio: 'pipe', env: { ...process.env, PATH: `${bin}${path.delimiter}${process.env.PATH}`, GH_LOG: log, GH_TOKEN: 'x', N: '3', ACTOR: 'OrderG-X', GITHUB_REPOSITORY: 'o/r', GITHUB_OUTPUT: path.join(w, 'out') } })
     } catch (e) { code = e.status }
     return { code, log: fs.existsSync(log) ? fs.readFileSync(log, 'utf8') : '' }
   }
@@ -938,6 +983,54 @@ test('维护者命令：/takedown 真跑「照做」那步——推上 main、�
   assert.doesNotMatch(bad.log, /已处理/)
 })
 
+test('维护者命令：第一次 /trust（信任名单文件原来没有）也推上去；/untrust 推上去以后不在这里回话，交给 confirm', { skip: (process.platform === 'win32' || !HAS_JQ) && '要 bash + jq' }, () => {
+  const script = stepScript('chatops.yml', '照做')
+  const w = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-trust-push-'))
+  const sh = (args, cwd) => execFileSync('git', args, { cwd, stdio: 'pipe', encoding: 'utf8' }).trim()
+  const remote = path.join(w, 'remote.git')
+  const work = path.join(w, 'work')
+  sh(['init', '-q', '--bare', remote], w)
+  fs.mkdirSync(path.join(work, 'policy'), { recursive: true })
+  sh(['init', '-q'], work)
+  fs.writeFileSync(path.join(work, 'policy/strikes.json'), '[]\n')
+  sh(['add', 'policy'], work)
+  sh(['-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-q', '-m', 'init'], work)
+  sh(['remote', 'add', 'origin', remote], work)
+  sh(['push', '-q', 'origin', 'HEAD:main'], work)
+  const bin = path.join(w, 'bin')
+  fs.mkdirSync(bin)
+  fs.writeFileSync(path.join(bin, 'gh'), '#!/bin/bash\necho "gh $*" >> "$GH_LOG"\nprev=""; for a in "$@"; do [ "$prev" = "--body-file" ] && { echo "REPLY: $(cat "$a")" >> "$GH_LOG"; }; prev="$a"; done\nexit 0\n', { mode: 0o755 })
+  const run = (action) => {
+    const log = path.join(w, `gh-${Math.random()}.log`)
+    const out = path.join(w, `out-${Math.random()}`)
+    fs.writeFileSync(out, '')
+    fs.writeFileSync(path.join(work, 'action.json'), JSON.stringify(action))
+    let code = 0
+    try {
+      execFileSync('bash', ['--noprofile', '--norc', '-eo', 'pipefail', '-c', script], { cwd: work, stdio: 'pipe', env: { ...process.env, PATH: `${bin}${path.delimiter}${process.env.PATH}`, GH_LOG: log, GH_TOKEN: 'x', N: '3', ACTOR: 'OrderG-X', GITHUB_REPOSITORY: 'o/r', GITHUB_OUTPUT: out } })
+    } catch (e) { code = e.status }
+    return { code, log: fs.existsSync(log) ? fs.readFileSync(log, 'utf8') : '', out: fs.readFileSync(out, 'utf8') }
+  }
+  // 第一次 /trust：文件是新的（没被 git 管）
+  fs.writeFileSync(path.join(work, 'policy/trust-overrides.json'), JSON.stringify({ 'id:42': { tier: 'T2', id: 42, login: 'alice', at: '2026-11-12T00:00:00Z' } }) + '\n')
+  const t = run({ action: 'trust', login: 'alice', uid: 42, changed: 'policy/trust-overrides.json' })
+  assert.equal(t.code, 0, t.log)
+  assert.match(t.log, /REPLY: ✓ 已处理：trust/)
+  assert.equal(sh(['--git-dir', remote, 'log', '-1', '--format=%s', 'main'], w), 'trust by OrderG-X (#3)')
+  assert.match(sh(['--git-dir', remote, 'show', 'main:policy/trust-overrides.json'], w), /"id:42"/)
+  // 没变：说没有要改的
+  const same = run({ action: 'trust', login: 'alice', uid: 42, changed: 'policy/trust-overrides.json' })
+  assert.match(same.log, /REPLY: 没有要改的/)
+  // /untrust：推上去，不回话，交给 confirm
+  fs.writeFileSync(path.join(work, 'policy/trust-overrides.json'), JSON.stringify({ 'id:42': { tier: 'T0', id: 42, login: 'alice', at: '2026-11-12T01:00:00Z' } }) + '\n')
+  const u = run({ action: 'untrust', login: 'alice', uid: 42, changed: 'policy/trust-overrides.json' })
+  assert.equal(u.code, 0, u.log)
+  assert.doesNotMatch(u.log, /REPLY/)
+  assert.equal(sh(['--git-dir', remote, 'log', '-1', '--format=%s', 'main'], w), 'untrust by OrderG-X (#3)')
+  assert.match(u.out, /^action=untrust$/m)
+  assert.match(u.out, /"uid":42/)
+})
+
 test('治理：违规两次不收、手动信任按 id、待审和每天上限、模板更新也给人看', () => {
   const strikes = [{ login: 'alice-1', id: 42, why: 'x' }, { login: 'Alice-1', id: 42, why: 'y' }, { login: 'alice-1', id: 999, why: 'old owner of the name' }, { login: 'bob', why: 'no id' }]
   assert.deepEqual(standing({ login: 'Alice-1', id: 42, strikes }), { strikes: 2, override: '' })
@@ -952,27 +1045,27 @@ test('治理：违规两次不收、手动信任按 id、待审和每天上限�
   const style = readResults(JSON.stringify({ entries: [{ id: 'alice-1__mint', type: 'style', ok: true, errors: [], flags: [], shots: [] }] }))
   const blocked = decide(style, { login: 'alice-1', createdAt: old, strikes: 2, now })
   assert.equal(blocked.conclusion, 'failure')
-  assert.equal(blocked.automerge, false)
+  assert.equal(blocked.conclusion === 'success', false)
   assert.ok(blocked.labels.includes('blocked: strikes'))
   assert.match(blocked.comment, /不再收稿/)
   const limit = decide(style, { login: 'alice-1', createdAt: old, pending: 4, now })
   assert.equal(limit.held, 'limit')
-  assert.equal(limit.automerge, false)
+  assert.equal(limit.conclusion === 'success', false)
   assert.ok(limit.labels.includes('held: limit'))
   // 排队卡只讲数量，不提账号年龄（之前误写了「满 7 天后会自动重查」）
   assert.match(limit.comment, /一次交太多了/)
   assert.match(limit.comment, /在等 4 个/)
   assert.doesNotMatch(limit.comment, /7 天|7 days/)
   assert.equal(decide(style, { login: 'alice-1', createdAt: old, today: 4, now }).held, 'limit')
-  assert.equal(decide(style, { login: 'alice-1', createdAt: old, pending: 3, today: 3, now }).automerge, true)
+  assert.equal(decide(style, { login: 'alice-1', createdAt: old, pending: 3, today: 3, now }).conclusion === 'success', true)
   // /trust 过的新账号不挂起；/untrust（T0）的风格卡也不自动合并
   assert.equal(decide(style, { login: 'alice-1', createdAt: '2026-11-05T00:00:00Z', override: 'T2', now }).held, '')
   assert.equal(decide(style, { login: 'alice-1', createdAt: old, override: 'T0', now }).lane, 'B')
   // 模板、设计系统：老作者（T2）更新自己已上架的也不自动合并（一律给人看）
   const upd = (over = {}) => readResults(JSON.stringify({ entries: [{ id: 'alice-1__matcha', type: 'template', ok: true, errors: [], flags: [], shots: [], update: true, ...over }] }))
-  assert.equal(decide(upd(), { login: 'alice-1', createdAt: old, priorMerged: 1, now }).automerge, false)
+  assert.equal(decide(upd(), { login: 'alice-1', createdAt: old, priorMerged: 1, now }).conclusion === 'success', false)
   assert.equal(decide(upd(), { login: 'alice-1', createdAt: old, priorMerged: 1, now }).lane, 'B')
-  assert.equal(decide(upd({ type: 'system' }), { login: 'alice-1', createdAt: old, override: 'T2', now }).automerge, false)
+  assert.equal(decide(upd({ type: 'system' }), { login: 'alice-1', createdAt: old, override: 'T2', now }).conclusion === 'success', false)
   assert.equal(decide(upd({ update: false }), { login: 'alice-1', createdAt: old, priorMerged: 1, now }).lane, 'B')
   assert.equal(decide(upd({ flags: [{ code: 'password', msg: 'x' }] }), { login: 'alice-1', createdAt: old, priorMerged: 1, now }).lane, 'B')
   assert.equal(decide(upd(), { login: 'alice-1', createdAt: old, priorMerged: 0, now }).lane, 'B')
@@ -1002,14 +1095,19 @@ test('举报：三个满 30 天的不同账号举报仿冒 / 色情才先隐藏'
   const now = Date.parse('2026-11-06T00:00:00Z')
   const old = '2025-01-01T00:00:00Z'
   const it = (login, id, b = body('eve__bank', PH), extra = {}) => ({ user: { login, id, type: 'User' }, body: b, ...extra })
-  const ages = { a: old, b: old, c: old, d: '2026-11-01T00:00:00Z', eve: old }
+  // 年龄按数字 id 记（工作流按 id 查）
+  const ages = { 1: old, 2: old, 3: old, 4: '2026-11-01T00:00:00Z', 5: old }
   assert.equal(shouldHide([it('a', 1), it('b', 2), it('c', 3)], { id: 'eve__bank', ages, now }).hide, true)
   assert.equal(shouldHide([it('a', 1), it('a', 1), it('b', 2)], { id: 'eve__bank', ages, now }).hide, false) // 同一个人举报两次算一个
   assert.equal(shouldHide([it('a', 1), it('b', 2), it('d', 4)], { id: 'eve__bank', ages, now }).hide, false) // 新账号不算
   assert.equal(shouldHide([it('a', 1), it('b', 2), it('eve', 5)], { id: 'eve__bank', ages, now }).hide, false) // 作者自己不算
   assert.equal(shouldHide([it('a', 1), it('b', 2), it('c', 3, body('eve__bank', '其他 / Other'))], { id: 'eve__bank', ages, now }).hide, false) // 别的类别不自动
   assert.equal(shouldHide([it('a', 1), it('b', 2), it('c', 3, body('eve__shop', PH))], { id: 'eve__bank', ages, now }).hide, false) // 别的设计
-  assert.equal(shouldHide([it('a', 1), it('b', 2), { user: { login: 'bot', id: 6, type: 'Bot' }, body: body('eve__bank', PH) }], { id: 'eve__bank', ages: { ...ages, bot: old }, now }).hide, false)
+  assert.equal(shouldHide([it('a', 1), it('b', 2), { user: { login: 'bot', id: 6, type: 'Bot' }, body: body('eve__bank', PH) }], { id: 'eve__bank', ages: { ...ages, 6: old }, now }).hide, false)
+  // 按名字记的年龄不算（改了名、旧名被别人占了：名字对得上也不是这个人）
+  assert.equal(shouldHide([it('a', 1), it('b', 2), it('c', 3)], { id: 'eve__bank', ages: { a: old, b: old, c: old }, now }).hide, false)
+  assert.equal(shouldHide([it('a', 1), it('b', 2), it('c', 3)], { id: 'eve__bank', ages: { 1: old, 2: old, 3: '2026-11-01T00:00:00Z', c: old }, now }).hide, false)
+  assert.deepEqual(shouldHide([it('a', 1), it('b', 2), it('c', 3)], { id: 'eve__bank', ages, now }).reporters, ['a', 'b', 'c'])
   // 撤销下架之后：之前的旧举报不再算；维护者关掉的不算
   const at = (t) => ({ created_at: t, state: 'open' })
   const before = [it('a', 1, undefined, at('2026-11-01T00:00:00Z')), it('b', 2, undefined, at('2026-11-01T00:00:00Z')), it('c', 3, undefined, at('2026-11-01T00:00:00Z'))]
@@ -1017,8 +1115,31 @@ test('举报：三个满 30 天的不同账号举报仿冒 / 色情才先隐藏'
   assert.equal(since, '2026-11-03T00:00:00Z')
   assert.equal(shouldHide([...before, it('d', 4, undefined, at('2026-11-04T00:00:00Z'))], { id: 'eve__bank', ages, now, since }).hide, false)
   assert.equal(shouldHide(before.map((x) => ({ ...x, state: 'closed' })), { id: 'eve__bank', ages, now }).hide, false)
+  // 按时间比：/restore 记的是带毫秒的（…00.000Z），同一秒的举报（…00Z）算之前，不再算；之后一秒的算；时间读不出来的不算
+  const ms = '2026-11-03T00:00:00.000Z'
+  const sameSec = it('a', 1, undefined, at('2026-11-03T00:00:00Z'))
+  const after = [it('b', 2, undefined, at('2026-11-03T00:00:01Z')), it('c', 3, undefined, at('2026-11-04T00:00:00Z'))]
+  assert.equal(shouldHide([sameSec, ...after], { id: 'eve__bank', ages, now, since: ms }).hide, false)
+  assert.equal(shouldHide([it('a', 1, undefined, at('2026-11-03T00:00:00.001Z')), ...after], { id: 'eve__bank', ages, now, since: ms }).hide, true)
+  assert.equal(shouldHide([it('a', 1, undefined, at('garbage')), ...after], { id: 'eve__bank', ages, now, since: ms }).hide, false)
   // 要查年龄的只是有效举报人，按数字 id 去重（改名的同一个人不算两个）
-  assert.deepEqual(candidates([it('a', 1), it('a-new', 1), it('b', 2), it('eve', 5), it('z', 9, body('eve__bank', '其他 / Other'))], { id: 'eve__bank' }), ['a', 'b'])
+  assert.deepEqual(candidates([it('a', 1), it('a-new', 1), it('b', 2), it('eve', 5), it('z', 9, body('eve__bank', '其他 / Other'))], { id: 'eve__bank' }), [{ id: 1, login: 'a' }, { id: 2, login: 'b' }])
+  // 作者按数字 id 认（知道 id 时）：作者改了名再举报不算；接手了旧名 eve 的别人照算
+  const ages2 = { ...ages, 77: old }
+  assert.equal(shouldHide([it('a', 1), it('b', 2), it('eve-new', 5)], { id: 'eve__bank', ages: ages2, now, authorId: 5 }).hide, false)
+  assert.equal(shouldHide([it('a', 1), it('b', 2), it('eve', 77)], { id: 'eve__bank', ages: ages2, now, authorId: 5 }).hide, true)
+  // 不知道 id（读不到 design.json）：退回按用户名认
+  assert.equal(shouldHide([it('a', 1), it('b', 2), it('eve', 77)], { id: 'eve__bank', ages: ages2, now }).hide, false)
+  // design.json 里的 author.id：三种类型的目录都找；没有、读不出来、不是正整数给 0
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-author-'))
+  const put = (dir, id, author) => { fs.mkdirSync(path.join(root, dir, id), { recursive: true }); fs.writeFileSync(path.join(root, dir, id, 'design.json'), typeof author === 'string' ? author : JSON.stringify({ author })) }
+  put('styles', 'eve__bank', { login: 'eve', id: 5 })
+  put('templates', 'x__one', { login: 'x', id: 6 })
+  put('systems', 'y__two', { login: 'y', id: '7' })
+  put('styles', 'z__bad', '{')
+  assert.equal(designAuthorId('eve__bank', root), 5)
+  assert.equal(designAuthorId('x__one', root), 6)
+  for (const id of ['y__two', 'z__bad', 'none__here', '../x']) assert.equal(designAuthorId(id, root), 0, id)
 })
 
 test('闸门：限额按数字 ID 算（改了名也算同一人），机器人代投也算', () => {
@@ -1065,4 +1186,417 @@ test('脚本能直接跑（命令行）', () => {
   assert.match(r, /✓ templates\/alice-1__matcha/)
   const res = JSON.parse(fs.readFileSync(path.join(out, 'results.json'), 'utf8'))
   assert.equal(res.entries[0].ok, true)
+})
+
+test('检查：一套查崩了（怪写法、目录读不了）——这套记成没过，照样查别的、照样写出结果（闸门才有结论）', { skip: process.getuid && process.getuid() === 0 }, () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-crash-'))
+  for (const d of ['vocab', 'policy']) fs.cpSync(path.join(FAKE, d), path.join(root, d), { recursive: true })
+  fs.copyFileSync(path.join(FAKE, 'LICENSE'), path.join(root, 'LICENSE'))
+  const put = (rel, files) => { const dir = path.join(root, rel); fs.mkdirSync(dir, { recursive: true }); for (const [n, v] of Object.entries(files)) fs.writeFileSync(path.join(dir, n), typeof v === 'string' ? v : JSON.stringify(v, null, 2)) }
+  put('templates/alice-1__matcha', goodFiles())
+  // author.login 写成带怪 toString 的对象：以前拿它 String() 会让整个检查崩掉
+  put('templates/alice-1__weird', goodFiles({ author: { login: { toString: null }, id: 42 } }))
+  put('templates/alice-1__locked', goodFiles())
+  const locked = path.join(root, 'templates/alice-1__locked')
+  fs.chmodSync(locked, 0o000)
+  try {
+    const out = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-crash-out-'))
+    const r = spawnSync(process.execPath, [path.join(REAL, 'scripts/check.mjs'), 'templates/alice-1__matcha', 'templates/alice-1__weird', 'templates/alice-1__locked'], { env: { ...process.env, GALLERY_ROOT: root, OUT: out, NO_RENDER: '1' }, encoding: 'utf8' })
+    const res = JSON.parse(fs.readFileSync(path.join(out, 'results.json'), 'utf8'))
+    const by = Object.fromEntries(res.entries.map((e) => [e.dir, e]))
+    assert.equal(res.entries.length, 3, r.stdout + r.stderr)
+    assert.equal(by['templates/alice-1__matcha'].ok, true, JSON.stringify(by['templates/alice-1__matcha'].errors))
+    assert.equal(by['templates/alice-1__weird'].ok, false)
+    assert.ok(by['templates/alice-1__weird'].errors.some((x) => x.code === 'owner'), JSON.stringify(by['templates/alice-1__weird'].errors))
+    const c = by['templates/alice-1__locked']
+    assert.equal(c.ok, false)
+    assert.ok(c.errors.some((x) => x.code === 'crash' && x.msg.includes('templates/alice-1__locked') && x.msgEn), JSON.stringify(c.errors))
+    // 闸门据此判：失败（不是「没结论」）
+    assert.equal(decide(readResults(JSON.stringify(res)), { login: 'alice-1', createdAt: '2020-01-01T00:00:00Z', now: Date.parse('2026-11-13T00:00:00Z') }).conclusion, 'failure')
+  } finally { fs.chmodSync(locked, 0o755) }
+})
+
+test('闸门标签：一个 PR 最多 12 个，控制用的（检查结果、封禁、挂起、没数全、车道）一个不少，只少展示用的 flag', () => {
+  const now = Date.parse('2026-11-06T00:00:00Z')
+  const many = (n, over = {}) => readResults(JSON.stringify({ entries: [{ id: 'alice-1__matcha', type: 'template', ok: true, errors: [], flags: Array.from({ length: n }, (_, i) => ({ code: `f${i}`, msg: 'x' })), shots: [], ...over }] }))
+  // 挂起（账号太新）+ 没数全 + 封禁（检查没过）：控制标签都在前面、都在
+  const d = decide(many(20), { login: 'alice-1', createdAt: '2026-11-05T00:00:00Z', partial: true, now })
+  assert.equal(d.labels.length, 12)
+  for (const l of ['checks: pass', 'held: author', 'count: partial', 'lane: B']) assert.ok(d.labels.includes(l), l)
+  assert.equal(d.labels.filter((l) => l.startsWith('flag: ')).length, 8)
+  const b = decide(many(20), { login: 'alice-1', createdAt: '2024-01-01T00:00:00Z', strikes: 2, partial: true, now })
+  for (const l of ['checks: fail', 'blocked: strikes', 'count: partial', 'lane: B']) assert.ok(b.labels.includes(l), l)
+  assert.equal(b.labels.length, 12)
+  // flag 少的：全给
+  const few = decide(many(2), { login: 'alice-1', createdAt: '2024-01-01T00:00:00Z', now })
+  assert.deepEqual(few.labels, ['checks: pass', 'lane: B', 'flag: f0', 'flag: f1'])
+  // 同一个 flag 只算一次
+  const dup = decide(readResults(JSON.stringify({ entries: [1, 2].map((k) => ({ id: `alice-1__m${k}`, type: 'template', ok: true, errors: [], flags: [{ code: 'password', msg: 'x' }], shots: [] })) })), { login: 'alice-1', createdAt: '2024-01-01T00:00:00Z', now })
+  assert.deepEqual(dup.labels.filter((l) => l.startsWith('flag: ')), ['flag: password'])
+})
+
+test('手动信任按数字 id 找：改了名也认；同一个 id 有几条取最后记的（at 最晚），时间一样或读不出来保守取 T0', async () => {
+  // 改名：记的时候叫 old-name，现在叫 new-name
+  assert.equal(standing({ login: 'new-name', id: 42, overrides: { 'old-name': { tier: 'T2', id: 42, at: '2026-11-01T00:00:00Z' } } }).override, 'T2')
+  // 改名前 /trust、改名后 /untrust：后记的 T0 说了算（不能靠改名绕过 /untrust）
+  const two = { 'old-name': { tier: 'T2', id: 42, at: '2026-11-01T00:00:00Z' }, 'new-name': { tier: 'T0', id: 42, at: '2026-11-02T00:00:00Z' } }
+  assert.equal(standing({ login: 'new-name', id: 42, overrides: two }).override, 'T0')
+  assert.equal(standing({ login: 'old-name', id: 42, overrides: two }).override, 'T0')
+  // 反过来：先 /untrust、后 /trust
+  const back = { a: { tier: 'T0', id: 42, at: '2026-11-01T00:00:00Z' }, b: { tier: 'T2', id: 42, at: '2026-11-02T00:00:00Z' } }
+  assert.equal(standing({ login: 'b', id: 42, overrides: back }).override, 'T2')
+  // 时间一样、读不出来（哪怕只有一条读不出来，另一条是有效的 T2）：T0
+  assert.equal(standing({ login: 'x', id: 42, overrides: { a: { tier: 'T2', id: 42, at: 't' }, b: { tier: 'T0', id: 42 } } }).override, 'T0')
+  assert.equal(standing({ login: 'x', id: 42, overrides: { a: { tier: 'T2', id: 42, at: '2026-11-01T00:00:00Z' }, b: { tier: 'T0', id: 42 } } }).override, 'T0')
+  assert.equal(standing({ login: 'x', id: 42, overrides: { a: { tier: 'T2', id: 42, at: '2026-11-01T00:00:00Z' }, b: { tier: 'T0', id: 42, at: 'later' } } }).override, 'T0')
+  // 只有 T2（时间读不出来也一样）：T2
+  assert.equal(standing({ login: 'x', id: 42, overrides: { a: { tier: 'T2', id: 42, at: 'x' }, b: { tier: 'T2', id: 42 } } }).override, 'T2')
+  assert.equal(standing({ login: 'x', id: 42, overrides: { a: { tier: 'T2', id: 42, at: '2026-11-01T00:00:00Z' }, b: { tier: 'T0', id: 42, at: '2026-11-01T00:00:00Z' } } }).override, 'T0')
+  // 别人的、没 id 的、tier 不对的、id 是 0 的都不算
+  assert.equal(standing({ login: 'x', id: 42, overrides: { x: { tier: 'T2', id: 7 }, y: { tier: 'T9', id: 42 }, z: 'T2' } }).override, '')
+  assert.equal(standing({ login: 'x', id: 0, overrides: { x: { tier: 'T2', id: 0 } } }).override, '')
+  // 名单不是对象：不认（读的时候已经报错了，这里只是不崩）
+  assert.equal(standing({ login: 'x', id: 42, overrides: [{ tier: 'T2', id: 42 }] }).override, '')
+})
+
+test('规矩文件严格读：只有文件不存在才用默认值；JSON 坏了、类型不对、读不了都报错（不能当成空名单）', async () => {
+  const { readPolicyJson } = await import('../scripts/lib/repo.mjs')
+  const d = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-pol-'))
+  const f = (n, t) => { const p = path.join(d, n); fs.writeFileSync(p, t); return p }
+  assert.deepEqual(readPolicyJson(path.join(d, 'none.json'), []), [])
+  assert.deepEqual(readPolicyJson(path.join(d, 'none.json'), {}), {})
+  assert.deepEqual(readPolicyJson(f('ok.json', '[{"id":1}]'), []), [{ id: 1 }])
+  assert.deepEqual(readPolicyJson(f('ok2.json', '{"a":{"tier":"T2","id":1}}'), {}), { a: { tier: 'T2', id: 1 } })
+  assert.throws(() => readPolicyJson(f('bad.json', '[{"id":1},]'), []))
+  assert.throws(() => readPolicyJson(f('obj.json', '{}'), []))
+  assert.throws(() => readPolicyJson(f('arr.json', '[]'), {}))
+  assert.throws(() => readPolicyJson(f('null.json', 'null'), {}))
+  assert.throws(() => readPolicyJson(f('str.json', '"x"'), {}))
+  assert.throws(() => readPolicyJson(d, {})) // 是个目录：读不了
+  // 闸门（命令行）：规矩文件坏了就退出非 0，不写 gate.json
+  const cwd = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-polcli-'))
+  fs.mkdirSync(path.join(cwd, 'policy'))
+  fs.writeFileSync(path.join(cwd, 'policy/strikes.json'), '[{"id":1},]')
+  fs.writeFileSync(path.join(cwd, 'results.json'), JSON.stringify({ entries: [] }))
+  assert.throws(() => execFileSync(process.execPath, [path.join(REAL, 'scripts/gate.mjs'), 'results.json', '--out', 'gate.json'], { cwd, stdio: 'pipe' }))
+  assert.ok(!fs.existsSync(path.join(cwd, 'gate.json')))
+  fs.writeFileSync(path.join(cwd, 'policy/strikes.json'), '[]')
+  fs.writeFileSync(path.join(cwd, 'policy/trust-overrides.json'), '[]')
+  assert.throws(() => execFileSync(process.execPath, [path.join(REAL, 'scripts/gate.mjs'), 'results.json', '--out', 'gate.json'], { cwd, stdio: 'pipe' }))
+  fs.writeFileSync(path.join(cwd, 'policy/trust-overrides.json'), '{}')
+  execFileSync(process.execPath, [path.join(REAL, 'scripts/gate.mjs'), 'results.json', '--out', 'gate.json'], { cwd, stdio: 'pipe' })
+  // 闸门还写好「维护者挂起状态反过来」的那一份（post 写之前状态变了就用它）
+  for (const mh of ['true', 'false']) {
+    fs.writeFileSync(path.join(cwd, 'results.json'), JSON.stringify({ entries: [{ id: 'alice-1__mint', type: 'style', ok: true, errors: [], flags: [], shots: [] }] }))
+    execFileSync(process.execPath, [path.join(REAL, 'scripts/gate.mjs'), 'results.json', '--out', 'gate.json'], { cwd, stdio: 'pipe', env: { ...process.env, GALLERY_ROOT: cwd, MAINT_HELD: mh, PR_AUTHOR_LOGIN: 'alice-1', ACCOUNT_CREATED_AT: '2020-01-01T00:00:00Z', PRIOR_MERGED: '1', COUNT_PARTIAL: '0' } })
+    const g = JSON.parse(fs.readFileSync(path.join(cwd, 'gate.json'), 'utf8'))
+    assert.equal(g.maintHeld, mh === 'true')
+    assert.equal(g.alt.maintHeld, mh !== 'true')
+    assert.equal(g.conclusion === 'success', mh !== 'true', JSON.stringify(g))
+    assert.equal(g.alt.conclusion === 'success', mh === 'true')
+    assert.equal(typeof g.alt.comment, 'string')
+    assert.ok(Array.isArray(g.alt.labels))
+  }
+  // 被关过又重开了（REOPENED）：两份都不自动合并（反过来的只是维护者挂起）
+  for (const mh of ['true', 'false']) {
+    execFileSync(process.execPath, [path.join(REAL, 'scripts/gate.mjs'), 'results.json', '--out', 'gate.json'], { cwd, stdio: 'pipe', env: { ...process.env, GALLERY_ROOT: cwd, MAINT_HELD: mh, REOPENED: 'true', PR_AUTHOR_LOGIN: 'alice-1', ACCOUNT_CREATED_AT: '2020-01-01T00:00:00Z', PRIOR_MERGED: '1', COUNT_PARTIAL: '0' } })
+    const g = JSON.parse(fs.readFileSync(path.join(cwd, 'gate.json'), 'utf8'))
+    assert.equal(g.conclusion === 'success', false, JSON.stringify(g))
+    assert.equal(g.alt.conclusion === 'success', false)
+    assert.equal(g.alt.conclusion, 'neutral')
+  }
+  assert.ok(fs.existsSync(path.join(cwd, 'gate.json')))
+})
+
+test('/trust、/untrust 写信任名单：同一个 id 只留一条（改名前的旧条目去掉）；名单坏了就报错、不覆盖', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-trust-'))
+  fs.mkdirSync(path.join(root, 'policy'))
+  const read = () => JSON.parse(fs.readFileSync(path.join(root, 'policy/trust-overrides.json'), 'utf8'))
+  const now = new Date('2026-11-12T00:00:00Z')
+  applyPolicy({ action: 'trust', login: 'old-name', uid: 42 }, { root, now })
+  applyPolicy({ action: 'trust', login: 'carol', uid: 9 }, { root, now })
+  applyPolicy({ action: 'untrust', login: 'new-name', uid: 42 }, { root, now })
+  assert.deepEqual(read(), { 'id:9': { tier: 'T2', id: 9, login: 'carol', at: now.toISOString() }, 'id:42': { tier: 'T0', id: 42, login: 'new-name', at: now.toISOString() } })
+  assert.equal(standing({ login: 'new-name', id: 42, overrides: read() }).override, 'T0')
+  // 用户名被别人重新注册：账号 42 叫 alice 时 /untrust 过，后来改了名；账号 99 注册了 alice、维护者 /trust 它——不能覆盖 42 的记录
+  fs.writeFileSync(path.join(root, 'policy/trust-overrides.json'), JSON.stringify({ alice: { tier: 'T0', id: 42, at: '2026-11-01T00:00:00Z' } }))
+  applyPolicy({ action: 'trust', login: 'alice', uid: 99 }, { root, now })
+  assert.equal(standing({ login: 'renamed', id: 42, overrides: read() }).override, 'T0')
+  assert.equal(standing({ login: 'alice', id: 99, overrides: read() }).override, 'T2')
+  applyPolicy({ action: 'untrust', login: 'alice', uid: 99 }, { root, now })
+  assert.equal(standing({ login: 'renamed', id: 42, overrides: read() }).override, 'T0')
+  assert.equal(Object.keys(read()).length, 2)
+  // 名单坏了：报错，文件原样不动
+  fs.writeFileSync(path.join(root, 'policy/trust-overrides.json'), '{"carol": ')
+  assert.throws(() => applyPolicy({ action: 'trust', login: 'dave', uid: 5 }, { root, now }))
+  assert.equal(fs.readFileSync(path.join(root, 'policy/trust-overrides.json'), 'utf8'), '{"carol": ')
+  fs.writeFileSync(path.join(root, 'policy/trust-overrides.json'), '[]')
+  assert.throws(() => applyPolicy({ action: 'untrust', login: 'dave', uid: 5 }, { root, now }))
+})
+
+test('命令的先后按评论时间算：保护的（/untrust、/takedown）一律生效；放行的（/trust、/restore）碰上更晚（或同一秒）的保护记录就不改', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-order-'))
+  fs.mkdirSync(path.join(root, 'policy'))
+  const T = (h) => new Date(`2026-11-12T${String(h).padStart(2, '0')}:00:00Z`)
+  const trust = () => JSON.parse(fs.readFileSync(path.join(root, 'policy/trust-overrides.json'), 'utf8'))['id:42']
+  // clock：处理的这一刻（默认就是评论时间）
+  const run = (action, h, extra = {}, clock = T(h).getTime()) => { const a = { action, login: 'alice', uid: 42, id: 'alice__x', reason: 'policy', ...extra }; const f = applyPolicy(a, { root, now: T(h), clock }); return { f, stale: !!a.stale } }
+  const TF = 'policy/trust-overrides.json'
+  // 10 点 /untrust 生效以后，9 点那条 /trust 才跑到（或被重跑）：不改
+  assert.deepEqual(run('untrust', 10), { f: TF, stale: false })
+  assert.deepEqual(run('trust', 9), { f: '', stale: true })
+  assert.equal(trust().tier, 'T0')
+  // 11 点 /trust（比 /untrust 晚）：生效，记录里的时间是评论时间
+  assert.deepEqual(run('trust', 11), { f: TF, stale: false })
+  assert.equal(trust().tier, 'T2')
+  assert.equal(trust().at, T(11).toISOString())
+  // 保护的一律生效：10 点那条 /untrust 被重跑也照样收紧，时间记成最晚的（11 点）——之后晚到的 11 点、10 点的旧 /trust 都盖不回去
+  assert.deepEqual(run('untrust', 10), { f: TF, stale: false })
+  assert.equal(trust().tier, 'T0')
+  assert.equal(trust().at, T(11).toISOString())
+  assert.deepEqual(run('trust', 11), { f: '', stale: true })
+  assert.deepEqual(run('trust', 10), { f: '', stale: true })
+  assert.equal(trust().tier, 'T0')
+  // 要放开：再发一次（更晚的）/trust
+  assert.deepEqual(run('trust', 12), { f: TF, stale: false })
+  assert.equal(trust().tier, 'T2')
+  // 同一秒：/untrust 盖得过 /trust，/trust 盖不过 /untrust；已经是不比它早的 /untrust 就不用改
+  assert.deepEqual(run('untrust', 12), { f: TF, stale: false })
+  assert.equal(trust().tier, 'T0')
+  assert.deepEqual(run('trust', 12), { f: '', stale: true })
+  assert.deepEqual(run('untrust', 12), { f: '', stale: false })
+  assert.deepEqual(run('untrust', 11), { f: '', stale: false })
+  // 同一个 id 有几条（改名前的、老写法的）：哪怕有一条不比这条早的 T0，最新的那条可能是放开的——并成一条 T0，时间取最晚的
+  fs.writeFileSync(path.join(root, TF), JSON.stringify({ 'id:42': { tier: 'T0', id: 42, at: T(10).toISOString() }, alice: { tier: 'T2', id: 42, at: T(12).toISOString() } }))
+  assert.deepEqual(run('untrust', 9), { f: TF, stale: false })
+  assert.deepEqual(JSON.parse(fs.readFileSync(path.join(root, TF), 'utf8')), { 'id:42': { tier: 'T0', id: 42, login: 'alice', at: T(12).toISOString() } })
+  assert.equal(standing({ login: 'alice', id: 42, overrides: JSON.parse(fs.readFileSync(path.join(root, TF), 'utf8')) }).override, 'T0')
+  // 时间读不出来的旧记录：/trust 不盖（分不出先后），/untrust 照写
+  fs.writeFileSync(path.join(root, TF), JSON.stringify({ 'id:42': { tier: 'T0', id: 42, at: 'garbage' } }))
+  assert.equal(run('trust', 13).stale, true)
+  assert.equal(run('untrust', 13).stale, false)
+  assert.equal(trust().at, T(13).toISOString())
+  // 读不出时间的保护记录当成「最晚到现在」：20 点重跑一条 9 点的旧 /untrust，记成 20 点——之后晚到的 14 点 /trust 放不开，20 点以后发的才行
+  fs.writeFileSync(path.join(root, TF), JSON.stringify({ 'id:42': { tier: 'T0', id: 42, at: 'garbage' }, alice: { tier: 'T2', id: 42, at: T(8).toISOString() } }))
+  assert.deepEqual(run('untrust', 9, {}, T(20).getTime()), { f: TF, stale: false })
+  assert.equal(trust().at, T(20).toISOString())
+  assert.equal(run('trust', 14).stale, true)
+  assert.equal(trust().tier, 'T0')
+  assert.equal(run('trust', 21).stale, false)
+  assert.equal(trust().tier, 'T2')
+  // 下架 / 撤销
+  fs.writeFileSync(path.join(root, 'policy/denylist.json'), '[]')
+  const DF = 'policy/denylist.json'
+  const deny = () => JSON.parse(fs.readFileSync(path.join(root, DF), 'utf8'))
+  assert.equal(run('takedown', 10).f, DF)
+  // 9 点的 /restore 是旧的（下架是 10 点发的）：不撤；同一秒的也不撤
+  assert.deepEqual(run('restore', 9), { f: '', stale: true })
+  assert.deepEqual(run('restore', 10), { f: '', stale: true })
+  assert.equal(deny()[0].restored, undefined)
+  assert.deepEqual(run('restore', 11), { f: DF, stale: false })
+  assert.equal(deny()[0].restored, T(11).toISOString())
+  // 保护的一律生效：11 点撤销以后，10 点那条 /takedown 被重跑——照样下架，时间记成最晚的（11 点），晚到的旧 /restore 撤不了
+  assert.deepEqual(run('takedown', 10), { f: DF, stale: false })
+  assert.deepEqual(deny().map((d) => [d.id, d.at, d.restored]), [['alice__x', T(11).toISOString(), undefined]])
+  assert.deepEqual(run('restore', 11), { f: '', stale: true })
+  // 要恢复：再发一次（更晚的）/restore
+  assert.deepEqual(run('restore', 12), { f: DF, stale: false })
+  assert.equal(deny()[0].restored, T(12).toISOString())
+  // 同一秒的 /takedown 盖得过 /restore
+  assert.deepEqual(run('takedown', 12), { f: DF, stale: false })
+  assert.equal(deny().filter((d) => d.id === 'alice__x' && !d.restored).length, 1)
+  // 已经下架着（这条或更晚的命令下的）：不用再记；更早下的照样换成这条（原因可能变了）
+  assert.deepEqual(run('takedown', 12), { f: '', stale: false })
+  assert.deepEqual(run('takedown', 10), { f: '', stale: false })
+  assert.deepEqual(run('takedown', 13, { reason: 'copyright' }), { f: DF, stale: false })
+  assert.deepEqual(deny().map((d) => [d.id, d.reason, d.at]), [['alice__x', 'copyright', T(13).toISOString()]])
+  // 读不出时间的下架、撤销记录：当成「最晚到现在」——20 点重跑一条 9 点的旧 /takedown，记成 20 点，之后晚到的 14 点 /restore 撤不了
+  fs.writeFileSync(path.join(root, DF), JSON.stringify([{ id: 'alice__x', at: T(5).toISOString(), restored: 'garbage' }]))
+  assert.deepEqual(run('takedown', 9, {}, T(20).getTime()), { f: DF, stale: false })
+  assert.deepEqual(deny().map((d) => [d.id, d.at, d.restored]), [['alice__x', T(20).toISOString(), undefined]])
+  assert.deepEqual(run('restore', 14), { f: '', stale: true })
+  assert.deepEqual(run('restore', 21), { f: DF, stale: false })
+  // 下架记录本身的时间读不出来（还下架着）：/restore 盖不过（分不出先后）；补发一次 /takedown 把它并成「处理的这一刻」，之后发的 /restore 才行
+  fs.writeFileSync(path.join(root, DF), JSON.stringify([{ id: 'alice__x', at: 'garbage', reason: 'policy' }]))
+  assert.deepEqual(run('restore', 21), { f: '', stale: true })
+  assert.deepEqual(run('takedown', 9, {}, T(20).getTime()), { f: DF, stale: false })
+  assert.deepEqual(deny().map((d) => [d.id, d.at, d.restored]), [['alice__x', T(20).toISOString(), undefined]])
+  assert.deepEqual(run('restore', 19), { f: '', stale: true })
+  assert.deepEqual(run('restore', 21), { f: DF, stale: false })
+  // 同一套有好几条（手改出来的）：也并成一条
+  fs.writeFileSync(path.join(root, DF), JSON.stringify([{ id: 'alice__x', at: T(12).toISOString() }, { id: 'alice__x', at: 'garbage' }]))
+  assert.deepEqual(run('takedown', 10, {}, T(20).getTime()), { f: DF, stale: false })
+  assert.deepEqual(deny().map((d) => [d.id, d.at]), [['alice__x', T(20).toISOString()]])
+  // 规矩文件手改坏了：不改、不覆盖（当成空的写回去，别的下架记录就丢了）
+  for (const [f, action] of [['denylist.json', 'takedown'], ['denylist.json', 'restore'], ['featured.json', 'feature'], ['trust-overrides.json', 'untrust']]) {
+    fs.writeFileSync(path.join(root, 'policy', f), '[{"id": "b__yyy",}]')
+    assert.throws(() => run(action, 14, { id: 'b__yyy' }), f)
+    assert.equal(fs.readFileSync(path.join(root, 'policy', f), 'utf8'), '[{"id": "b__yyy",}]')
+  }
+})
+
+test('维护者命令（命令行）：规矩文件坏了回 error、不改；--holds 列出 /approve 之后（或同一秒）发 /hold 的人', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-cli-'))
+  fs.mkdirSync(path.join(root, 'policy'))
+  fs.writeFileSync(path.join(root, 'policy/denylist.json'), '[1,]')
+  const cli = (args, env = {}) => spawnSync(process.execPath, [path.join(REAL, 'scripts/chatops.mjs'), ...args], { cwd: root, env: { ...process.env, GALLERY_ROOT: root, ...env }, encoding: 'utf8' })
+  const r = cli(['--apply', '--out', path.join(root, 'a.json')], { COMMENT_BODY: '/takedown alice__xyz', COMMENT_AT: '2026-11-12T10:00:00Z' })
+  assert.equal(r.status, 0, r.stderr)
+  const a = JSON.parse(fs.readFileSync(path.join(root, 'a.json'), 'utf8'))
+  assert.equal(a.action, 'error')
+  assert.match(a.msg, /规矩文件读不出来，没改/)
+  assert.equal(fs.readFileSync(path.join(root, 'policy/denylist.json'), 'utf8'), '[1,]')
+  // --holds
+  const since = '2026-11-13T01:00:00Z'
+  const c = (id, login, body, at = '2026-11-13T01:00:05Z', type = 'User') => ({ id, user: { login, type }, body, created_at: at })
+  const pages = [[c(400, 'm1', '/hold', '2026-11-13T00:00:00Z'), c(499, 'm2', '/hold brand', since), c(500, 'me', '/approve x')], [c(501, 'm3', '看一下\n /hold'), c(502, 'm4', '/hold\uFEFFx'), c(503, 'bot[bot]', '/hold', undefined, 'Bot'), c(504, 'm5', '/holdx'), c(505, 'm6', '/approve y\n/hold'), c(498, 'm7', '/hold', 'x'), c(506, 'm8', '/reject spam')]]
+  fs.writeFileSync(path.join(root, 'c.json'), JSON.stringify(pages))
+  const h = cli(['--holds', path.join(root, 'c.json'), '--id', '500', '--since', since])
+  assert.equal(h.status, 0, h.stderr)
+  // /reject 也算（关了以后作者能重开自己的 PR：旧的 /approve 不能越过它）
+  //   每条一行「评论 id 发的人」（工作流按评论看机器人有没有点 👀）
+  assert.deepEqual(h.stdout.trim().split('\n').sort(), ['498 m7', '499 m2', '501 m3', '502 m4', '506 m8'])
+  // 读不出来（不是分页的列表、/approve 的 id 空着或不对、时间不对、评论缺 id）：失败（工作流当成挂起了）
+  for (const [p, id, t] of [[{}, '500', since], [pages, 'x', since], [pages, '', since], [pages, '500', 'garbage'], [[[{ user: { login: 'a' }, body: '/hold' }]], '500', since]]) {
+    fs.writeFileSync(path.join(root, 'c.json'), JSON.stringify(p))
+    assert.notEqual(cli(['--holds', path.join(root, 'c.json'), '--id', id, '--since', t]).status, 0, JSON.stringify([p, id, t]))
+  }
+  // --action：认得的命令是什么（取消回话用）；不是命令是 none
+  const ac = (body, pr = 'true') => cli(['--action'], { COMMENT_BODY: body, IS_PR: pr }).stdout.trim()
+  assert.equal(ac('说明\r\n/hold'), 'hold')
+  assert.equal(ac('\ufeff/approve\u00a0' + 'a'.repeat(40)), 'merge')
+  assert.equal(ac('/hold', 'false'), 'error')
+  assert.equal(ac('看这里 https://x.y/z'), 'none')
+  assert.equal(ac('/approved'), 'none')
+  // --target：/trust、/untrust 要查的用户名（工作流拿去查数字 id）；别的命令、不是命令都不出东西
+  const tg = (body, pr = 'false') => cli(['--target'], { COMMENT_BODY: body, IS_PR: pr })
+  assert.equal(tg('/untrust @Alice-1').stdout.trim(), 'alice-1')
+  assert.equal(tg('请看一下\n/trust bob').stdout.trim(), 'bob')
+  for (const b of ['/takedown alice__xyz', '/approve ' + 'a'.repeat(40), 'hello /untrust x', '']) {
+    const t = tg(b, 'true')
+    assert.equal(t.status, 0, t.stderr)
+    assert.equal(t.stdout, '', b)
+  }
+})
+
+test('检查：闸门算出来合进 main 以后和 PR 里不一样的目录（BEHIND）、合不到一起（CONFLICT）——报错，不能过', () => {
+  const out = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-behind-'))
+  const changed = path.join(out, 'changed.txt')
+  const dir = path.join(FAKE, 'templates/alice-1__matcha')
+  const f = fs.readdirSync(dir).find((x) => fs.statSync(path.join(dir, x)).isFile())
+  fs.writeFileSync(changed, `M\0templates/alice-1__matcha/${f}\0`)
+  const run = (env) => {
+    spawnSync(process.execPath, [path.join(REAL, 'scripts/check.mjs'), '--changed', changed], { env: { ...process.env, GALLERY_ROOT: FAKE, OUT: out, NO_RENDER: '1', SUBMITTER_LOGIN: 'alice-1', ...env }, encoding: 'utf8' })
+    return JSON.parse(fs.readFileSync(path.join(out, 'results.json'), 'utf8'))
+  }
+  const base = run({})
+  assert.ok(!base.guard.some((x) => x.code === 'conflict'), JSON.stringify(base.guard))
+  const e0 = base.entries.find((x) => x.dir === 'templates/alice-1__matcha')
+  assert.ok(e0 && !e0.errors.some((x) => x.code === 'behind'))
+  const b = run({ BEHIND: ' templates/x__y templates/alice-1__matcha' })
+  const e = b.entries.find((x) => x.dir === 'templates/alice-1__matcha')
+  assert.equal(e.ok, false)
+  assert.ok(e.errors.some((x) => x.code === 'behind' && /Update branch/.test(x.msg) && /Update branch/.test(x.msgEn)))
+  const c = run({ CONFLICT: '1' })
+  assert.ok(c.guard.some((x) => x.code === 'conflict' && /冲突/.test(x.msg)))
+  // 落后的目录在 PR 里整个删掉了（没有条目）：记在守卫上，也不能过
+  assert.ok(b.guard.some((x) => x.code === 'behind' && x.msg.includes('templates/x__y')), JSON.stringify(b.guard))
+  // 闸门据此判：都是失败
+  const old = '2020-01-01T00:00:00Z', now = Date.parse('2026-11-13T00:00:00Z')
+  for (const r of [b, c, run({ BEHIND: 'templates/x__y' })]) assert.equal(decide(readResults(JSON.stringify(r)), { login: 'alice-1', createdAt: old, now }).conclusion, 'failure')
+  assert.notEqual(decide(readResults(JSON.stringify(base)), { login: 'alice-1', createdAt: old, now }).conclusion, 'failure')
+})
+
+test('submission-open.sh：机器人代开的 PR 投稿 issue 开着才放（0）；关了 3；读不出、查不到 1；别人开的不管', { skip: process.platform === 'win32' && '要 bash' }, () => {
+  const w = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-subopen-'))
+  const bin = path.join(w, 'bin'); fs.mkdirSync(bin)
+  // 假 gh：issues/<号> 的状态从环境变量拿；STATE=fail 就报错
+  fs.writeFileSync(path.join(bin, 'gh'), '#!/bin/bash\necho "$*" >> "$W/gh.log"\n[ "$STATE" = fail ] && exit 1\necho "$STATE"\n', { mode: 0o755 })
+  const go = (prj, state = 'open false') => {
+    const f = path.join(w, 'pr.json'); fs.writeFileSync(f, JSON.stringify(prj)); fs.writeFileSync(path.join(w, 'gh.log'), '')
+    const r = spawnSync('bash', [path.join(REAL, 'scripts/submission-open.sh'), f], { env: { ...process.env, PATH: `${bin}:${process.env.PATH}`, W: w, STATE: state, GITHUB_REPOSITORY: 'o/r', APP_SLUG: 'bot' }, encoding: 'utf8' })
+    return { code: r.status, gh: fs.readFileSync(path.join(w, 'gh.log'), 'utf8') }
+  }
+  const bot = (body) => ({ user: { login: 'bot[bot]' }, body })
+  const body = 'Submitted-by: a (1)\r\nSubmission: https://github.com/o/r/issues/12\r\n'
+  assert.equal(go(bot(body)).code, 0)
+  assert.match(go(bot(body)).gh, /api repos\/o\/r\/issues\/12 /)
+  assert.equal(go(bot(body), 'closed false').code, 3)
+  // 被拒了（rejected 标签：作者自己关过、又重开了）：也不合
+  assert.equal(go(bot(body), 'open true').code, 3)
+  assert.equal(go(bot(body), 'open').code, 1)
+  assert.equal(go(bot(body), 'fail').code, 1)
+  assert.equal(go(bot(body), 'weird').code, 1)
+  for (const b of ['', 'Submission: https://github.com/x/y/issues/12', 'Submission: https://github.com/o/r/issues/0', 'Submission: https://github.com/o/r/issues/12x']) assert.equal(go(bot(b)).code, 1, b)
+  // 别人开的 PR：不查
+  const eve = go({ user: { login: 'eve' }, body })
+  assert.equal(eve.code, 0)
+  assert.equal(eve.gh, '')
+  // 作者读不出来（缺字段、空的、不是字符串）：不能当成「别人开的」放过，算查不到
+  for (const prj of [{ body }, { user: null, body }, { user: {}, body }, { user: { login: '' }, body }, { user: { login: 5 }, body }]) {
+    const r = go(prj)
+    assert.equal(r.code, 1, JSON.stringify(prj))
+    assert.equal(r.gh, '')
+  }
+})
+
+test('was-closed.sh：作者读不出来（缺字段、空的）算查不到（1），不当成「不是机器人代开的」只看 PR 自己的记录', { skip: process.platform === 'win32' && '要 bash' }, () => {
+  const w = fs.mkdtempSync(path.join(os.tmpdir(), 'gallery-wasclosed-'))
+  const bin = path.join(w, 'bin'); fs.mkdirSync(bin)
+  // 在临时目录里跑（脚本会在当前目录写中间文件）
+  fs.mkdirSync(path.join(w, 'scripts'))
+  for (const f of ['was-closed.sh', 'closed-by.sh']) fs.copyFileSync(path.join(REAL, 'scripts', f), path.join(w, 'scripts', f))
+  fs.writeFileSync(path.join(bin, 'gh'), '#!/bin/bash\necho "$*" >> "$W/gh.log"\necho "[]"\n', { mode: 0o755 })
+  const go = (prj) => {
+    const f = path.join(w, 'pr.json'); fs.writeFileSync(f, JSON.stringify(prj)); fs.writeFileSync(path.join(w, 'gh.log'), '')
+    const r = spawnSync('bash', [path.join(w, 'scripts/was-closed.sh'), f], { cwd: w, env: { ...process.env, PATH: `${bin}:${process.env.PATH}`, W: w, GITHUB_REPOSITORY: 'o/r', APP_SLUG: 'bot' }, encoding: 'utf8' })
+    return { code: r.status, gh: fs.readFileSync(path.join(w, 'gh.log'), 'utf8') }
+  }
+  // 对照：别人开的、没被关过：3
+  assert.equal(go({ number: 7, user: { login: 'eve' }, body: '' }).code, 3)
+  for (const prj of [{ number: 7, body: '' }, { number: 7, user: {}, body: '' }, { number: 7, user: { login: '' }, body: '' }, { number: 7, user: { login: null }, body: '' }]) {
+    assert.equal(go(prj).code, 1, JSON.stringify(prj))
+  }
+})
+
+test('审核卡太长被截短时，给维护者的完整 /approve 命令还在（放在最前面）', () => {
+  const now = Date.parse('2026-11-06T00:00:00Z')
+  const H = 'd'.repeat(40)
+  const item = (i) => ({ code: `c${i}`, msg: `提醒${i}`.repeat(80).slice(0, 400), msgEn: `note ${i} `.repeat(50).slice(0, 400) })
+  const res = readResults(JSON.stringify({ entries: Array.from({ length: 4 }, (_, k) => ({ id: `alice-1__m${k}xx`, type: 'template', ok: true, errors: [], flags: Array.from({ length: 40 }, (_, i) => item(i)), shots: Array.from({ length: 8 }, (_, i) => `shots/alice-1__m${k}xx/s${i}.jpg`) })) }))
+  const d = decide(res, { login: 'alice-1', createdAt: '2020-01-01T00:00:00Z', shotsBase: 'https://raw.githubusercontent.com/o/r/review-shots/3/9', sha: H, now })
+  assert.equal(d.conclusion, 'neutral')
+  assert.match(d.comment, /审核卡太长，后面省略了/)
+  assert.ok(d.comment.includes(`/approve ${H}`))
+  // A 车道（全绿风格卡）：挂起了（数量超了）、没挂起，卡上都给 /approve（机器人不合并，一律维护者看过再合）
+  const style = readResults(JSON.stringify({ entries: [{ id: 'alice-1__sty', type: 'style', ok: true, errors: [], flags: [], shots: [] }] }))
+  const lim = decide(style, { login: 'alice-1', createdAt: '2020-01-01T00:00:00Z', priorMerged: 3, today: 5, sha: H, now })
+  assert.deepEqual([lim.lane, lim.held, lim.conclusion === 'success'], ['A', 'limit', false])
+  assert.ok(lim.comment.includes(`/approve ${H}`))
+  const auto = decide(style, { login: 'alice-1', createdAt: '2020-01-01T00:00:00Z', priorMerged: 3, sha: H, now })
+  assert.deepEqual([auto.lane, auto.conclusion], ['A', 'success'])
+  assert.ok(auto.comment.includes(`/approve ${H}`))
+  // 结果里没有「自动合并」这回事
+  assert.ok(!('automerge' in auto))
+  assert.doesNotMatch(auto.comment, /自动合并|auto-merg/)
+  assert.match(auto.comment, /等维护者看一眼/)
+})
+
+test('审核卡太长就截短（评论上限 65536 字）：截短的说清楚，短的原样', async () => {
+  const { capCard, CARD_MAX } = await import('../scripts/gate.mjs')
+  assert.equal(capCard('abc'), 'abc')
+  const exact = 'x'.repeat(CARD_MAX)
+  assert.equal(capCard(exact), exact)
+  const long = capCard('y'.repeat(CARD_MAX * 5))
+  assert.ok(long.length <= CARD_MAX)
+  assert.match(long, /审核卡太长，后面省略了/)
+  // decide 出来的卡也截了：每套设计的错误、提醒都写满（不截的话远超上限）
+  const now = Date.parse('2026-11-06T00:00:00Z')
+  const item = (i) => ({ code: `c${i}`, msg: `错误${i}`.repeat(60).slice(0, 300), msgEn: `error ${i} `.repeat(40).slice(0, 300) })
+  const res = readResults(JSON.stringify({ entries: Array.from({ length: 5 }, (_, k) => ({ id: `alice-1__m${k}xx`, type: 'template', ok: false, errors: Array.from({ length: 30 }, (_, i) => item(i)), flags: Array.from({ length: 30 }, (_, i) => item(i + 30)), shots: [] })) }))
+  assert.ok(res.entries[0].errors[0].msg.length > 100 && res.entries[0].errors.length === 30)
+  const d = decide(res, { login: 'alice-1', createdAt: '2024-01-01T00:00:00Z', now })
+  assert.ok(d.comment.length <= CARD_MAX, String(d.comment.length))
+  assert.match(d.comment, /审核卡太长，后面省略了/)
+  assert.match(d.comment, /^<!-- dsh-gallery-gate -->/)
 })

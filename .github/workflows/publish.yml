@@ -14,6 +14,9 @@ on:
 
 permissions: {}
 
+# 一次只发一回。这里故意不用 queue: max：每回轮到了（shots 一开始）才取 main 现在的提交来建，
+# 排着的被后来的顶掉不丢东西——后来的那回取到的 main 只会更新（main 只往前走），发的就是最新内容；全排队反而会把中间的版本挨个发一遍。
+# 重跑旧的一回也一样取现在的 main；只单独重跑 publish 这个 job 时，截图还是当初那版：main 后来变了就不发（见 publish 里的核对）
 concurrency:
   group: publish
   cancel-in-progress: false
@@ -24,9 +27,22 @@ jobs:
     timeout-minutes: 20
     permissions:
       contents: read
+    outputs:
+      sha: ${{ steps.pin.outputs.sha }}
     steps:
+      - name: 取 main 现在的提交（截图、建目录都用这一个）
+        id: pin
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          sha=$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)
+          [[ "$sha" =~ ^[0-9a-f]{40}$ ]] || { echo "取不到 main 的提交：$sha"; exit 1; }
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
       - uses: actions/checkout@v4
         with:
+          ref: ${{ steps.pin.outputs.sha }}
           persist-credentials: false
 
       - uses: actions/setup-node@v4
@@ -57,8 +73,19 @@ jobs:
       contents: read
       id-token: write
     steps:
+      - name: 核对：截图那会儿取的 main 还是现在的 main（只单独重跑这个 job 时会不一样：那就不发，请重跑全部 job）
+        if: github.run_attempt != '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PINNED: ${{ needs.shots.outputs.sha }}
+        run: |
+          set -euo pipefail
+          now=$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)
+          [ "$now" = "$PINNED" ] || { echo "::error::main 已经更新（截图用的是 ${PINNED}，现在是 ${now}），这回不发；请重跑全部 job"; exit 1; }
+
       - uses: actions/checkout@v4
         with:
+          ref: ${{ needs.shots.outputs.sha }}
           fetch-depth: 0
           persist-credentials: false
 
@@ -127,10 +154,10 @@ jobs:
           PV: ${{ steps.build.outputs.packs_version }}
         run: |
           for p in dsh-design-gallery dsh-design-gallery-packs; do
-            curl -fsS -X PUT "https://registry-direct.npmmirror.com/-/package/$p/syncs" >/dev/null || echo "npmmirror 同步接口没响应（$p）"
+            curl -fsS -X PUT "https://registry-direct.npmmirror.com/-/package/$p/syncs" >/dev/null || echo "npmmirror 同步接口没响应（${p}）"
           done
           sleep 60
           for r in https://registry.npmmirror.com https://mirrors.cloud.tencent.com/npm https://repo.huaweicloud.com/repository/npm https://registry.npmjs.org; do
             got=$(curl -fsS -m 20 -H 'Accept: application/vnd.npm.install-v1+json' "$r/dsh-design-gallery" | jq -r '."dist-tags".latest' 2>/dev/null || echo '?')
-            echo "$r → $got（要 $V）"
+            echo "$r → ${got}（要 ${V}）"
           done

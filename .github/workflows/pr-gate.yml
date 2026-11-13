@@ -1,7 +1,7 @@
 # 投稿闸门：pr-check 跑完后，拿 App token、只检出 main，把检查产物当不可信数据读。
 # PR 能改 pr-check.yml 本身（pull_request 用的是 PR 里的工作流），所以产物可以是伪造的：
 # 闸门自己按 PR 的真实改动重算结构守卫、归属和规则（只读文件、不渲染、不执行投稿内容），产物只能多报问题、提供截图。
-# 定车道、贴审核卡（带截图）、打标签、写「Submission gate」检查；A 车道自动合并。
+# 初筛：定车道、贴审核卡（带截图）、打标签、写「Submission gate」检查、@ 维护者。不合并：合并只由维护者（审核会话）发 /approve。
 name: pr-gate
 
 on:
@@ -13,18 +13,81 @@ permissions:
   contents: read
   actions: read
 
-concurrency:
-  group: pr-gate-${{ github.event.workflow_run.head_sha }}
-  cancel-in-progress: false
+# 排队（都在 job 上，不在整个工作流上；都用 queue: max——GitHub 默认一个组只留一个排队的，后来的会把先排队的顶掉）：
+#   - 算（gate）：同一个提交的排队（pr-gate-<提交>）
+#   - 写到 PR 上的（检查、审核卡、标签、提醒、「没跑完」的卡）：同一个 PR 的排队（dsh-pr-<号>）
+#     ——不同提交的闸门回合不会交错；轮到了再核一遍是不是最新那回、PR 还是不是这个提交，再写
+#   - 合并（维护者的 /approve，在 chatops 里）：全仓库一个「合并的队」（dsh-merge），一次只合一个
+#   - 「没跑完」等几分钟再重跑的那段不排队（不然后面的要干等）
+# 注意：PR 里的工作流（pull_request 用 PR 里的版本）能用同名的并发组把这里排着、跑着的 job 取消掉。被取消的只会是「没写 / 没合」
+#   （闸门结论缺了），不会合进不该合的：保护性的命令（/hold、/untrust……）不排任何队；见 MAINTAINING.md
+# 「最新的一回 pr-check」按提交 + 来源仓库（node_id，改名也不变）+ 来源分支认：两个 PR 的提交一样时，各算各的，不互相顶掉；
+#   别的回合被取消了的不算「后面又跑过」
 
 jobs:
+  # 检查没跑完（GitHub 机器断网、超时……）就没有产物：不走闸门，走下面的 incomplete
+  # 只认 .github/workflows/pr-check.yml 这个文件跑出来的：PR 能另加一个同名的 pr-check 工作流（workflow_run 按名字匹配）
+  probe:
+    if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.path == '.github/workflows/pr-check.yml'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    outputs:
+      has: ${{ steps.a.outputs.has }}
+      id: ${{ steps.a.outputs.id }}
+      fresh: ${{ steps.f.outputs.fresh }}
+    steps:
+      - name: 是不是这个提交最新的一回检查
+        id: f
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+          RUN_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          RUN_HEAD_REPO_ID: ${{ github.event.workflow_run.head_repository.node_id }}
+        run: |
+          set -euo pipefail
+          # 确定过期（后面又跑过 = 有更大的 id；这回被重跑过 = attempt 涨了；比如维护者重跑了旧的 pr-gate）：fresh=false，后面的 job 都不跑
+          # 说不准（查询出错、数据不对、连这回都没数到）：fresh 留空，照旧往下走（gate / incomplete 自己还会再核，核不准就报错）
+          if ! gh api --paginate "repos/$GITHUB_REPOSITORY/actions/workflows/pr-check.yml/runs?head_sha=$RUN_SHA&per_page=100" > runs-raw.json; then echo "查不到"; exit 0; fi
+          # 别的回合被取消了的不算「后面又跑过」（同 scripts/latest-check.sh）
+          if ! jq -r --arg b "$RUN_HEAD_BRANCH" --arg r "$RUN_HEAD_REPO_ID" --argjson me "$RUN_ID" '.workflow_runs[] | select(.head_branch == $b and .head_repository.node_id == $r and (.conclusion != "cancelled" or .id == $me)) | "\(.id) \(.run_attempt)"' runs-raw.json > runs.txt; then echo "检查记录读不出来"; exit 0; fi
+          if grep -qvE '^[0-9]+ [0-9]+$' runs.txt; then echo "检查记录的格式不对"; exit 0; fi
+          newest=$(sort -n runs.txt | tail -1 | cut -d' ' -f1)
+          mine=$(awk -v id="$RUN_ID" '$1 == id { print $2; exit }' runs.txt)
+          if [ -n "$newest" ] && [ "$newest" -gt "$RUN_ID" ]; then echo "后面又跑过"; echo "fresh=false" >> "$GITHUB_OUTPUT"; exit 0; fi
+          [ -n "$mine" ] || { echo "数不到这一回"; exit 0; }
+          if [ "$mine" -gt "$RUN_ATTEMPT" ]; then echo "这回被重跑过"; echo "fresh=false" >> "$GITHUB_OUTPUT"; else echo "fresh=true" >> "$GITHUB_OUTPUT"; fi
+
+      - name: 看检查产物在不在
+        id: a
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN: ${{ github.event.workflow_run.id }}
+          STARTED: ${{ github.event.workflow_run.run_started_at }}
+        run: |
+          set -euo pipefail
+          # 按名字筛、再分页取全（PR 能让检查多传一堆产物，把 check-results 挤到后面几页）；查询出错就让这步失败（照旧走闸门，由取产物那步报错）
+          # 只认这一回（这次 attempt 开始以后）传的：重跑时上一回的同名产物可能还在
+          gh api --paginate "repos/$GITHUB_REPOSITORY/actions/runs/$RUN/artifacts?name=check-results&per_page=100" \
+            --jq ".artifacts[] | select(.name == \"check-results\" and (.expired | not) and .created_at >= \"$STARTED\") | \"\(.created_at) \(.id)\"" > artifact-ids.txt
+          if [ -s artifact-ids.txt ]; then echo "has=true" >> "$GITHUB_OUTPUT"; echo "id=$(sort artifact-ids.txt | tail -1 | cut -d' ' -f2)" >> "$GITHUB_OUTPUT"; else echo "has=false" >> "$GITHUB_OUTPUT"; fi
+
   gate:
-    if: github.event.workflow_run.event == 'pull_request'
+    needs: probe
+    # 看不了产物在不在（probe 自己出错）也照旧走闸门，由取产物那步报错
+    if: ${{ !cancelled() && github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.path == '.github/workflows/pr-check.yml' && needs.probe.outputs.has != 'false' && needs.probe.outputs.fresh != 'false' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    concurrency:
+      group: pr-gate-${{ github.event.workflow_run.head_sha }}
+      cancel-in-progress: false
+      queue: max
+    # 算完交给 post（按 PR 排队再写）：号（跳过的没有号，post 就不跑）；结果 gate.json 传成这次运行的产物 gate-result
+    # （不走 job 输出：审核卡能有几十 KB，放进环境变量会超过单个变量的上限，post 连 shell 都起不来）
     outputs:
-      number: ${{ steps.pr.outputs.number }}
-      ping: ${{ steps.post.outputs.ping }}
+      number: ${{ steps.result.outputs.number }}
+      submission: ${{ steps.pr.outputs.submission }}
     steps:
       - id: app
         uses: actions/create-github-app-token@v1
@@ -43,55 +106,97 @@ jobs:
 
       - run: npm ci --ignore-scripts --no-audit --no-fund
 
-      - name: 取检查产物
-        uses: actions/download-artifact@v4
-        with:
-          name: check-results
-          path: artifact
-          run-id: ${{ github.event.workflow_run.id }}
-          github-token: ${{ github.token }}
+      - name: 取检查产物（按 probe 认定的那一个 id 取）
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ID: ${{ needs.probe.outputs.id }}
+        run: |
+          set -euo pipefail
+          [ -n "$ID" ] || { echo "probe 没认出这一回的产物"; exit 1; }
+          gh api "repos/$GITHUB_REPOSITORY/actions/artifacts/$ID/zip" > artifact.zip
+          mkdir artifact && unzip -q artifact.zip -d artifact
 
-      - name: 核对是哪个 PR（产物里的号要和 GitHub 上的对得上）
+      - name: 核对是哪个 PR（按来源找往 main 合的那个）
         id: pr
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+          RUN_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          RUN_HEAD_REPO_ID: ${{ github.event.workflow_run.head_repository.node_id }}
+          READ_TOKEN: ${{ github.token }}
           APP_SLUG: ${{ steps.app.outputs.app-slug }}
         run: |
           set -euo pipefail
-          n=$(head -c 12 artifact/pr | tr -cd '0-9')
-          [ -n "$n" ] || { echo "产物里没有 PR 号"; exit 1; }
+          # 这回检查已经不是这个提交最新的一回（后面又跑过，或这回被重跑过；比如维护者重跑了旧的 pr-gate）：什么都不写，以最新的为准
+          # （写结果之前还会再核一遍；查不到就这步失败）
+          rc=0; bash scripts/latest-check.sh "$RUN_SHA" "$RUN_ID" "$RUN_ATTEMPT" "$RUN_HEAD_BRANCH" "$RUN_HEAD_REPO_ID" || rc=$?
+          if [ "$rc" = 3 ]; then echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          [ "$rc" = 0 ] || exit 1
+          # 每一页都得是 PR 数组（null、错误对象、里面不是 PR 都不行）：坏页不能当成「没有 PR」放过数量上限
+          pulls_ok='all(.[]; type == "array" and all(.[]; type == "object" and (.number | type) == "number"))'
+          gh api --paginate "repos/$GITHUB_REPOSITORY/pulls?state=open&per_page=100" > open-raw.json
+          jq -e -s "$pulls_ok" open-raw.json > /dev/null || { echo "开着的 PR 列表不对"; exit 1; }
+          jq -s 'add // []' open-raw.json > open-pulls.json
+          # 是哪个 PR：按这回检查的「来源仓库 + 分支 + 提交」在开着的、往 main 合的 PR 里找（只认唯一的一个；同一个来源往 main 只能开一个）。
+          #   不用产物里写的号（PR 能改检查）；也不认往别的分支合的 PR：同一个来源分支能再开一个往 submission/5 之类合的 PR，
+          #   它的检查跑在同一个提交上——这回检查一律按 main 算，结论写给往 main 合的那个
+          n=$(jq -r --arg sha "$RUN_SHA" --arg repo "$RUN_HEAD_REPO_ID" --arg ref "$RUN_HEAD_BRANCH" '[.[] | select(.head.sha == $sha and .head.repo.node_id == $repo and .head.ref == $ref and .base.ref == "main")] | if length == 1 then .[0].number else empty end' open-pulls.json)
+          [ -n "$n" ] || { echo "开着的、往 main 合的 PR 里没有这回检查的来源（关了、有新提交、或者不是往 main 合的），跳过"; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0; }
           gh api "repos/$GITHUB_REPOSITORY/pulls/$n" > pr.json
-          [ "$(jq -r .head.sha pr.json)" = "$RUN_SHA" ] || { echo "PR 已经有新提交，跳过"; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0; }
-          [ "$(jq -r .state pr.json)" = "open" ] || { echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0; }
+          n=$(jq -r .number pr.json)
+          [[ "$n" =~ ^[1-9][0-9]*$ ]] || { echo "PR 号不对：$n"; exit 1; }
+          # 再核一遍单个 PR 的样子（列表可能是一会儿之前的）。缺字段（读不出来）：这步失败（交给 incomplete），不当成「PR 变了」跳过
+          jq -e '((.state // "") | test("^(open|closed)$")) and ((.head.sha // "") | test("^[0-9a-f]{40}$")) and ((.head.ref // "") | type) == "string" and (.head.ref // "") != "" and ((.head.repo.node_id // "") | type) == "string" and (.head.repo.node_id // "") != "" and ((.base.ref // "") | type) == "string" and (.base.ref // "") != "" and ((.user.login // "") | type) == "string" and (.user.login // "") != "" and (.user.id | type) == "number"' pr.json > /dev/null || { echo "PR 读不出来"; exit 1; }
+          now=$(jq -r '"\(.state) \(.head.sha) \(.head.repo.node_id) \(.head.ref) \(.base.ref)"' pr.json)
+          [ "$now" = "open $RUN_SHA $RUN_HEAD_REPO_ID $RUN_HEAD_BRANCH main" ] || { echo "PR 变了（${now}），跳过"; echo "skip=true" >> "$GITHUB_OUTPUT"; exit 0; }
           login=$(jq -r .user.login pr.json); id=$(jq -r .user.id pr.json); url=$(jq -r .html_url pr.json)
+          # 维护者挂起着（held: maintainer）：卡上照实写、给 /approve 命令、不 @
+          mheld=$(jq -r '[.labels[]?.name] | any(. == "held: maintainer")' pr.json)
+          # 被关过、又重开的（维护者 /reject 或者手动关过、作者自己关过，又重开了；机器人代开的看投稿的 issue 关没关过）：
+          #   卡上照实写、提醒维护者看过再 /approve（拒稿的标签可能没打上，不能只看标签）。查不到就这步失败
+          rc=0; bash scripts/was-closed.sh pr.json || rc=$?
+          case "$rc" in 0) reop=true ;; 3) reop=false ;; *) echo "查不到 PR 有没有被关过"; exit 1 ;; esac
           # 机器人代开的 issue 投稿：投稿人和 issue 链接写在 PR 说明里（只有机器人和维护者能改）
           if [ "$login" = "${APP_SLUG}[bot]" ]; then
-            line=$(jq -r '.body // ""' pr.json | grep -E '^Submitted-by: [A-Za-z0-9-]{1,39} \([0-9]+\)$' | head -1 || true)
-            sub=$(jq -r '.body // ""' pr.json | grep -E '^Submission: https://github\.com/[A-Za-z0-9._-]+/[A-Za-z0-9._-]+/issues/[0-9]+$' | head -1 | cut -d' ' -f2 || true)
+            # 说明可能是 CRLF 换行（维护者在网页上改过）：先去掉 \r 再认
+            line=$(jq -r '.body // ""' pr.json | tr -d '\r' | grep -E '^Submitted-by: [A-Za-z0-9-]{1,39} \([0-9]+\)$' | head -1 || true)
+            sub=$(jq -r '.body // ""' pr.json | tr -d '\r' | grep -E '^Submission: https://github\.com/[A-Za-z0-9._-]+/[A-Za-z0-9._-]+/issues/[0-9]+$' | head -1 | cut -d' ' -f2 || true)
             [ -n "$line" ] && login=$(echo "$line" | sed -E 's/^Submitted-by: ([A-Za-z0-9-]+) .*/\1/') && id=$(echo "$line" | sed -E 's/.*\(([0-9]+)\)$/\1/')
             [ -n "$sub" ] && url="$sub"
           fi
-          created=$(gh api "users/$login" --jq .created_at)
+          # 账号注册时间按数字 id 查（用户名能改、旧名能被别人占用）；返回的 id 对不上就失败
+          [[ "$id" =~ ^[1-9][0-9]*$ ]] || { echo "投稿人 id 不对：$id"; exit 1; }
+          acct=$(gh api "user/$id" --jq '"\(.id) \(.created_at)"')
+          [ "${acct%% *}" = "$id" ] || { echo "查到的账号对不上（${acct}）"; exit 1; }
+          created=${acct#* }
           lower=$(echo "$login" | tr 'A-Z' 'a-z')
           # 满 7 天的已收录设计有几套
           prior=$(git log --diff-filter=A --before='7 days ago' --name-only --format= -- "templates/${lower}__*" "systems/${lower}__*" "styles/${lower}__*" | cut -d/ -f1-2 | sort -u | grep -c . || true)
           # 这个作者（按数字 ID，改名也算同一人）同时在等的、24 小时内交的（直接开的 PR + 机器人代开的 issue 投稿）
           # 在等的：所有 open PR 分页取全；24 小时内的：按创建时间倒序翻页，翻到早于 24 小时为止
           since=$(date -u -d '24 hours ago' +%Y-%m-%dT%H:%M:%SZ)
-          gh api --paginate "repos/$GITHUB_REPOSITORY/pulls?state=open&per_page=100" | jq -s 'add // []' > open-pulls.json
           echo '[]' > recent-pulls.json
-          # 翻到早于 24 小时为止；翻满 30 页还没到（一天三千多个 PR）就算没数全：partial=1，闸门不自动合并、转人工
+          # 翻到早于 24 小时为止；翻满 30 页还没到（一天三千多个 PR）就算没数全：partial=1，卡上照实写
           partial=1
+          # 每一步单独写（a && b、if [ "$(…)" ] 里出错 -e 管不到：坏页会被当成「翻完了」）
           for page in $(seq 1 30); do
             gh api "repos/$GITHUB_REPOSITORY/pulls?state=all&sort=created&direction=desc&per_page=100&page=$page" > page.json
-            jq -s 'add' recent-pulls.json page.json > r.tmp && mv r.tmp recent-pulls.json
-            if [ "$(jq length page.json)" -lt 100 ]; then partial=0; break; fi
-            if [ "$(jq -r '.[-1].created_at // ""' page.json)" \< "$since" ]; then partial=0; break; fi
+            jq -e -s "$pulls_ok" page.json > /dev/null || { echo "第 $page 页 PR 列表不对"; exit 1; }
+            jq -s 'add' recent-pulls.json page.json > r.tmp
+            mv r.tmp recent-pulls.json
+            len=$(jq length page.json)
+            last=$(jq -r '.[-1].created_at // ""' page.json)
+            if [ "$len" -lt 100 ]; then partial=0; break; fi
+            if [ "$last" \< "$since" ]; then partial=0; break; fi
           done
-          pending=0; today=0
-          eval "$(ID="$id" BOT="${APP_SLUG}[bot]" SINCE="$since" node scripts/gate.mjs --count open-pulls.json recent-pulls.json | grep -E '^(pending|today)=[0-9]+$')"
-          { echo "number=$n"; echo "login=$login"; echo "id=$id"; echo "created=$created"; echo "prior=$prior"; echo "pending=$pending"; echo "today=$today"; echo "partial=$partial"; echo "submission=$url"; } >> "$GITHUB_OUTPUT"
+          # 数不出来（脚本出错）就让这步失败，不能按 0 放过数量上限
+          counts=$(ID="$id" BOT="${APP_SLUG}[bot]" SINCE="$since" node scripts/gate.mjs --count open-pulls.json recent-pulls.json)
+          pending=$(printf '%s\n' "$counts" | sed -nE 's/^pending=([0-9]+)$/\1/p')
+          today=$(printf '%s\n' "$counts" | sed -nE 's/^today=([0-9]+)$/\1/p')
+          [ -n "$pending" ] && [ -n "$today" ] || { echo "数不出在等 / 24 小时内交了几套"; exit 1; }
+          { echo "number=$n"; echo "login=$login"; echo "id=$id"; echo "created=$created"; echo "prior=$prior"; echo "pending=$pending"; echo "today=$today"; echo "partial=$partial"; echo "submission=$url"; echo "mheld=$mheld"; echo "reop=$reop"; } >> "$GITHUB_OUTPUT"
 
       - name: 可信侧重查（不信产物）：按 PR 的真实改动重算结构守卫、归属、规则
         if: steps.pr.outputs.skip != 'true'
@@ -109,6 +214,19 @@ jobs:
           # 只把动到的设计目录当数据铺进工作区（HEAD 还是 main，归属按 main 上原来的数字 ID 认）
           # 按 git 树逐个取普通文件，不用 git archive（.gitattributes 的 export-ignore 能把文件藏起来）；软链接、子模块不取，check 会报「没取到」
           dirs=$(node scripts/changed.mjs trusted-changed.txt)
+          # 合进 main 以后是什么样（main 现在的样子 + 这个 PR，git merge-tree 算）：PR 动到的设计目录得和 PR 里的一模一样——
+          #   不然查的、渲染的（都按 PR 里的取）不是会合进去的样子（比如 main 在 PR 分出去之后删了这一套里的文件、PR 里还有，
+          #   或者两个 PR 往同一套各加 35 个文件）。不一样的报 behind、合不到一起的报 conflict（check.mjs 读环境变量）
+          CONFLICT=0; BEHIND=
+          if mt=$(git merge-tree --write-tree --no-messages HEAD "$RUN_SHA" 2>/dev/null); then
+            tree=$(printf '%s\n' "$mt" | head -1)
+            for d in $dirs; do
+              [ "$(git rev-parse -q --verify "$tree:$d" || echo none)" = "$(git rev-parse -q --verify "$RUN_SHA:$d" || echo none)" ] || BEHIND="$BEHIND $d"
+            done
+          else
+            CONFLICT=1
+          fi
+          export CONFLICT BEHIND
           for d in $dirs; do rm -rf "$d"; done
           if [ -n "$dirs" ]; then node scripts/extract.mjs . "$RUN_SHA" . $dirs; fi
           NO_RENDER=1 OUT=trusted node scripts/check.mjs --changed trusted-changed.txt || true
@@ -135,6 +253,8 @@ jobs:
             rm -rf "./$N/$RUN"; mkdir -p "./$N"
             cp -R "../stage/$N/$RUN" "./$N/"
             git add "$N"
+            # 重跑同一回：截图和分支上的一模一样，不用再提交
+            if git diff --cached --quiet; then ok=1; break; fi
             git -c user.name=dsh-design-gallery-bot -c user.email=bot@users.noreply.github.com commit -q -m "shots for #$N"
             if git push -q "$remote" HEAD:review-shots; then ok=1; break; fi
             echo "review-shots 推送撞车，第 $i 次，稍后重试"
@@ -155,57 +275,142 @@ jobs:
           COUNT_PARTIAL: ${{ steps.pr.outputs.partial }}
           SHOTS_BASE: ${{ steps.shots.outputs.base }}
           MAINTAINER: ${{ github.repository_owner }}
+          MAINT_HELD: ${{ steps.pr.outputs.mheld }}
+          REOPENED: ${{ steps.pr.outputs.reop }}
+          # 卡上给维护者的 /approve 命令带上这一版的提交号
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
         run: node scripts/gate.mjs artifact/results.json --trusted trusted/results.json --out gate.json
 
-      - name: 写检查、贴卡、打标签、（A 车道）合并
+      - name: 交给写结果的 job（按 PR 排队再写）
         if: steps.pr.outputs.skip != 'true'
-        id: post
+        id: result
         env:
-          GH_TOKEN: ${{ steps.app.outputs.token }}
           N: ${{ steps.pr.outputs.number }}
-          SHA: ${{ github.event.workflow_run.head_sha }}
-          SUBMISSION: ${{ steps.pr.outputs.submission }}
-          APP_SLUG: ${{ steps.app.outputs.app-slug }}
         run: |
           set -euo pipefail
-          conclusion=$(jq -r .conclusion gate.json)
-          gh api "repos/$GITHUB_REPOSITORY/check-runs" -f name='Submission gate' -f head_sha="$SHA" -f status=completed -f conclusion="$conclusion" \
-            -f "output[title]=$(jq -r '.lane' gate.json) lane" -f "output[summary]=$(jq -r .comment gate.json | head -c 60000)" >/dev/null
-          jq -r .comment gate.json > card.md
-          # 同一张卡反复更新，不刷屏
-          cid=$(gh api "repos/$GITHUB_REPOSITORY/issues/$N/comments" --paginate --jq ".[] | select(.user.login == \"${APP_SLUG}[bot]\" and (.body | startswith(\"<!-- dsh-gallery-gate -->\"))) | .id" | tail -1)
-          if [ -n "$cid" ]; then gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$cid" -F body=@card.md >/dev/null; else gh pr comment "$N" --body-file card.md >/dev/null; fi
-          { echo 'ping<<EOF_DSH_PING'; jq -r '.ping // ""' gate.json; echo 'EOF_DSH_PING'; } >> "$GITHUB_OUTPUT"
-          # 标签：先去掉闸门自己上次打的（checks / lane / flag / held: author|limit / blocked），再加新的；维护者的 held: maintainer 不动
-          gh api "repos/$GITHUB_REPOSITORY/issues/$N/labels" --jq '.[].name' > labels.txt
-          for l in $(jq -Rr 'select(test("^(checks|lane|flag|blocked): |^held: (author|limit)$")) | @uri' labels.txt); do gh api -X DELETE "repos/$GITHUB_REPOSITORY/issues/$N/labels/$l" >/dev/null || true; done
-          jq -c '{labels: .labels}' gate.json | gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$N/labels" --input - >/dev/null
-          # 维护者 /hold 过的不自动合并（作者再推送也一样）
-          if [ "$(jq -r .automerge gate.json)" = "true" ] && ! grep -qx 'held: maintainer' labels.txt; then
-            gh pr merge "$N" --squash --body "Submission: $SUBMISSION" --match-head-commit "$SHA"
-          fi
+          jq -e 'type == "object"' gate.json > /dev/null
+          # 记下算的时候用的违规记录、手动信任是哪一版（main 上的 blob）：post 写之前、合并之前再比，变了（比如 /untrust）就重算
+          pv="$(git rev-parse -q --verify 'HEAD:policy/strikes.json' || echo none) $(git rev-parse -q --verify 'HEAD:policy/trust-overrides.json' || echo none)"
+          # 还有算的时候 main 是哪一版（base）：合并之前看 main 上的设计、检查规则（别的投稿先合进去了、规则改了）动没动，动了就重算
+          base=$(git rev-parse HEAD)
+          mkdir -p gate-result
+          jq --arg p "$pv" --arg b "$base" '.policy = $p | .base = $b' gate.json > gate-result/gate.json
+          echo "number=$N" >> "$GITHUB_OUTPUT"
 
-  # 别人的投稿等人看：单独 @ 维护者一次（审核卡是反复改的那条，改出来的 @ 不会提醒；被 @ 过就订阅了这个 PR，之后的动静 GitHub 自己会提醒）
-  # 同一个 PR 的几次闸门（不同提交）可能同时跑：提醒这一步按 PR 排队，轮到了再查一遍「提醒过没有、现在还该不该提醒」
-  ping:
+      - uses: actions/upload-artifact@v4
+        if: steps.pr.outputs.skip != 'true'
+        with:
+          name: gate-result
+          path: gate-result/gate.json
+          # 和 Actions 能重跑的期限（30 天）一样：隔几天单独重跑失败的 post 时还取得到
+          retention-days: 30
+          overwrite: true
+          if-no-files-found: error
+
+  # 写到 PR 上的（检查、审核卡、标签）：同一个 PR 的排队，轮到了再核一遍，再写
+  post:
     needs: gate
-    if: needs.gate.outputs.ping != ''
+    # probe 出过错、gate 照样跑完的也要写（不写状态函数的话，祖先失败了这一步会被跳过）
+    if: ${{ !cancelled() && needs.gate.result == 'success' && needs.gate.outputs.number != '' }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 5
+    timeout-minutes: 10
     concurrency:
-      group: pr-gate-ping-${{ needs.gate.outputs.number }}
+      group: dsh-pr-${{ needs.gate.outputs.number }}
       cancel-in-progress: false
+      queue: max
     steps:
       - id: app
         uses: actions/create-github-app-token@v1
         with:
           app-id: ${{ vars.GALLERY_APP_ID }}
           private-key: ${{ secrets.GALLERY_APP_PRIVATE_KEY }}
-      - name: '@ 维护者（每个 PR 一次；检查没过、挂起了、维护者 /hold 过的不提醒）'
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      # gate 这次算出来的结果（同一次运行里传的产物，PR 碰不到）
+      - uses: actions/download-artifact@v4
+        with:
+          name: gate-result
+          path: gate-result
+      - name: 写检查、贴卡、打标签
+        id: post
         env:
           GH_TOKEN: ${{ steps.app.outputs.token }}
           N: ${{ needs.gate.outputs.number }}
-          PING: ${{ needs.gate.outputs.ping }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+          SUBMISSION: ${{ needs.gate.outputs.submission }}
+          APP_SLUG: ${{ steps.app.outputs.app-slug }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+          RUN_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          RUN_HEAD_REPO_ID: ${{ github.event.workflow_run.head_repository.node_id }}
+          READ_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          [[ "$N" =~ ^[1-9][0-9]*$ ]] || { echo "PR 号不对：$N"; exit 1; }
+          jq -e 'type == "object"' gate-result/gate.json > /dev/null || { echo "闸门结果读不出来"; exit 1; }
+          cp gate-result/gate.json gate.json
+          # 排队的时候检查又重跑了（同一个提交）：这回的结论作废，什么都不写，等新的那回
+          latest() { local rc=0; bash scripts/latest-check.sh "$SHA" "$RUN_ID" "$RUN_ATTEMPT" "$RUN_HEAD_BRANCH" "$RUN_HEAD_REPO_ID" || rc=$?; [ "$rc" = 0 ] && return 0; [ "$rc" = 3 ] && { echo "检查又重跑了，这回作废"; exit 0; }; exit 1; }
+          # 违规记录、手动信任：算的时候用的（gate.json 的 policy）和 main 上现在的不一样（维护者 /untrust、/trust，记了违规……）：
+          #   这回的结论作废，让检查重跑、按现在的重算；查不到就这步失败
+          source scripts/policy-lib.sh
+          same_policy() {
+            local pol
+            policy_now || exit 1
+            [ "$pol" = "$(jq -r '.policy // ""' gate.json)" ] && return 0
+            echo "算的时候用的违规记录 / 手动信任已经变了，这回作废，让检查重跑"
+            # 草稿（作者自己的）重跑不了（recheck 不替作者改）：这步失败，交给 incomplete 写「没跑完」、请作者标成可以审了
+            [ "$draft" = false ] || { echo "是草稿，重跑不了，交给 incomplete"; exit 1; }
+            # 等的时候变成了草稿（重跑不了）：recheck 返回 4，这步跟着失败，同样交给 incomplete
+            DRAFT_RC=4 bash scripts/recheck.sh "$N" "$SHA"
+            exit 0
+          }
+          latest
+          # 排队的时候作者推了新提交、PR 被关了：这回说的是旧提交，不写（新提交那回会写；不能盖掉它的卡和标签）
+          now=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$N" --jq '"\(.state) \(.head.sha) \(.draft) \([.labels[]?.name] | any(. == "held: maintainer"))"')
+          read -r st hs draft mheld_now <<< "$now"
+          # 先核读出来的样子（缺字段不能当成「关了 / 有新提交」悄悄不写：这步失败，交给 incomplete）
+          [[ "$st" =~ ^(open|closed)$ && "$hs" =~ ^[0-9a-f]{40}$ && "$draft" =~ ^(true|false)$ && "$mheld_now" =~ ^(true|false)$ ]] || { echo "PR 读不出来（${now}）"; exit 1; }
+          [ "$st $hs" = "open $SHA" ] || { echo "PR 关了或有新提交（${now}），这回不写"; exit 0; }
+          same_policy
+          # 算的时候和现在维护者挂没挂起不一样（排队时发了 /hold、摘了 held: maintainer）：卡上的话、结论都换成闸门
+          #   按现在的样子算好的那一份（alt）写。没有 alt（读不出来）就这步失败（交给 incomplete 重跑）。没过的不看这个（两份一样）
+          if [ "$(jq -r .conclusion gate.json)" != failure ] && [ "$mheld_now" != "$(jq -r '.maintHeld // false' gate.json)" ]; then
+            echo "维护者挂起的状态变了，换成按现在算的那一份"
+            jq -e '.alt | type == "object" and (.comment | type) == "string" and (.labels | type) == "array"' gate.json > /dev/null || { echo "没有另一份结果"; exit 1; }
+            jq '. + .alt | del(.alt)' gate.json > gate-alt.json && mv gate-alt.json gate.json
+          fi
+          conclusion=$(jq -r .conclusion gate.json)
+          ps=$(policy_short "$(jq -r '.policy // ""' gate.json)") || { echo "规矩版本读不出来"; exit 1; }
+          base=$(jq -r '.base // ""' gate.json)
+          [[ "$base" =~ ^[0-9a-f]{40}$ ]] || { echo "算的时候 main 是哪一版读不出来"; exit 1; }
+          # external_id 记下是哪一回 pr-check、按哪一版规矩、哪一版 main 算出来的（<run id>/<attempt>/<违规记录>/<信任名单>/<main 前 12 位>）：
+          #   /approve 只认和最新那回对得上的（不能只比时间——旧回合可能写得更晚），规矩变了、main 上的设计或检查规则动了也不认
+          gh api "repos/$GITHUB_REPOSITORY/check-runs" -f name='Submission gate' -f head_sha="$SHA" -f status=completed -f conclusion="$conclusion" -f external_id="$RUN_ID/$RUN_ATTEMPT/$ps/${base:0:12}" \
+            -f "output[title]=$(jq -r '.lane' gate.json) lane" -f "output[summary]=$(jq -r .comment gate.json | head -c 60000)" >/dev/null
+          jq -r .comment gate.json > card.md
+          # 同一张卡反复更新，不刷屏
+          cid=$(gh api "repos/$GITHUB_REPOSITORY/issues/$N/comments" --paginate --jq ".[] | select(.user.login == \"${APP_SLUG}[bot]\" and (.body | startswith(\"<!-- dsh-gallery-gate -->\"))) | .id" | tail -1)
+          if [ -n "$cid" ]; then gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$cid" -F body=@card.md >/dev/null; else gh pr comment "$N" --body-file card.md >/dev/null; fi
+          { echo 'ping<<EOF_DSH_PING'; jq -r '.ping // ""' gate.json; echo 'EOF_DSH_PING'; } >> "$GITHUB_OUTPUT"
+          # 标签：先去掉闸门自己上次打的（checks / lane / flag / held: author|limit / blocked / count），再加新的；维护者的 held: maintainer 不动
+          gh api --paginate "repos/$GITHUB_REPOSITORY/issues/$N/labels?per_page=100" --jq '.[].name' > labels.txt
+          # 要去掉的先单独取出来（写在 for 里，jq 出错 -e 管不到）；删不掉（除了已经没了的 404）就这步失败，不能留着旧的挂起标签说成功
+          old=$(jq -Rr 'select(test("^(checks|lane|flag|blocked|count): |^held: (author|limit)$")) | @uri' labels.txt)
+          for l in $old; do
+            gh api -X DELETE "repos/$GITHUB_REPOSITORY/issues/$N/labels/$l" > /dev/null 2> del-err.txt || grep -q 'HTTP 404' del-err.txt || { echo "删不掉旧标签 $l"; cat del-err.txt; exit 1; }
+          done
+          jq -c '{labels: .labels}' gate.json | gh api -X POST "repos/$GITHUB_REPOSITORY/issues/$N/labels" --input - >/dev/null
+
+      # 别人的投稿等人看：单独 @ 维护者一次（审核卡是反复改的那条，改出来的 @ 不会提醒；被 @ 过就订阅了这个 PR，之后的动静 GitHub 自己会提醒）
+      # 在 PR 的队里：同一个 PR 的几次闸门（不同提交）不会同时走到这里
+      - name: '@ 维护者（每个 PR 一次；检查没过、挂起了、维护者 /hold 过的不提醒）'
+        if: steps.post.outputs.ping != ''
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          N: ${{ needs.gate.outputs.number }}
+          PING: ${{ steps.post.outputs.ping }}
           SHA: ${{ github.event.workflow_run.head_sha }}
           APP_SLUG: ${{ steps.app.outputs.app-slug }}
         run: |
@@ -214,10 +419,210 @@ jobs:
           [ "$(jq -r .state pr.json)" = open ] || { echo "PR 不开着了"; exit 0; }
           # 排队的时候作者又推了新提交：这次的结果（和标签）说的是旧提交，等新提交那次闸门再定
           [ "$(jq -r .head.sha pr.json)" = "$SHA" ] || { echo "PR 已经有新提交，这次不提醒"; exit 0; }
-          gh api "repos/$GITHUB_REPOSITORY/issues/$N/labels" --jq '.[].name' > labels.txt
+          gh api --paginate "repos/$GITHUB_REPOSITORY/issues/$N/labels?per_page=100" --jq '.[].name' > labels.txt
           grep -qx 'checks: pass' labels.txt || { echo "现在检查没过"; exit 0; }
           if grep -q '^held: ' labels.txt; then echo "挂起中，不提醒"; exit 0; fi
           pinged=$(gh api "repos/$GITHUB_REPOSITORY/issues/$N/comments" --paginate --jq ".[] | select(.user.login == \"${APP_SLUG}[bot]\" and (.body | startswith(\"<!-- dsh-gallery-ping -->\"))) | .id" | tail -1)
           [ -z "$pinged" ] || { echo "提醒过了"; exit 0; }
           printf '%s\n' "$PING" > ping.md
           gh pr comment "$N" --repo "$GITHUB_REPOSITORY" --body-file ping.md >/dev/null
+
+  # 检查没跑完（没有产物）：贴卡说清楚不是投稿的问题，过几分钟让检查重跑（scripts/recheck.sh：转草稿再标回）
+  # 同一个提交跑满 3 回（不管结论，算上手动重跑）还没产物就不再自动重跑，单独 @ 维护者一次
+  # 分三段：找是哪个 PR（不写）→ 贴卡（排 PR 的队）→ 等几分钟再重跑（不排队，免得维护者命令干等）
+  #   闸门自己出错了（取不到产物、可信重查崩了、GitHub 接口出错……）也走这里：不然这回检查既没有结论、也没人重跑
+  #   （同一个提交最多自动重跑 3 回，然后 @ 维护者）。查产物那步出错（has 留空）照旧走闸门，闸门成了就不走这里。
+  #   写结果的 post 出错了（写检查之前、之后都算）也走这里：宁可盖成「没跑完」重跑一回，不能留下没有结论、没人管的检查
+  incomplete:
+    needs: [probe, gate, post]
+    if: ${{ !cancelled() && (needs.probe.result == 'success' || needs.probe.result == 'failure') && needs.probe.outputs.fresh != 'false' && (needs.probe.outputs.has == 'false' || needs.gate.result == 'failure' || needs.post.result == 'failure') }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      number: ${{ steps.find.outputs.number }}
+    steps:
+      - id: app
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.GALLERY_APP_ID }}
+          private-key: ${{ secrets.GALLERY_APP_PRIVATE_KEY }}
+      - name: 检查没跑完：找是哪个 PR
+        id: find
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+          RUN_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          RUN_PRS: ${{ toJSON(github.event.workflow_run.pull_requests) }}
+          RUN_HEAD_REPO_ID: ${{ github.event.workflow_run.head_repository.node_id }}
+          RUN_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          set -euo pipefail
+          R="$GITHUB_REPOSITORY"
+          # 被新提交顶掉、手动取消的不管；整个跳过的（只有 PR 自己改了 pr-check.yml 才会这样）也不管、不重跑：没有闸门检查，合不了
+          case "$RUN_CONCLUSION" in
+            cancelled) echo "检查被取消了（多半是有新提交），不管"; exit 0 ;;
+            skipped) echo "检查整个跳过了（PR 改了检查工作流），不管、不重跑"; exit 0 ;;
+          esac
+          # 同仓库的分支 GitHub 直接给号（只认唯一的一个）；fork 来的给不了，按「来源仓库 + 分支 + 提交」在开着的 PR 里找，也只认唯一的
+          # 往别的分支合的不算（闸门只按 main 算）
+          n=$(printf '%s' "$RUN_PRS" | jq -r '[.[]? | select(.base.ref == "main") | .number] | if length == 1 then .[0] else empty end' 2>/dev/null || true)
+          if [ -z "$n" ]; then
+            # 读不出来隔一会儿再试（5、10、20、40 秒；这一步失败，后面贴卡、重跑都不会跑：PR 没有闸门结论、合并不了，
+            #   作者推新提交或在 Actions 里重跑就好）
+            for i in 1 2 3 4 5; do
+              if gh api --paginate "repos/$R/pulls?state=open&per_page=100" > open-raw.json 2>/dev/null; then break; fi
+              [ "$i" != 5 ] || { echo "::error::查不到开着的 PR"; exit 1; }
+              sleep $(( 5 * (1 << (i - 1)) ))
+            done
+            jq -e -s 'all(.[]; type == "array" and all(.[]; type == "object" and (.number | type) == "number"))' open-raw.json > /dev/null || { echo "开着的 PR 列表不对"; exit 1; }
+            jq -s 'add // []' open-raw.json > open-pulls.json
+            n=$(jq -r --arg sha "$RUN_SHA" --arg repo "$RUN_HEAD_REPO_ID" --arg ref "$RUN_HEAD_BRANCH" '[.[] | select(.head.sha == $sha and .head.repo.node_id == $repo and .head.ref == $ref and .base.ref == "main") | .number] | if length == 1 then .[0] else empty end' open-pulls.json)
+          fi
+          [ -n "$n" ] || { echo "认不准这次检查对应哪个开着的 PR，不动"; exit 0; }
+          [[ "$n" =~ ^[1-9][0-9]*$ ]] || { echo "PR 号不对：$n"; exit 1; }
+          echo "number=$n" >> "$GITHUB_OUTPUT"
+
+  # 祖先（gate、post）跳过了、失败了：不写状态函数的话这里会被跟着跳过，所以显式写 !cancelled() 和直接依赖成功
+  incomplete_post:
+    needs: incomplete
+    if: ${{ !cancelled() && needs.incomplete.result == 'success' && needs.incomplete.outputs.number != '' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    concurrency:
+      group: dsh-pr-${{ needs.incomplete.outputs.number }}
+      cancel-in-progress: false
+      queue: max
+    outputs:
+      wait: ${{ steps.card.outputs.wait }}
+      attempts: ${{ steps.card.outputs.attempts }}
+    steps:
+      - id: app
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.GALLERY_APP_ID }}
+          private-key: ${{ secrets.GALLERY_APP_PRIVATE_KEY }}
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: 检查没跑完：贴卡、说多久以后重跑
+        id: card
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          READ_TOKEN: ${{ github.token }}
+          N: ${{ needs.incomplete.outputs.number }}
+          RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+          RUN_HEAD_REPO_ID: ${{ github.event.workflow_run.head_repository.node_id }}
+          RUN_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          APP_SLUG: ${{ steps.app.outputs.app-slug }}
+          WAIT: '300'
+          MAX: '3'
+        run: |
+          set -euo pipefail
+          R="$GITHUB_REPOSITORY"; n="$N"
+          source scripts/incomplete-lib.sh
+          # 轮到了再看一眼：还开着、还是这个提交（排队的时候作者推了新提交就不写：不能盖掉新提交的卡和标签）。
+          #   读不出来多试两回；还是不行：请维护者看一下，这步失败（还没贴卡、没安排重跑：不能悄悄断掉）
+          got=
+          for i in 1 2 3; do
+            if gh api "repos/$R/pulls/$n" > pr.json 2>/dev/null && jq -e '(.state | type) == "string" and (.head.sha | type) == "string"' pr.json > /dev/null 2>&1; then got=1; break; fi
+            [ "$i" = 3 ] || sleep 5
+          done
+          if [ -z "$got" ]; then
+            ping_maint '这个投稿的检查没跑完，机器人又一直查不到这个 PR（GitHub 报错），没能贴卡、也没能安排重跑，麻烦看一下、需要的话在 Actions 里手动重跑。 / Checks for this submission did not finish and the bot kept failing to read the PR, so it could not post the card or schedule a re-run; please take a look and re-run them from Actions if needed.' || echo "::warning::没能 @ 维护者"
+            exit 1
+          fi
+          [ "$(jq -r .state pr.json)" = open ] || { echo "#$n 不开着了，不动"; exit 0; }
+          [ "$(jq -r .head.sha pr.json)" = "$RUN_SHA" ] && [ "$(jq -r '.head.repo.node_id // ""' pr.json)" = "$RUN_HEAD_REPO_ID" ] && [ "$(jq -r .head.ref pr.json)" = "$RUN_HEAD_BRANCH" ] || { echo "#$n 已经有新提交（或对不上），不动"; exit 0; }
+          attempts=0; busy=0; stale=0
+          # 数不准（查询出错、连触发这回的都没数到）：判断不了这回是不是最新的，不写检查、卡片、标签（免得盖掉新一回的结果），
+          # 只请维护者看一下，这步算失败
+          if ! count; then
+            echo "数不准跑过几回，判断不了这回是不是最新的：什么都不写"
+            ping_maint '这个投稿的检查没跑完，机器人也查不到它跑过几回（Actions 接口出错），麻烦看一下、需要的话在 Actions 里手动重跑。 / Checks for this submission did not finish and the bot could not read the run history; please take a look and re-run them from Actions if needed.'
+            exit 1
+          fi
+          tries=$attempts
+          if [ "$stale" = 1 ]; then echo "这回检查已经不是这个提交最新的一回了，不动（以最新的为准）"; exit 0; fi
+          [ "$tries" -ge 1 ] || tries=1
+          draft=$(jq -r .draft pr.json)
+          wait=$(( WAIT * tries )); mins=$(( (wait + 59) / 60 ))
+          if [ "$draft" = true ]; then
+            zh="把 PR 标成「可以审了」（Ready for review）或者推一个新提交，检查就会重跑。"
+            en="Mark the PR as ready for review or push a new commit to re-run the checks."
+          elif [ "$tries" -lt "$MAX" ]; then
+            zh="机器人大约 ${mins} 分钟后自动重跑（会把这个 PR 转成草稿再标回来，这是正常的，不用管）。"
+            en="It will re-run automatically in about ${mins} minutes (the bot briefly turns this PR into a draft and back to do that; nothing to worry about)."
+          else
+            zh="试了几回都没跑完，不再自动重跑，维护者会来看。"
+            en="It failed to finish several times, so it will not retry on its own; a maintainer will take a look."
+          fi
+          # 先把「要不要自动重跑」写到输出、该 @ 的先 @：后面贴卡、写检查、打标签出错了，重跑和提醒照样有（不能让一次接口出错把自动恢复断掉）
+          if [ "$draft" != true ]; then
+            if [ "$tries" -lt "$MAX" ]; then { echo "wait=$wait"; echo "attempts=$attempts"; } >> "$GITHUB_OUTPUT"
+            else
+              # 同一个 PR 24 小时内只 @ 一次「没跑完」（不按提交算：不然推一个新提交就能再 @ 一回）
+              ping_maint '这个投稿的检查试了几回都没跑完（GitHub 机器的问题），麻烦看一下、在 Actions 里手动重跑。 / Checks for this submission failed to finish several times; please take a look and re-run them from Actions.' || echo "::warning::没能 @ 维护者"
+            fi
+          fi
+          { echo '<!-- dsh-gallery-gate -->'; echo '### ⟳ 检查没跑完 / Checks did not finish'; echo
+            echo "这回是 GitHub 机器那边出了问题（比如网络断了），不是投稿本身的问题，不用改、也不用重新提交。$zh"; echo
+            echo "Something went wrong on GitHub's machines (for example a network outage), not with your submission. No need to change or resubmit anything. $en"; } > card.md
+          gh api "repos/$R/check-runs" -f name='Submission gate' -f head_sha="$RUN_SHA" -f status=completed -f conclusion=failure -f external_id="$RUN_ID/$RUN_ATTEMPT" \
+            -f 'output[title]=checks did not finish' -f "output[summary]=$(head -c 60000 card.md)" >/dev/null
+          cid=$(gh api "repos/$R/issues/$n/comments" --paginate --jq ".[] | select(.user.login == \"${APP_SLUG}[bot]\" and (.body | startswith(\"<!-- dsh-gallery-gate -->\"))) | .id" | tail -1)
+          if [ -n "$cid" ]; then gh api -X PATCH "repos/$R/issues/comments/$cid" -F body=@card.md >/dev/null; else gh pr comment "$n" --repo "$R" --body-file card.md >/dev/null; fi
+          # 标签：去掉闸门自己打的（和闸门同一套），换成 checks: incomplete；维护者的 held: maintainer 不动
+          gh api --paginate "repos/$R/issues/$n/labels?per_page=100" --jq '.[].name' > labels.txt
+          old=$(jq -Rr 'select(test("^(checks|lane|flag|blocked|count): |^held: (author|limit)$")) | @uri' labels.txt)
+          for l in $old; do
+            gh api -X DELETE "repos/$R/issues/$n/labels/$l" > /dev/null 2> del-err.txt || grep -q 'HTTP 404' del-err.txt || { echo "删不掉旧标签 $l"; cat del-err.txt; exit 1; }
+          done
+          gh api -X POST "repos/$R/issues/$n/labels" -f 'labels[]=checks: incomplete' >/dev/null
+
+  incomplete_recheck:
+    needs: [incomplete, incomplete_post]
+    # 上一段贴卡、写检查失败了也照样重跑（要不要重跑在它动手写之前就定了）
+    if: ${{ !cancelled() && needs.incomplete.result == 'success' && needs.incomplete_post.outputs.wait != '' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - id: app
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.GALLERY_APP_ID }}
+          private-key: ${{ secrets.GALLERY_APP_PRIVATE_KEY }}
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: 检查没跑完：等一会儿让检查重跑
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+          READ_TOKEN: ${{ github.token }}
+          N: ${{ needs.incomplete.outputs.number }}
+          RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          RUN_ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+          RUN_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          RUN_HEAD_REPO_ID: ${{ github.event.workflow_run.head_repository.node_id }}
+          APP_SLUG: ${{ steps.app.outputs.app-slug }}
+          WAIT_S: ${{ needs.incomplete_post.outputs.wait }}
+          BEFORE: ${{ needs.incomplete_post.outputs.attempts }}
+        run: |
+          set -euo pipefail
+          R="$GITHUB_REPOSITORY"; n="$N"
+          source scripts/incomplete-lib.sh
+          [[ "$WAIT_S" =~ ^[0-9]+$ && "$BEFORE" =~ ^[0-9]+$ ]] || { echo "上一段给的等多久 / 跑过几回不对"; exit 1; }
+          sleep "$WAIT_S"
+          attempts=0; busy=0; stale=0
+          # 等完再数：数不准就请维护者看一下（卡上说了会自动重跑，不能悄悄断掉），这步算失败
+          if ! count; then
+            echo "等完再数的时候数不准跑过几回，这回不重跑"
+            ping_maint '这个投稿的检查没跑完，机器人等了一会儿想重跑，却查不到它跑过几回（Actions 接口出错），这回没能重跑，麻烦看一下、需要的话在 Actions 里手动重跑。 / Checks for this submission did not finish, and when the bot came back to re-run them it could not read the run history, so it did not re-run them; please take a look and re-run them from Actions if needed.'
+            exit 1
+          fi
+          # 等的时候已经有别的检查（维护者手动重跑、作者推了提交……）就不再添一回：新的那回会被取消，次数也会超
+          if [ "$attempts" != "$BEFORE" ] || [ "$busy" -gt 0 ] || [ "$stale" = 1 ]; then echo "等的时候已经有别的检查了，这回不重跑"; exit 0; fi
+          # exec：任务被取消时信号直接给到 recheck.sh（它会尽量把草稿标回去）
+          exec bash scripts/recheck.sh "$n" "$RUN_SHA"
