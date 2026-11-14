@@ -1,0 +1,25 @@
+:root {
+  /* palette — sampled from the reference carousel */
+  --paper: #ffffff;
+  --ink: #1a2215;          /* header band */
+  --green: #0f2b00;        /* display type + footer band */
+  --orange: #fc5300;       /* template accent */
+  --orange-deep: #b93d00;  /* small-size orange text */
+  --body: #2f352a;
+  --muted: #6f7468;
+  --line: #e6e1d5;
+  --cart-red: #d92b1c;     /* the cart's own red, used sparingly */
+  --night: #0b0805;
+
+  /* type */
+  --font-sans: "Noto Sans SC", "Source Han Sans SC", "HarmonyOS Sans SC",
+    "Microsoft YaHei", system-ui, sans-serif;
+  --font-serif: "Georgia", "Times New Roman", "Songti SC", serif;
+
+  /* geometry */
+  --poster-w: 1080px;
+  --poster-h: 1440px;
+  --header-h: 146px;
+  --footer-h: 126px;
+  --pad-x: 56px;
+}

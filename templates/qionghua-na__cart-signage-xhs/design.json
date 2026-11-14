@@ -1,0 +1,54 @@
+{
+  "format": 1,
+  "type": "template",
+  "title": {
+    "en": "cart-signage-xhs"
+  },
+  "description": {
+    "zh": "小推车设计"
+  },
+  "kind": "poster",
+  "size": "1080x1440",
+  "screens": [
+    {
+      "file": "cover.html",
+      "title": {
+        "zh": "封面"
+      }
+    },
+    {
+      "file": "step1.html",
+      "title": {
+        "en": "Step 1"
+      }
+    },
+    {
+      "file": "step2.html",
+      "title": {
+        "en": "Step 2"
+      }
+    },
+    {
+      "file": "step3.html",
+      "title": {
+        "en": "Step 3"
+      }
+    },
+    {
+      "file": "summary.html",
+      "title": {
+        "zh": "总结"
+      }
+    }
+  ],
+  "license": "CC-BY-4.0",
+  "ai": {
+    "generated": true,
+    "tool": "dsh-design-studio@0.20.0"
+  },
+  "shareHash": "a653eaa72a27849a45830ccf64eae3b5",
+  "author": {
+    "login": "Qionghua-na",
+    "id": 354726454
+  }
+}
