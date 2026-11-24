@@ -73,5 +73,5 @@
 
 ## 上线前要改的
 
-- `package.json` 的 `dsh-design-studio` 钉在确切版本（现在 0.11.0）；设计台发了改动规则 / 截图的新版后，这里改版本号再 `npm install` 更新 lockfile。
+- `package.json` 的 `dsh-design-studio` 钉在确切版本（现在 1.3.0）；设计台发了改动规则 / 截图的新版后，这里改版本号再 `npm install` 更新 lockfile。
 - 要不要留投诉邮箱还没定（要的话写进 POLICY.md 和 takedown 表单）。

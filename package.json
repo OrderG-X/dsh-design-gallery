@@ -10,7 +10,7 @@
     "test": "node --test --test-concurrency=1 test/*.mjs"
   },
   "devDependencies": {
-    "dsh-design-studio": "0.11.0",
+    "dsh-design-studio": "1.3.0",
     "jsqr": "1.4.0"
   },
   "engines": {
